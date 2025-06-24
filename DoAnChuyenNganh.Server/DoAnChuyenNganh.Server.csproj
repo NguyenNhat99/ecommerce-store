@@ -38,9 +38,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Helpers\" />
-    <Folder Include="Repository\Interfaces\" />
     <Folder Include="Repository\Implementations\" />
+    <Folder Include="Repository\Interfaces\" />
   </ItemGroup>
 
 </Project>
