@@ -1,6 +1,14 @@
-﻿namespace DoAnChuyenNganh.Server.Repository
+﻿using Microsoft.Extensions.DependencyInjection;
+using DoAnChuyenNganh.Server.Repository.Interfaces;
+using DoAnChuyenNganh.Server.Repository.Implementations;
+
+namespace DoAnChuyenNganh.Server.Repository
 {
-    public class RepositoryRegistration
+    public static class RepositoryRegistration
     {
+        public static void AddRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<IBrandRepository, BrandRepository>();
+        }
     }
 }

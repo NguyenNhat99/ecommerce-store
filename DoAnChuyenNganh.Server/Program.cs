@@ -1,4 +1,5 @@
 using DoAnChuyenNganh.Server.Data;
+using DoAnChuyenNganh.Server.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,9 @@ builder.Services.AddDbContext<EcommerceStoreContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("EcommerceStore"));
 });
 builder.Services.AddAutoMapper(typeof(Program));
+
+//Add repository
+builder.Services.AddRepositories();
 
 builder.Services.AddAuthentication(options =>
 {
