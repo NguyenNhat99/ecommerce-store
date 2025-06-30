@@ -36,4 +36,9 @@
     </ProjectReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Assets\Articles\" />
+    <Folder Include="wwwroot\Assets\Products\" />
+  </ItemGroup>
+
 </Project>
