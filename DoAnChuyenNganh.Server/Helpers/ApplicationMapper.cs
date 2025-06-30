@@ -8,6 +8,7 @@ namespace DoAnChuyenNganh.Server.Helpers
     {
         public ApplicationMapper() {
             CreateMap<Brand, BrandModel>().ReverseMap();
+            CreateMap<Category, CategoryModel>().ReverseMap();
         }
     }
 }
