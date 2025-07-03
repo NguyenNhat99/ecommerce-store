@@ -17,6 +17,8 @@ namespace DoAnChuyenNganh.Server.Data
         public DbSet<RatingProduct> RatingProducts { get; set; }
         public DbSet<Color> Colors { get; set; }
         public DbSet<ProductColor> ProductColors { get; set; }
+        public DbSet<ProductSize> ProductSizes { get; set; }
+        public DbSet<Size> Sizes { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -35,6 +37,21 @@ namespace DoAnChuyenNganh.Server.Data
                 .WithMany(ps => ps.ProductColors)
                 .HasForeignKey(ps => ps.ColorId)
                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<ProductSize>(entity =>
+            {
+                entity.HasKey(ps => new { ps.ProductId, ps.SizeId });
+                //Khoa ngoại ddeeen size
+                entity.HasOne(ps => ps.Size)
+                    .WithMany(ps => ps.ProductSizes)
+                    .HasForeignKey(ps => ps.SizeId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                // khóa ngoại đến product
+                entity.HasOne(ps => ps.Product)
+                    .WithMany(ps => ps.ProductSizes)
+                    .HasForeignKey(ps => ps.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

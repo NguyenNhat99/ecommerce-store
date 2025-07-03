@@ -3,6 +3,7 @@ using System;
 using DoAnChuyenNganh.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DoAnChuyenNganh.Server.Migrations
 {
     [DbContext(typeof(EcommerceStoreContext))]
-    partial class EcommerceStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250703075804_AddSizeTable")]
+    partial class AddSizeTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -498,7 +501,7 @@ namespace DoAnChuyenNganh.Server.Migrations
             modelBuilder.Entity("DoAnChuyenNganh.Server.Data.ProductImage", b =>
                 {
                     b.HasOne("DoAnChuyenNganh.Server.Data.Product", "Product")
-                        .WithMany("ProductImages")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -611,8 +614,6 @@ namespace DoAnChuyenNganh.Server.Migrations
             modelBuilder.Entity("DoAnChuyenNganh.Server.Data.Product", b =>
                 {
                     b.Navigation("ProductColors");
-
-                    b.Navigation("ProductImages");
 
                     b.Navigation("ProductSizes");
                 });

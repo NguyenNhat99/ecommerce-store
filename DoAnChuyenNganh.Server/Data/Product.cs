@@ -26,6 +26,8 @@ namespace DoAnChuyenNganh.Server.Data
         public string? Avatar { get; set; }
         public virtual Category? Category { get; set; }
         public virtual Brand? Brand { get; set; }
+        public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
+        public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
         public virtual ICollection<ProductColor> ProductColors { get; set; } = new List<ProductColor>();
     }
 }
