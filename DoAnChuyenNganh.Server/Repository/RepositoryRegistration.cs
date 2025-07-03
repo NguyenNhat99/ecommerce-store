@@ -10,6 +10,8 @@ namespace DoAnChuyenNganh.Server.Repository
         {
             services.AddScoped<IBrandRepository, BrandRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IImageRepository, ImageRepository>();
         }
     }
 }
