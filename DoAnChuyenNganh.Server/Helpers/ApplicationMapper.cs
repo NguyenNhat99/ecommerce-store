@@ -10,7 +10,6 @@ namespace DoAnChuyenNganh.Server.Helpers
             CreateMap<Brand, BrandModel>().ReverseMap();
             CreateMap<Category, CategoryModel>().ReverseMap();
 
-
             //Mapper Product -> ProductResponseModel
             CreateMap<Product, ProductResponseModel>()
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.ProductImages))
@@ -33,6 +32,14 @@ namespace DoAnChuyenNganh.Server.Helpers
               .ForMember(dest => dest.SizeId, opt => opt.MapFrom(src => src.SizeId))
               .ForMember(dest => dest.SizeName, opt => opt.MapFrom(src => src.Size.Name))
               .ForMember(dest => dest.Stock, opt => opt.MapFrom(src => src.Stock));
+
+            //Mapper User -> AccountModel
+            CreateMap<User, AccountModel>()
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender));
         }
     }
 }
