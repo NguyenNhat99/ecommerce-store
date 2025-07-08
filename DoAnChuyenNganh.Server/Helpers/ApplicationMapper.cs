@@ -40,6 +40,9 @@ namespace DoAnChuyenNganh.Server.Helpers
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender));
+
+            //Mapper 
+            CreateMap<Color, ColorModel>().ReverseMap();
         }
     }
 }
