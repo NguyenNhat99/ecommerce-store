@@ -14,9 +14,10 @@
     <Folder Include="src\layouts\userlayout\header\" />
     <Folder Include="src\layouts\userlayout\footer\" />
     <Folder Include="src\context\" />
+    <Folder Include="src\page\admin\products\" />
+    <Folder Include="src\page\admin\profile\" />
     <Folder Include="src\utils\" />
     <Folder Include="src\service\" />
-    <Folder Include="src\page\admin\" />
     <Folder Include="src\page\auth\" />
     <Folder Include="src\page\user\" />
   </ItemGroup>

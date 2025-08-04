@@ -9,6 +9,9 @@ export const ROUTERS = {
         NOTAUTH: "khong-quyen-truy-cap",
     },
     ADMIN: {
-        DASHBOARD: "admin/dashboard"
+        DASHBOARD: "admin/dashboard",
+        UPDATEPRODUCT: "admin/san-pham/cap-nhat",
+        LISTPRODUCT: "admin/san-pham",
+        INSERTPRODUCT: "admin/san-pham/them"
     },
 };
