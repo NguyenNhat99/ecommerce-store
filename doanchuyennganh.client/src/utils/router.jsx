@@ -14,6 +14,7 @@ export const ROUTERS = {
         LISTPRODUCT: "admin/san-pham",
         INSERTPRODUCT: "admin/san-pham/them",
         BRANDS: "admin/thuong-hieu",
-        CATEGORIES: "admin/loai-san-pham"
+        CATEGORIES: "admin/loai-san-pham",
+        PROFILE: "admin/thong-tin-ca-nhan"
     },
 };

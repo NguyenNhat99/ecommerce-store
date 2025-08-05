@@ -15,6 +15,7 @@ import {
     Label as LabelIcon,
     Article as ArticleIcon
 } from "@mui/icons-material";
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 
 import { useNavigate } from "react-router-dom";
 import authService from "../../service/authService";
@@ -25,9 +26,11 @@ const drawerWidth = 240;
 const menuItems = [
     { label: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
     { label: "Sản phẩm", icon: <FormatListBulletedIcon />, path: "/admin/san-pham" },
-    { label: "Bài viết", icon: <ArticleIcon />, path: "/admin/bai-viet" },
+    //{ label: "Bài viết", icon: <ArticleIcon />, path: "/admin/bai-viet" },
     { label: "Loại sản phẩm", icon: <CategoryIcon />, path: "/admin/loai-san-pham" },
-    { label: "Thương hiệu", icon: <LabelIcon />, path: "/admin/thuong-hieu" }
+    { label: "Thương hiệu", icon: <LabelIcon />, path: "/admin/thuong-hieu" },
+    { label: "Màu sắc", icon: <ColorLensIcon />, path: "/admin/mau-sac" }
+
 ];
 
 function AdminLayout({ children }) {

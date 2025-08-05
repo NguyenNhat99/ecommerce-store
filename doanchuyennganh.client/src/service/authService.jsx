@@ -82,5 +82,5 @@ export default {
     getCurrentUser,
     updatePassword,
     updateInformation,
-    signUp, // ✅ Thêm dòng này
+    signUp, 
 };
