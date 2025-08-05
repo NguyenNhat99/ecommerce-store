@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using DoAnChuyenNganh.Server.Repository.Interfaces;
 using DoAnChuyenNganh.Server.Repository.Implementations;
+using DoAnChuyenNganh.Server.Helpers;
 
 namespace DoAnChuyenNganh.Server.Repository
 {
@@ -13,7 +14,6 @@ namespace DoAnChuyenNganh.Server.Repository
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IColorRepository, ColorRepository>();
 
         }
     }

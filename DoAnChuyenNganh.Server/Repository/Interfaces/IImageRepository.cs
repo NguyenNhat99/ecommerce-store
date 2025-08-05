@@ -6,7 +6,7 @@ namespace DoAnChuyenNganh.Server.Repository.Interfaces
     {
         public Task<string> GetByIdProductAsync(int idProduct);
         public Task<string> AddAsync(IFormFile file, string folder);
-        //public Task<bool> DeleteAsync(int id);
+        public Task<bool> DeleteAsync(string fileName, string folder);
         //public Task<bool> UpdateAsync(int id, CategoryModel model);
         //public Task<bool> DeleteAsync(int id);
     }

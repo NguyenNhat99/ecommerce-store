@@ -22,43 +22,107 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
         public async Task<ProductResponseModel> AddAsync(ProductRequestModel model)
         {
             var newProduct = _mapper.Map<Product>(model);
-            #region Xử lý hình
+
+            #region Xử lý avatar
             if (model.Avatar != null)
                 newProduct.Avatar = await _imageRepository.AddAsync(model.Avatar, "Products");
+
             _context.Products.Add(newProduct);
-            if (model.Images!.Any() || model.Images != null)
+            await _context.SaveChangesAsync(); // để lấy được Id cho các bảng liên quan
+            #endregion
+
+            #region Xử lý hình ảnh chi tiết
+            if (model.Images != null && model.Images.Any())
             {
-                foreach(var image in model.Images)
+                foreach (var image in model.Images)
                 {
-                    var newImage = new ProductImage()
+                    var newImage = new ProductImage
                     {
-                        ImageUrl = await _imageRepository.AddAsync(model.Avatar, "Products"),
+                        ImageUrl = await _imageRepository.AddAsync(image, "Products"),
                         ProductId = newProduct.Id
                     };
                     _context.ProductImages.Add(newImage);
                 }
             }
+            await _context.SaveChangesAsync();
             #endregion
+
             #region Xử lý Size
             await AddAndUpdateProductSize(newProduct.Id, model.ProductSizes);
             #endregion
+
             #region Xử lý màu
-
+            if (model.ColorCodes != null && model.ColorCodes.Any())
+            {
+                foreach (var colorCode in model.ColorCodes)
+                {
+                    var c = await _context.Colors.Where(c => c.CodeColor.Equals(colorCode)).FirstOrDefaultAsync();
+                    if (c != null)
+                    {
+                        var productColor = new ProductColor
+                        {
+                            ProductId = newProduct.Id,
+                            ColorId = c.Id,
+                        };
+                        _context.ProductColors.Add(productColor);
+                    }
+                    else
+                    {
+                        var color = new Color
+                        {
+                            Name = "",
+                            CodeColor = colorCode + ""
+                        };
+                        _context.Colors.Add(color);
+                        _context.SaveChanges();
+                        var productColor = new ProductColor
+                        {
+                            ProductId = newProduct.Id,
+                            ColorId = color.Id,
+                        };
+                        _context.ProductColors.Add(productColor);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
             #endregion
-            await _context.SaveChangesAsync();  
-            throw new NotImplementedException();
+            await _context.SaveChangesAsync();
 
+            // Load lại product đầy đủ để map ra response
+            var fullProduct = await _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductSizes).ThenInclude(ps => ps.Size)
+                .Include(p => p.ProductColors).ThenInclude(pc => pc.Color)
+                .FirstOrDefaultAsync(p => p.Id == newProduct.Id);
+
+            return _mapper.Map<ProductResponseModel>(fullProduct!);
         }
-        public Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var deleteProduct = await _context.Products.FindAsync(id);
+            if (deleteProduct == null) return false;
+            var productColors = await _context.ProductColors.Where(pc => pc.ProductId.Equals(deleteProduct.Id)).ToListAsync();
+            if (productColors.Any() && productColors!=null) 
+                _context.ProductColors.RemoveRange(productColors);
+            var productImages = await _context.ProductImages.Where(pi => pi.Id.Equals(deleteProduct.Id)).ToListAsync();
+            if(productImages!=null && productImages.Any())
+            {
+                foreach (var image in productImages)
+                {
+                    await _imageRepository.DeleteAsync(image.ImageUrl, "Products");
+                }
+                _context.ProductImages.RemoveRange(productImages);
+            }
+            _context.Products.Remove(deleteProduct);
+            await _context.SaveChangesAsync();
+            return true;
         }
 
-        public Task<List<ProductResponseModel>> GetAllAsync()
+        public async Task<List<ProductResponseModel>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var products = await _context.Products.ToListAsync();
+            return _mapper.Map<List<ProductResponseModel>>(products);
         }
-
         public Task<ProductResponseModel> GetByIdAsync(int id)
         {
             throw new NotImplementedException();

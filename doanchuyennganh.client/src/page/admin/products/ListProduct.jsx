@@ -4,7 +4,6 @@ import {
     TableCell, TableContainer, TableHead, TablePagination, TableRow, Collapse,
     IconButton, Tooltip
 } from '@mui/material';
-
 import {
     Add as AddIcon,
     Delete as DeleteIcon,
@@ -12,22 +11,10 @@ import {
     KeyboardArrowDown,
     KeyboardArrowUp
 } from '@mui/icons-material';
-
 import { useNavigate } from 'react-router-dom';
 import { DialogsProvider, useDialogs } from '@toolpad/core/useDialogs';
+import productService from '../../../service/productService';
 
-const mockProducts = Array.from({ length: 15 }, (_, i) => ({
-    id: i + 1,
-    name: `Giày thể thao #${i + 1}`,
-    price: 990000 + i * 50000,
-    originalPrice: 1490000 + i * 30000,
-    stock: Math.floor(Math.random() * 50 + 1),
-    productSizes: [
-        { sizeId: 1, sizeName: "38", stock: 10 },
-        { sizeId: 2, sizeName: "39", stock: 7 },
-        { sizeId: 3, sizeName: "40", stock: 5 }
-    ]
-}));
 function Row({ row, onDeleted }) {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
@@ -38,11 +25,15 @@ function Row({ row, onDeleted }) {
             okText: "Xóa", cancelText: "Hủy"
         });
         if (confirmed) {
-            onDeleted(row.id);
-            await dialogs.alert("Xóa thành công");
+            try {
+                await productService.deleteOne(row.id);
+                onDeleted(row.id);
+                await dialogs.alert("Xóa thành công");
+            } catch {
+                await dialogs.alert("Xóa thất bại");
+            }
         }
     };
-
     return (
         <>
             <TableRow hover>
@@ -52,8 +43,8 @@ function Row({ row, onDeleted }) {
                     </IconButton>
                 </TableCell>
                 <TableCell>{row.name}</TableCell>
-                <TableCell align="right">{row.price.toLocaleString()}₫</TableCell>
-                <TableCell align="right">{row.originalPrice.toLocaleString()}₫</TableCell>
+                <TableCell align="right">{row.price?.toLocaleString()}₫</TableCell>
+                <TableCell align="right">{row.originalPrice?.toLocaleString()}₫</TableCell>
                 <TableCell align="right">{row.stock}</TableCell>
                 <TableCell align="right">
                     <Tooltip title="Chỉnh sửa">
@@ -79,7 +70,7 @@ function Row({ row, onDeleted }) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {row.productSizes.map((size) => (
+                                    {row.productSizes?.map((size) => (
                                         <TableRow key={size.sizeId}>
                                             <TableCell>{size.sizeName}</TableCell>
                                             <TableCell align="right">{size.stock}</TableCell>
@@ -94,6 +85,7 @@ function Row({ row, onDeleted }) {
         </>
     );
 }
+
 export default function ListProductPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState([]);
@@ -102,7 +94,15 @@ export default function ListProductPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        setProducts(mockProducts); // Load dữ liệu ảo
+        const fetchProducts = async () => {
+            try {
+                const data = await productService.getAll();
+                setProducts(data);
+            } catch (error) {
+                console.error("Lỗi khi tải sản phẩm:", error);
+            }
+        };
+        fetchProducts();
     }, []);
 
     const handleChangePage = (_, newPage) => setPage(newPage);
@@ -113,11 +113,11 @@ export default function ListProductPage() {
 
     const filtered = products.filter((p) =>
         [p.name, p.price, p.originalPrice, p.stock]
-            .some(field => field.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+            .some(field => field?.toString().toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
-        <DialogsProvider sx={{ width: '100%',height:'100%', px: 0 }}>
+        <DialogsProvider>
             <Box sx={{ width: '100%', height: '100%', px: 0 }}>
                 <Breadcrumbs sx={{ mb: 2 }}>
                     <Link underline="hover" color="inherit" href="/admin/dashboard">

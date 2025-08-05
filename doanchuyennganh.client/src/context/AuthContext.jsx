@@ -32,7 +32,6 @@ export const AuthProvider = ({ children }) => {
         loadUser();
 
         return () => {
-            // Cleanup khi component unmount
             isMounted = false; 
         };
     }, []);
@@ -42,10 +41,13 @@ export const AuthProvider = ({ children }) => {
             const token = await authService.login(email, password);
             const userData = await authService.getCurrentUser();
             setUser(userData);
+            return userData; 
         } catch (error) {
             console.error("Lỗi đăng nhập:", error);
+            throw error;
         }
     };
+
     const signOut = () => {
         authService.logout();
         setUser(null);

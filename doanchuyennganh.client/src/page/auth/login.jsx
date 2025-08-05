@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useContext, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -8,17 +8,16 @@ import {
     Avatar,
     InputAdornment,
     IconButton,
-    IconButton as MIconButton,
-    Link,
     Snackbar,
     Alert,
+    Link as MuiLink,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../service/authService';
+import AuthContext from '../../context/AuthContext';
 
 const LoginPage = () => {
     const [form, setForm] = useState({ email: '', password: '' });
@@ -26,6 +25,8 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const navigate = useNavigate();
+
+    const { user, signIn } = useContext(AuthContext);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -41,12 +42,21 @@ const LoginPage = () => {
         }
 
         try {
-            await authService.login(form.email, form.password);
+            await signIn(form);
         } catch (err) {
-            setError(err.message || 'Đăng nhập thất bại!');
+            setError('Đăng nhập thất bại!');
             setOpenSnackbar(true);
         }
     };
+    useEffect(() => {
+        if (user) {
+            if (user.role === 'Admin' || user.role === 'Staff') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate('/');
+            }
+        }
+    }, [user, navigate]);
 
     return (
         <Box
@@ -61,15 +71,10 @@ const LoginPage = () => {
             }}
         >
             <Paper elevation={4} sx={{ p: 4, width: '100%', maxWidth: 400, position: 'relative' }}>
-                {/* Nút quay lại */}
-                <MIconButton
-                    onClick={() => navigate(-1)}
-                    sx={{ position: 'absolute', top: 16, left: 16 }}
-                >
+                <IconButton onClick={() => navigate(-1)} sx={{ position: 'absolute', top: 16, left: 16 }}>
                     <ArrowBackIosNewIcon />
-                </MIconButton>
+                </IconButton>
 
-                {/* Avatar + Tiêu đề */}
                 <Avatar sx={{ bgcolor: 'primary.main', mx: 'auto', mb: 2 }}>
                     <LockOutlinedIcon />
                 </Avatar>
@@ -77,7 +82,6 @@ const LoginPage = () => {
                     Đăng nhập
                 </Typography>
 
-                {/* Form */}
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
                     <TextField
                         label="Email"
@@ -102,10 +106,7 @@ const LoginPage = () => {
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        edge="end"
-                                    >
+                                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                                         {showPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
                                 </InputAdornment>
@@ -113,37 +114,23 @@ const LoginPage = () => {
                         }}
                     />
 
-                    {/* Link: Quên mật khẩu */}
                     <Box sx={{ textAlign: 'right', mt: 1 }}>
-                        <Link
-                            component="button"
-                            variant="body2"
-                            onClick={() => navigate('/quen-mat-khau')}
-                            sx={{ textDecoration: 'none' }}
-                        >
+                        <MuiLink component="button" variant="body2" onClick={() => navigate('/quen-mat-khau')}>
                             Quên mật khẩu?
-                        </Link>
+                        </MuiLink>
                     </Box>
 
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{ mt: 2, py: 1.5 }}
-                    >
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, py: 1.5 }}>
                         Đăng nhập
                     </Button>
                 </Box>
 
-                {/* Link đăng ký */}
                 <Typography variant="body2" align="center" sx={{ mt: 2 }}>
                     Bạn chưa có tài khoản?{' '}
                     <a href="/dang-ky-tai-khoan" style={{ textDecoration: 'none' }}>Đăng ký</a>
                 </Typography>
             </Paper>
 
-            {/* Snackbar */}
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={3000}

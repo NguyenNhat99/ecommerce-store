@@ -22,7 +22,7 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
                 var newFileName = $"{Guid.NewGuid()}{ext}";
 
                 var rootPath = _webHostEnvironment.ContentRootPath;
-                var folderPath = Path.Combine(rootPath, "Assets", folder);
+                var folderPath = Path.Combine(rootPath, "wwwroot/Assets", folder);
 
                 var filePath = Path.Combine(folderPath, newFileName);
 
@@ -33,6 +33,23 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
             }
             return "";
         }
+
+        public async Task<bool> DeleteAsync(string fileName, string folder)
+        {
+            if (string.IsNullOrEmpty(fileName)) return false;
+
+            var rootPath = _webHostEnvironment.ContentRootPath;
+            var folderPath = Path.Combine(rootPath, "wwwroot/Assets", folder);
+            var filePath = Path.Combine(folderPath, fileName);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+                return true;
+            }
+            return false;
+        }
+
         public async Task<string> GetByIdProductAsync(int idProduct)
         {
             var image =await _context.ProductImages.FirstOrDefaultAsync(p => p.Id == idProduct);

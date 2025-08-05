@@ -6,43 +6,48 @@ namespace DoAnChuyenNganh.Server.Helpers
 {
     public class ApplicationMapper : Profile
     {
-        public ApplicationMapper() {
+        public ApplicationMapper()
+        {
             CreateMap<Brand, BrandModel>().ReverseMap();
             CreateMap<Category, CategoryModel>().ReverseMap();
 
-            //Mapper Product -> ProductResponseModel
+            // Mapper Product -> ProductResponseModel
             CreateMap<Product, ProductResponseModel>()
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.ProductImages))
-                .ForMember(dest => dest.ProductSizes, opt => opt.MapFrom(src => src.ProductSizes));
+                .ForMember(dest => dest.ProductSizes, opt => opt.MapFrom(src => src.ProductSizes))
+                .ForMember(dest => dest.ProductColors, opt => opt.MapFrom(src => src.ProductColors));
 
-            // Mapper ProductResquestModel->Product
+            // Mapper ProductRequestModel -> Product
             CreateMap<ProductRequestModel, Product>()
-               .ForMember(dest => dest.ProductSizes, opt => opt.Ignore())
-               .ForMember(dest => dest.Avatar, opt => opt.Ignore())
-               .ForMember(dest => dest.ProductImages, opt => opt.Ignore());
+                .ForMember(dest => dest.ProductSizes, opt => opt.Ignore())
+                .ForMember(dest => dest.ProductImages, opt => opt.Ignore())
+                .ForMember(dest => dest.ProductColors, opt => opt.Ignore())
+                .ForMember(dest => dest.Avatar, opt => opt.Ignore());
 
-            //Mapper ProductImage -> ProductImageModel
+            // ProductImage -> ProductImageModel
             CreateMap<ProductImage, ProductImageModel>();
 
-            //Mapper ProductSizeModel -> ProductSize
+            // ProductSize <=> ProductSizeModel
             CreateMap<ProductSizeModel, ProductSize>();
-
-            //Mapper ProductSize -> ProductSizeModel
             CreateMap<ProductSize, ProductSizeModel>()
-              .ForMember(dest => dest.SizeId, opt => opt.MapFrom(src => src.SizeId))
-              .ForMember(dest => dest.SizeName, opt => opt.MapFrom(src => src.Size.Name))
-              .ForMember(dest => dest.Stock, opt => opt.MapFrom(src => src.Stock));
+                .ForMember(dest => dest.SizeId, opt => opt.MapFrom(src => src.SizeId))
+                .ForMember(dest => dest.SizeName, opt => opt.MapFrom(src => src.Size.Name))
+                .ForMember(dest => dest.Stock, opt => opt.MapFrom(src => src.Stock));
 
-            //Mapper User -> AccountModel
+            // ProductColor -> ProductColorModel
+            CreateMap<ProductColor, ProductColorModel>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Color.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Color.Name))
+                .ForMember(dest => dest.CodeColor, opt => opt.MapFrom(src => src.Color.CodeColor));
+
+            CreateMap<Color, ColorModel>().ReverseMap();
+
             CreateMap<User, AccountModel>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender));
-
-            //Mapper 
-            CreateMap<Color, ColorModel>().ReverseMap();
         }
     }
 }
