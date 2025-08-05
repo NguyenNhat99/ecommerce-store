@@ -10,7 +10,12 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddCors(options =>
+    options.AddPolicy("AllowAllOrigins", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    })
+);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -43,12 +48,7 @@ builder.Services.AddSwaggerGen(option =>
 
 });
 
-builder.Services.AddCors(options =>
-    options.AddPolicy("AllowAllOrigins",policy =>
-    {
-        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    })
-);
+
 builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<EcommerceStoreContext>().AddDefaultTokenProviders();
 builder.Services.AddDbContext<EcommerceStoreContext>(options =>
 {
@@ -92,6 +92,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAllOrigins");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

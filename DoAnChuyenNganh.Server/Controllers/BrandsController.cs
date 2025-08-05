@@ -96,7 +96,7 @@ namespace DoAnChuyenNganh.Server.Controllers
         /// http 204 NoContent: Xóa thành công
         /// http 500: Xảy ra lỗi ở server hoặc bất kỳ
         /// </returns>
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
             try

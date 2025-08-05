@@ -6,26 +6,39 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 const userlayout = lazy(() => import("./layouts/userlayout"));
 const adminlayout = lazy(() => import("./layouts/adminlayout"));
 
+//page auth
+const Login = lazy(() => import("./page/auth/login"));
+const Register = lazy(() => import("./page/auth/Register"));
+const ForgotPassword = lazy(() => import("./page/auth/ForgotPassword"));
+
 //page user
 const Homepage = lazy(() => import("./page/user/homepage"));
-const LoginPage = lazy(() => import("./page/auth/login"));
 
 //page admin
 const Dashboard = lazy(() => import("./page/admin/dashboard"));
 const InsertProduct = lazy(() => import("./page/admin/products/InsertProduct"));
 const UpdateProduct = lazy(() => import("./page/admin/products/UpdateProduct"));
 const ListProduct = lazy(() => import("./page/admin/products/ListProduct"));
+const Brands = lazy(() => import("./page/admin/brands/Index"));
 
 
 const ROUTES_CONFIG = [
     {
+        path: ROUTERS.AUTH.LOGIN,
+        component: <Login />,
+    },
+    {
+        path: ROUTERS.AUTH.REGISTER,
+        component: <Register />,
+    },
+    {
+        path: ROUTERS.AUTH.FORGOTPASSWORD,
+        component: <ForgotPassword />,
+    },
+    {
         path: ROUTERS.USER.HOME,
         component: <Homepage />,
         layout: userlayout,
-    },
-    {
-        path: ROUTERS.AUTH.LOGIN,
-        component: <LoginPage />,
     },
     {
         path: ROUTERS.ADMIN.DASHBOARD,
@@ -48,6 +61,12 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.ADMIN.LISTPRODUCT,
         component: <ListProduct />,
+        layout: adminlayout
+    }
+    ,
+    {
+        path: ROUTERS.ADMIN.BRANDS,
+        component: <Brands />,
         layout: adminlayout
     }
 ];

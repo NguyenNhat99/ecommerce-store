@@ -19,7 +19,8 @@ const brandService = {
     },
     updateOne: async (id, data) => {
         try {
-            await api.put(`/brands/${id}`, data);
+            const payload = { ...data, id };
+            await api.put(`/brands/${id}`, payload);
             Promise.resolve("Cập nhật thành công");
         } catch {
             Promise.reject("Cập nhật thất bại");

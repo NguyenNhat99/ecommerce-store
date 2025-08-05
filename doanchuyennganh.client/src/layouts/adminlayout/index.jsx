@@ -56,7 +56,7 @@ function AdminLayout({ children }) {
             <Box sx={{ p: 2, textAlign: "center" }}>
                 <img src="/logo.svg" alt="Logo" width={40} />
                 <Typography variant="h6" fontWeight="bold" mt={1}>
-                    Admin
+                    Trang quản trị
                 </Typography>
             </Box>
             <Divider />
@@ -84,7 +84,7 @@ function AdminLayout({ children }) {
     );
 
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ width:'100vw',display: "flex" }}>
             <CssBaseline />
             <AppBar
                 position="fixed"
@@ -105,9 +105,9 @@ function AdminLayout({ children }) {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        Trang quản trị
-                    </Typography>
+                    {/*<Typography variant="h6" noWrap component="div">*/}
+                    {/*    Trang quản trị*/}
+                    {/*</Typography>*/}
                     <Box sx={{ flexGrow: 1 }} />
                     <Tooltip title="Cài đặt tài khoản">
                         <IconButton onClick={handleUserMenuOpen} sx={{ p: 0 }}>
@@ -182,13 +182,22 @@ function AdminLayout({ children }) {
             {/* Nội dung chính */}
             <Box
                 component="main"
-                sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)` } }}
+                sx={{
+                    flexGrow: 1,
+                    width: '100%',
+                    minHeight: '100vh',
+                    px: { xs: 1, sm: 2, md: 3 },
+                    pt: 3,
+                    pb: 4,
+                    overflowX: 'hidden'
+                }}
             >
                 <Toolbar />
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
+                    style={{ width: "100%" }}
                 >
                     {children}
                 </motion.div>

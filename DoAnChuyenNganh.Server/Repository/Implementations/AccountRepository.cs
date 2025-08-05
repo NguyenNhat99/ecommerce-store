@@ -118,11 +118,11 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
             var result = await userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                if (!await roleManager.RoleExistsAsync(UserRole.Staff))
-                {
-                    await roleManager.CreateAsync(new IdentityRole(UserRole.Staff));
-                }
-                await userManager.AddToRoleAsync(user, UserRole.Staff);
+                //if (!await roleManager.RoleExistsAsync(UserRole.Customer))
+                //{
+                //    await roleManager.CreateAsync(new IdentityRole(UserRole.Customer));
+                //}
+                await userManager.AddToRoleAsync(user, UserRole.Customer);
             }
             return result;
         }
