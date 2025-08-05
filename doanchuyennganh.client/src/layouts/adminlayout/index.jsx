@@ -125,12 +125,12 @@ function AdminLayout({ children }) {
                         transformOrigin={{ vertical: "top", horizontal: "right" }}
                         sx={{ mt: "45px" }}
                     >
-                        <MenuItem disabled>
-                            <Box>
-                                <Typography fontWeight="bold">Admin</Typography>
-                                <Typography variant="caption">admin@example.com</Typography>
-                            </Box>
-                        </MenuItem>
+                        {/*<MenuItem disabled>*/}
+                        {/*    <Box>*/}
+                        {/*        <Typography fontWeight="bold">Admin</Typography>*/}
+                        {/*        <Typography variant="caption">admin@example.com</Typography>*/}
+                        {/*    </Box>*/}
+                        {/*</MenuItem>*/}
                         <Divider />
                         <MenuItem onClick={() => handleNavigate("/admin/thong-tin-ca-nhan")}>
                             <Typography>Thông tin cá nhân</Typography>
@@ -143,7 +143,6 @@ function AdminLayout({ children }) {
             </AppBar>
 
             <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
-                {/* Drawer cho mobile */}
                 <Drawer
                     variant="temporary"
                     open={mobileOpen}
