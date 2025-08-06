@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Flag để tránh memory leak
         let isMounted = true; 
 
         const loadUser = async () => {

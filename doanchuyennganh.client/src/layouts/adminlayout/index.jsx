@@ -15,7 +15,6 @@ import {
     Label as LabelIcon,
     Article as ArticleIcon
 } from "@mui/icons-material";
-import ColorLensIcon from '@mui/icons-material/ColorLens';
 
 import { useNavigate } from "react-router-dom";
 import authService from "../../service/authService";
@@ -29,7 +28,6 @@ const menuItems = [
     { label: "Loại sản phẩm", icon: <CategoryIcon />, path: "/admin/loai-san-pham" },
     { label: "Thương hiệu", icon: <LabelIcon />, path: "/admin/thuong-hieu" },
 ];
-
 function AdminLayout({ children }) {
     const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);

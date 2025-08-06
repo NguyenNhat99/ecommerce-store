@@ -29,6 +29,20 @@ namespace DoAnChuyenNganh.Server.Controllers
                 return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
             }
         }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProductResponseModel>> GetById(int id)
+        {
+            try
+            {
+                var product = await _productRepository.GetByIdAsync(id);
+                if (product == null) return NotFound(new { message = "không tìm thấy sản phẩm" });
+                return Ok(product);
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
+            }
+        }
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {

@@ -123,9 +123,10 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
             var products = await _context.Products.ToListAsync();
             return _mapper.Map<List<ProductResponseModel>>(products);
         }
-        public Task<ProductResponseModel> GetByIdAsync(int id)
+        public async Task<ProductResponseModel> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await _context.ProductColors.FindAsync(id);
+            return _mapper.Map<ProductResponseModel>(product);
         }
 
         public Task<bool> UpdateAsync(int id, ProductRequestModel model)

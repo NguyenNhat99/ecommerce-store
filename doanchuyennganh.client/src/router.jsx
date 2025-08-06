@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Route, Routes } from "react-router";
 import { ROUTERS } from "./utils/router";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import Loading from "../src/components/Loading/index"
 //layout 
 const userlayout = lazy(() => import("./layouts/userlayout"));
 const adminlayout = lazy(() => import("./layouts/adminlayout"));
@@ -45,38 +46,44 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.ADMIN.DASHBOARD,
         component: <Dashboard />,
-        layout: adminlayout
+        layout: adminlayout,
+        roles: ["Admin","Staff"]
     },
     {
         path: ROUTERS.ADMIN.INSERTPRODUCT,
         component: <InsertProduct />,
-        layout: adminlayout
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
     },
     {
         path: ROUTERS.ADMIN.UPDATEPRODUCT,
         component: <UpdateProduct />,
-        layout: adminlayout
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
     },
     {
         path: ROUTERS.ADMIN.LISTPRODUCT,
         component: <ListProduct />,
-        layout: adminlayout
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
     },
     {
         path: ROUTERS.ADMIN.BRANDS,
         component: <Brands />,
-        layout: adminlayout
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
     },
     {
         path: ROUTERS.ADMIN.CATEGORIES,
         component: <Categories />,
-        layout: adminlayout
-    }
-    ,
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
+    },
     {
         path: ROUTERS.ADMIN.PROFILE,
         component: <Profile />,
-        layout: adminlayout
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
     }
 ];
 
@@ -87,12 +94,12 @@ const renderUserRouter = () => {
             {ROUTES_CONFIG.map(({ path, component, layout: Layout, roles }, index) => {
                 let element = component;
 
-                if (roles) {
-                    element = <ProtectedRoute allowedRoles={roles}>{element}</ProtectedRoute>;
-                }
-
                 if (Layout) {
                     element = <Layout>{element}</Layout>;
+                }
+
+                if (roles) {
+                    element = <ProtectedRoute allowedRoles={roles}>{element}</ProtectedRoute>;
                 }
 
                 return <Route key={index} path={path} element={element} />;
@@ -103,10 +110,10 @@ const renderUserRouter = () => {
 
 const RouterCustom = () => {
     return (
-        //<Suspense fallback={<Loading />}>
-        //    {renderUserRouter()}
-        //</Suspense>
-        renderUserRouter()
+        <Suspense fallback={<Loading />}>
+            {renderUserRouter()}
+        </Suspense>
+        //renderUserRouter()
     );
 };
 export default RouterCustom;
