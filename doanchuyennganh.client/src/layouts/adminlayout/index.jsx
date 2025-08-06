@@ -26,11 +26,8 @@ const drawerWidth = 240;
 const menuItems = [
     { label: "Dashboard", icon: <DashboardIcon />, path: "/admin/dashboard" },
     { label: "Sản phẩm", icon: <FormatListBulletedIcon />, path: "/admin/san-pham" },
-    //{ label: "Bài viết", icon: <ArticleIcon />, path: "/admin/bai-viet" },
     { label: "Loại sản phẩm", icon: <CategoryIcon />, path: "/admin/loai-san-pham" },
     { label: "Thương hiệu", icon: <LabelIcon />, path: "/admin/thuong-hieu" },
-    { label: "Màu sắc", icon: <ColorLensIcon />, path: "/admin/mau-sac" }
-
 ];
 
 function AdminLayout({ children }) {

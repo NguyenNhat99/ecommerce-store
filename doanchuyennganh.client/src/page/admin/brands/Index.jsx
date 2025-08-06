@@ -3,7 +3,7 @@ import {
     Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
     Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, Grid, Tooltip, InputAdornment, Pagination, Breadcrumbs, Link,
-    Snackbar, Alert
+    Snackbar, Alert, CircularProgress
 } from '@mui/material';
 import { Add, Edit, Delete, Refresh, Search } from '@mui/icons-material';
 import brandService from '../../../service/brandService';
@@ -14,6 +14,7 @@ const ManageBrands = () => {
     const [brands, setBrands] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(true);
 
     const [open, setOpen] = useState(false);
     const [editBrand, setEditBrand] = useState(null);
@@ -22,12 +23,15 @@ const ManageBrands = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     const fetchBrands = async () => {
+        setLoading(true);
         try {
             const data = await brandService.getAll();
             setBrands(data);
             setPage(1);
         } catch (error) {
             showSnackbar(error, 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -143,54 +147,62 @@ const ManageBrands = () => {
                 </Grid>
             </Grid>
 
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                        <TableRow>
-                            <TableCell><strong>ID</strong></TableCell>
-                            <TableCell><strong>Tên thương hiệu</strong></TableCell>
-                            <TableCell><strong>Mô tả</strong></TableCell>
-                            <TableCell align="center"><strong>Thao tác</strong></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {displayedBrands.length === 0 ? (
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell colSpan={4} align="center">Không tìm thấy thương hiệu nào.</TableCell>
+                                <TableCell><strong>ID</strong></TableCell>
+                                <TableCell><strong>Tên thương hiệu</strong></TableCell>
+                                <TableCell><strong>Mô tả</strong></TableCell>
+                                <TableCell align="center"><strong>Thao tác</strong></TableCell>
                             </TableRow>
-                        ) : (
-                            displayedBrands.map((b, i) => (
-                                <TableRow key={b.id} sx={{ backgroundColor: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                                    <TableCell>{b.id}</TableCell>
-                                    <TableCell>{b.name}</TableCell>
-                                    <TableCell>{b.description}</TableCell>
-                                    <TableCell align="center">
-                                        <Tooltip title="Sửa">
-                                            <Button size="small" onClick={() => handleOpen(b)}>
-                                                <Edit fontSize="small" />
-                                            </Button>
-                                        </Tooltip>
-                                        <Tooltip title="Xóa">
-                                            <Button size="small" color="error" onClick={() => handleDelete(b.id)}>
-                                                <Delete fontSize="small" />
-                                            </Button>
-                                        </Tooltip>
-                                    </TableCell>
+                        </TableHead>
+                        <TableBody>
+                            {displayedBrands.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={4} align="center">Không tìm thấy thương hiệu nào.</TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            ) : (
+                                displayedBrands.map((b, i) => (
+                                    <TableRow key={b.id} sx={{ backgroundColor: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                                        <TableCell>{b.id}</TableCell>
+                                        <TableCell>{b.name}</TableCell>
+                                        <TableCell>{b.description}</TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title="Sửa">
+                                                <Button size="small" onClick={() => handleOpen(b)}>
+                                                    <Edit fontSize="small" />
+                                                </Button>
+                                            </Tooltip>
+                                            <Tooltip title="Xóa">
+                                                <Button size="small" color="error" onClick={() => handleDelete(b.id)}>
+                                                    <Delete fontSize="small" />
+                                                </Button>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
 
-            <Box mt={2} display="flex" justifyContent="center">
-                <Pagination
-                    count={Math.ceil(filteredBrands.length / rowsPerPage)}
-                    page={page}
-                    onChange={(e, value) => setPage(value)}
-                    color="primary"
-                />
-            </Box>
+            {!loading && (
+                <Box mt={2} display="flex" justifyContent="center">
+                    <Pagination
+                        count={Math.ceil(filteredBrands.length / rowsPerPage)}
+                        page={page}
+                        onChange={(e, value) => setPage(value)}
+                        color="primary"
+                    />
+                </Box>
+            )}
 
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{editBrand ? 'Sửa thương hiệu' : 'Thêm thương hiệu mới'}</DialogTitle>
@@ -202,6 +214,7 @@ const ManageBrands = () => {
                                 name="name"
                                 fullWidth
                                 required
+                                inputProps={{ maxLength: 255 }}
                                 value={form.name}
                                 onChange={handleChange}
                             />

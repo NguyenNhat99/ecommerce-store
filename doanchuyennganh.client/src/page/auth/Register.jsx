@@ -14,6 +14,7 @@ import {
     InputLabel,
     Snackbar,
     Alert,
+    CircularProgress
 } from '@mui/material';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import Visibility from '@mui/icons-material/Visibility';
@@ -35,6 +36,7 @@ const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -78,6 +80,7 @@ const RegisterPage = () => {
             gender: form.gender === 'true',
         };
 
+        setLoading(true);
         try {
             const res = await authService.signUp(data);
             setSnackbar({ open: true, message: res.message || 'Đăng ký thành công!', severity: 'success' });
@@ -88,6 +91,8 @@ const RegisterPage = () => {
                 message: error.message || 'Đăng ký thất bại!',
                 severity: 'error',
             });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -104,10 +109,7 @@ const RegisterPage = () => {
             }}
         >
             <Paper elevation={4} sx={{ p: 4, width: '100%', maxWidth: 500, position: 'relative' }}>
-                <IconButton
-                    onClick={() => navigate(-1)}
-                    sx={{ position: 'absolute', top: 16, left: 16 }}
-                >
+                <IconButton onClick={() => navigate(-1)} sx={{ position: 'absolute', top: 16, left: 16 }}>
                     <ArrowBackIosNewIcon />
                 </IconButton>
 
@@ -230,8 +232,9 @@ const RegisterPage = () => {
                         color="primary"
                         fullWidth
                         sx={{ mt: 2, py: 1.5 }}
+                        disabled={loading}
                     >
-                        Đăng ký
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Đăng ký'}
                     </Button>
                 </Box>
 

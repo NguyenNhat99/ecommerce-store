@@ -3,7 +3,7 @@ import {
     Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
     Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, Grid, Tooltip, InputAdornment, Pagination, Breadcrumbs, Link,
-    Snackbar, Alert
+    Snackbar, Alert, CircularProgress
 } from '@mui/material';
 import { Add, Edit, Delete, Refresh, Search } from '@mui/icons-material';
 import categoryService from '../../../service/categoryService';
@@ -14,6 +14,7 @@ const ManageCategories = () => {
     const [categories, setCategories] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(true); // loading state
 
     const [open, setOpen] = useState(false);
     const [editCategory, setEditCategory] = useState(null);
@@ -22,12 +23,15 @@ const ManageCategories = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
     const fetchCategories = async () => {
+        setLoading(true);
         try {
             const data = await categoryService.getAll();
             setCategories(data);
             setPage(1);
         } catch (error) {
             showSnackbar(error, 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -143,54 +147,62 @@ const ManageCategories = () => {
                 </Grid>
             </Grid>
 
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                        <TableRow>
-                            <TableCell><strong>ID</strong></TableCell>
-                            <TableCell><strong>Tên loại</strong></TableCell>
-                            <TableCell><strong>Mô tả</strong></TableCell>
-                            <TableCell align="center"><strong>Thao tác</strong></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {displayedCategories.length === 0 ? (
+            {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+                    <CircularProgress />
+                </Box>
+            ) : (
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell colSpan={4} align="center">Không tìm thấy loại sản phẩm nào.</TableCell>
+                                <TableCell><strong>ID</strong></TableCell>
+                                <TableCell><strong>Tên loại</strong></TableCell>
+                                <TableCell><strong>Mô tả</strong></TableCell>
+                                <TableCell align="center"><strong>Thao tác</strong></TableCell>
                             </TableRow>
-                        ) : (
-                            displayedCategories.map((c, i) => (
-                                <TableRow key={c.id} sx={{ backgroundColor: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                                    <TableCell>{c.id}</TableCell>
-                                    <TableCell>{c.categoryName}</TableCell>
-                                    <TableCell>{c.description}</TableCell>
-                                    <TableCell align="center">
-                                        <Tooltip title="Sửa">
-                                            <Button size="small" onClick={() => handleOpen(c)}>
-                                                <Edit fontSize="small" />
-                                            </Button>
-                                        </Tooltip>
-                                        <Tooltip title="Xóa">
-                                            <Button size="small" color="error" onClick={() => handleDelete(c.id)}>
-                                                <Delete fontSize="small" />
-                                            </Button>
-                                        </Tooltip>
-                                    </TableCell>
+                        </TableHead>
+                        <TableBody>
+                            {displayedCategories.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={4} align="center">Không tìm thấy loại sản phẩm nào.</TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                            ) : (
+                                displayedCategories.map((c, i) => (
+                                    <TableRow key={c.id} sx={{ backgroundColor: i % 2 === 0 ? '#fff' : '#fafafa' }}>
+                                        <TableCell>{c.id}</TableCell>
+                                        <TableCell>{c.categoryName}</TableCell>
+                                        <TableCell>{c.description}</TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip title="Sửa">
+                                                <Button size="small" onClick={() => handleOpen(c)}>
+                                                    <Edit fontSize="small" />
+                                                </Button>
+                                            </Tooltip>
+                                            <Tooltip title="Xóa">
+                                                <Button size="small" color="error" onClick={() => handleDelete(c.id)}>
+                                                    <Delete fontSize="small" />
+                                                </Button>
+                                            </Tooltip>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
 
-            <Box mt={2} display="flex" justifyContent="center">
-                <Pagination
-                    count={Math.ceil(filteredCategories.length / rowsPerPage)}
-                    page={page}
-                    onChange={(e, value) => setPage(value)}
-                    color="primary"
-                />
-            </Box>
+            {!loading && (
+                <Box mt={2} display="flex" justifyContent="center">
+                    <Pagination
+                        count={Math.ceil(filteredCategories.length / rowsPerPage)}
+                        page={page}
+                        onChange={(e, value) => setPage(value)}
+                        color="primary"
+                    />
+                </Box>
+            )}
 
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{editCategory ? 'Sửa loại sản phẩm' : 'Thêm loại sản phẩm mới'}</DialogTitle>

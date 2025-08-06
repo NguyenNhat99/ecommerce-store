@@ -11,6 +11,7 @@ import {
     Snackbar,
     Alert,
     Link as MuiLink,
+    CircularProgress
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
@@ -24,6 +25,7 @@ const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const { user, signIn } = useContext(AuthContext);
@@ -41,13 +43,17 @@ const LoginPage = () => {
             return;
         }
 
+        setLoading(true);
         try {
             await signIn(form);
         } catch (err) {
             setError('Đăng nhập thất bại!');
             setOpenSnackbar(true);
+        } finally {
+            setLoading(false);
         }
     };
+
     useEffect(() => {
         if (user) {
             if (user.role === 'Admin' || user.role === 'Staff') {
@@ -120,8 +126,15 @@ const LoginPage = () => {
                         </MuiLink>
                     </Box>
 
-                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, py: 1.5 }}>
-                        Đăng nhập
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        sx={{ mt: 2, py: 1.5 }}
+                        disabled={loading}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Đăng nhập'}
                     </Button>
                 </Box>
 
