@@ -65,6 +65,6 @@ namespace DoAnChuyenNganh.Server.Models
         /// <summary>
         /// Danh sách ID màu sắc được chọn
         /// </summary>
-        public List<int> ColorCodes { get; set; } = new();
+        public List<string> ColorCodes { get; set; } = new();
     }
 }

@@ -2,7 +2,7 @@
 import {
     Box, Typography, Button, TextField, Breadcrumbs, Link, Paper, Table, TableBody,
     TableCell, TableContainer, TableHead, TablePagination, TableRow, Collapse,
-    IconButton, Tooltip
+    IconButton, Tooltip, CircularProgress
 } from '@mui/material';
 import {
     Add as AddIcon,
@@ -60,6 +60,27 @@ function Row({ row, onDeleted }) {
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ m: 2 }}>
                             <Typography variant="subtitle1" gutterBottom>
+                                Màu sắc sản phẩm:
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                {row.productColors?.map((color, index) => (
+                                    <Box
+                                        key={index}
+                                        sx={{
+                                            width: 24,
+                                            height: 24,
+                                            borderRadius: 0.5,
+                                            bgcolor: color.codeColor,
+                                            border: '1px solid #ccc',
+                                            boxShadow: '0 0 2px rgba(0,0,0,0.2)'
+                                        }}
+                                        title={color.colorName}
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
+                        <Box sx={{ m: 2 }}>
+                            <Typography variant="subtitle1" gutterBottom>
                                 Kích thước sản phẩm
                             </Typography>
                             <Table size="small">
@@ -89,6 +110,7 @@ function Row({ row, onDeleted }) {
 export default function ListProductPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const navigate = useNavigate();
@@ -96,10 +118,13 @@ export default function ListProductPage() {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                setLoading(true);
                 const data = await productService.getAll();
                 setProducts(data);
             } catch (error) {
                 console.error("Lỗi khi tải sản phẩm:", error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchProducts();
@@ -149,45 +174,51 @@ export default function ListProductPage() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
 
-                <Paper elevation={3} sx={{ borderRadius: 3, overflow: "hidden", width: '100%' }}>
-                    <TableContainer>
-                        <Table>
-                            <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-                                <TableRow>
-                                    <TableCell />
-                                    <TableCell>Tên</TableCell>
-                                    <TableCell align="right">Giá hiện tại</TableCell>
-                                    <TableCell align="right">Giá gốc</TableCell>
-                                    <TableCell align="right">Kho</TableCell>
-                                    <TableCell align="right">Lệnh</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {filtered
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((row) => (
-                                        <Row
-                                            key={row.id}
-                                            row={row}
-                                            onDeleted={(deletedId) =>
-                                                setProducts((prev) => prev.filter((p) => p.id !== deletedId))
-                                            }
-                                        />
-                                    ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <Paper elevation={3} sx={{ borderRadius: 3, overflow: "hidden", width: '100%' }}>
+                        <TableContainer>
+                            <Table>
+                                <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+                                    <TableRow>
+                                        <TableCell />
+                                        <TableCell>Tên</TableCell>
+                                        <TableCell align="right">Giá hiện tại</TableCell>
+                                        <TableCell align="right">Giá gốc</TableCell>
+                                        <TableCell align="right">Kho</TableCell>
+                                        <TableCell align="right">Lệnh</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {filtered
+                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                        .map((row) => (
+                                            <Row
+                                                key={row.id}
+                                                row={row}
+                                                onDeleted={(deletedId) =>
+                                                    setProducts((prev) => prev.filter((p) => p.id !== deletedId))
+                                                }
+                                            />
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
 
-                    <TablePagination
-                        component="div"
-                        count={filtered.length}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        rowsPerPageOptions={[5, 10, 25]}
-                    />
-                </Paper>
+                        <TablePagination
+                            component="div"
+                            count={filtered.length}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            rowsPerPageOptions={[5, 10, 25]}
+                        />
+                    </Paper>
+                )}
             </Box>
         </DialogsProvider>
     );

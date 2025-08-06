@@ -171,10 +171,12 @@ const AddProductForm = () => {
             setPreviewProductImages(previewsUrl);
         }
     };
-
+    const handleCheck = (e) => {
+        e.preventDefault();
+        productColors.forEach(color => console.log ("colorCodes", color));
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!validateForm()) {
             return;
         }
@@ -198,6 +200,7 @@ const AddProductForm = () => {
             });
 
             // Gọi API ở đây (ví dụ)
+            console.log("form: " + formData)
             await productService.createOne(formData);
 
             setNotification({
@@ -207,9 +210,9 @@ const AddProductForm = () => {
             });
 
             // Reset form sau khi submit thành công
-            setTimeout(() => {
-                navigate("/admin/san-pham");
-            }, 1500);
+            //setTimeout(() => {
+            //    navigate("/admin/san-pham");
+            //}, 1500);
         } catch (error) {
             setNotification({
                 open: true,

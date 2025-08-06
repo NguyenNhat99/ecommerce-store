@@ -120,19 +120,111 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
 
         public async Task<List<ProductResponseModel>> GetAllAsync()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await _context.Products
+                .Include(p => p.ProductSizes).ThenInclude(ps => ps.Size)
+                 .Include(p => p.ProductColors).ThenInclude(pc => pc.Color).ToListAsync();
             return _mapper.Map<List<ProductResponseModel>>(products);
         }
         public async Task<ProductResponseModel> GetByIdAsync(int id)
         {
-            var product = await _context.ProductColors.FindAsync(id);
+            var product = await _context.Products
+                .Include(p => p.ProductImages)
+               .Include(p => p.ProductSizes).ThenInclude(ps => ps.Size)
+                .Include(p => p.ProductColors).ThenInclude(pc => pc.Color).FirstOrDefaultAsync(p => p.Id == id);
             return _mapper.Map<ProductResponseModel>(product);
         }
 
-        public Task<bool> UpdateAsync(int id, ProductRequestModel model)
+        public async Task<bool> UpdateAsync(int id, ProductRequestModel model)
         {
-            throw new NotImplementedException();
+            var existingProduct = await _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductColors)
+                .Include(p => p.ProductSizes)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (existingProduct == null)
+                return false;
+
+            // Cập nhật các trường cơ bản
+            existingProduct.Name = model.Name;
+            existingProduct.Description = model.Description;
+            existingProduct.Price = model.Price;
+            existingProduct.OriginalPrice = model.OriginalPrice;
+            existingProduct.Stock = model.Stock;
+            existingProduct.CategoryId = model.CategoryId;
+            existingProduct.BrandId = model.BrandId;
+
+            #region Cập nhật ảnh đại diện (avatar)
+            if (model.Avatar != null)
+            {
+                // Xóa ảnh cũ
+                if (!string.IsNullOrEmpty(existingProduct.Avatar))
+                    await _imageRepository.DeleteAsync(existingProduct.Avatar, "Products");
+
+                // Lưu ảnh mới
+                existingProduct.Avatar = await _imageRepository.AddAsync(model.Avatar, "Products");
+            }
+            #endregion
+
+            #region Cập nhật ảnh chi tiết
+            if (model.Images != null && model.Images.Any())
+            {
+                // Xóa ảnh cũ
+                foreach (var image in existingProduct.ProductImages)
+                {
+                    await _imageRepository.DeleteAsync(image.ImageUrl, "Products");
+                }
+                _context.ProductImages.RemoveRange(existingProduct.ProductImages);
+
+                // Thêm ảnh mới
+                foreach (var image in model.Images)
+                {
+                    var newImage = new ProductImage
+                    {
+                        ProductId = id,
+                        ImageUrl = await _imageRepository.AddAsync(image, "Products")
+                    };
+                    _context.ProductImages.Add(newImage);
+                }
+            }
+            #endregion
+
+            #region Cập nhật size
+            await AddAndUpdateProductSize(id, model.ProductSizes);
+            #endregion
+
+            #region Cập nhật màu sắc
+            // Xóa màu cũ
+            var oldColors = await _context.ProductColors.Where(pc => pc.ProductId == id).ToListAsync();
+            _context.ProductColors.RemoveRange(oldColors);
+
+            // Thêm màu mới
+            if (model.ColorCodes != null && model.ColorCodes.Any())
+            {
+                foreach (var colorCode in model.ColorCodes)
+                {
+                    var existingColor = await _context.Colors.FirstOrDefaultAsync(c => c.CodeColor == colorCode);
+                    if (existingColor == null)
+                    {
+                        existingColor = new Color { CodeColor = colorCode, Name = "" };
+                        _context.Colors.Add(existingColor);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    var newProductColor = new ProductColor
+                    {
+                        ProductId = id,
+                        ColorId = existingColor.Id
+                    };
+                    _context.ProductColors.Add(newProductColor);
+                }
+            }
+            #endregion
+
+            await _context.SaveChangesAsync();
+            return true;
         }
+
 
         /// <summary>
         /// thêm và cập nhật Size, ProductSize

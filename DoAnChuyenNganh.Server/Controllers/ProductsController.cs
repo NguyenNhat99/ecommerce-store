@@ -79,5 +79,32 @@ namespace DoAnChuyenNganh.Server.Controllers
                 return BadRequest(ModelState);
             }
         }
+        /// <summary>
+        /// API cập nhật sản phẩm (kèm ảnh, size, màu)
+        /// </summary>
+        /// <param name="id">Id sản phẩm cần cập nhật</param>
+        /// <param name="model">ProductRequestModel</param>
+        /// <returns>Trạng thái cập nhật</returns>
+        [HttpPut("{id}")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductRequestModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var success = await _productRepository.UpdateAsync(id, model);
+                if (!success)
+                    return NotFound(new { message = "Không tìm thấy sản phẩm để cập nhật." });
+
+                return Ok(new { message = "Cập nhật sản phẩm thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau!", error = ex.Message });
+            }
+        }
+
     }
 }

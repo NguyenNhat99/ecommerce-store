@@ -13,9 +13,9 @@ import {
     FormatListBulleted as FormatListBulletedIcon,
     Category as CategoryIcon,
     Label as LabelIcon,
-    Article as ArticleIcon
+    Article as ArticleIcon,
 } from "@mui/icons-material";
-
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { useNavigate } from "react-router-dom";
 import authService from "../../service/authService";
 import { motion } from "framer-motion";
@@ -27,6 +27,7 @@ const menuItems = [
     { label: "Sản phẩm", icon: <FormatListBulletedIcon />, path: "/admin/san-pham" },
     { label: "Loại sản phẩm", icon: <CategoryIcon />, path: "/admin/loai-san-pham" },
     { label: "Thương hiệu", icon: <LabelIcon />, path: "/admin/thuong-hieu" },
+    { label: "Tài khoản", icon: <SupervisorAccountIcon />, path: "/admin/quan-ly-tai-khoan" },
 ];
 function AdminLayout({ children }) {
     const navigate = useNavigate();

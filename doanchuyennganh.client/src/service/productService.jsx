@@ -13,6 +13,20 @@ const productService = {
             return Promise.reject("Tạo sản phẩm thất bại");
         }
     },
+
+    updateOne: async (id, data) => {
+        try {
+            const response = await api.put(`/products/${id}`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return response.data;
+        } catch (error) {
+            return Promise.reject("Cập nhật sản phẩm thất bại");
+        }
+    },
+
     getAll: async () => {
         try {
             const response = await api.get(`/products`);
@@ -21,12 +35,22 @@ const productService = {
             return Promise.reject("Lấy sản phẩm thất bại");
         }
     },
+
+    getOne: async (id) => {
+        try {
+            const response = await api.get(`/products/${id}`);
+            return response.data;
+        } catch (error) {
+            return Promise.reject("Lấy sản phẩm thất bại");
+        }
+    },
+
     deleteOne: async (id) => {
         try {
             await api.delete(`/products/${id}`);
             return Promise.resolve();
         } catch (error) {
-            return Promise.reject("Xóa sản phâlmr thất bại");
+            return Promise.reject("Xóa sản phẩm thất bại");
         }
     },
 };

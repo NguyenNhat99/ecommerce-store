@@ -10,7 +10,7 @@ export const ROUTERS = {
     },
     ADMIN: {
         DASHBOARD: "admin/dashboard",
-        UPDATEPRODUCT: "admin/san-pham/cap-nhat",
+        UPDATEPRODUCT: "admin/san-pham/sua/:id",
         LISTPRODUCT: "admin/san-pham",
         INSERTPRODUCT: "admin/san-pham/them",
         BRANDS: "admin/thuong-hieu",
