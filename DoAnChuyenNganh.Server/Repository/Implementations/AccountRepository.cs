@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 
 namespace DoAnChuyenNganh.Server.Repository.Implementations
 {
@@ -19,9 +20,11 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IMapper mapper;
+        private readonly IEmailSender emailSender;
+
         public AccountRepository(EcommerceStoreContext context, UserManager<User> userManager, SignInManager<User> signInManager, 
             IConfiguration configuration, RoleManager<IdentityRole> roleManager, IHttpContextAccessor httpContextAccessor,
-            IMapper mapper) {
+            IMapper mapper, IEmailSender emailSender) {
 
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -29,6 +32,7 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
             this.roleManager = roleManager;
             this.httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
+            this.emailSender = emailSender;
         }
         /// <summary>
         /// Lấy thông tin user hiện tại
@@ -173,6 +177,36 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
             user.Address = model.Address;
 
             var result = await userManager.UpdateAsync(user);
+            return result.Succeeded;
+        }
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            //var check = await userManager.IsEmailConfirmedAsync(user);
+            //if (user == null || !(await userManager.IsEmailConfirmedAsync(user)))
+            //    return true;
+            if (user == null) return false;
+
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = System.Web.HttpUtility.UrlEncode(token);
+            var resetLink = $"https://localhost:5173/reset-password?email={email}&token={encodedToken}";
+
+            await emailSender.SendEmailAsync(email, "Reset Password",
+                $"<p>Click the link below to reset your password:</p><a href='{resetLink}'>Reset Password</a>");
+
+            return true;
+        }
+        public async Task<bool> ResetPasswordAsync(ResetPasswordModel model)
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user == null) return false;
+
+            //nếu cần test trong swagger thì tắ cm decodedToken
+            //var decodedToken = HttpUtility.UrlDecode(model.Token);
+            //var result = await userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+
+            var result = await userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+
             return result.Succeeded;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using DoAnChuyenNganh.Server.Models;
+using DoAnChuyenNganh.Server.Repository.Implementations;
 using DoAnChuyenNganh.Server.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -143,5 +144,39 @@ namespace DoAnChuyenNganh.Server.Controllers
                 return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
             }
         }
+        [HttpPost("auth/forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid) return BadRequest(ModelState);
+                bool check = await _accountRepository.ForgotPasswordAsync(model.Email);
+                if (!check) return BadRequest(new { message = "Thất bại !"});
+                return Ok(new {message="Vui lòng kiểm tra Email của bạn !"});
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
+            }
+        }
+
+        [HttpPost("auth/reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid) return BadRequest(ModelState);
+                var result = await _accountRepository.ResetPasswordAsync(model);
+                if (!result) return BadRequest("Reset failed");
+                return Ok(new {message="Đổi mật khẩu thành công"});
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
+
+            }
+        }
+
+
     }
 }

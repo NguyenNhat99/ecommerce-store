@@ -6,6 +6,7 @@ export const ROUTERS = {
         LOGIN: "dang-nhap",
         REGISTER: "dang-ky-tai-khoan",
         FORGOTPASSWORD: "quen-mat-khau",
+        RESSETPASSWORD: "reset-password",
         NOTAUTH: "khong-quyen-truy-cap",
     },
     ADMIN: {

@@ -65,6 +65,28 @@ const updateInformation = async (updateData) => {
         throw error.response?.data || error.message || 'Lỗi không xác định';
     }
 };
+const forgotPassword = async (email) => {
+    try {
+        const res = await api.post(`/accounts/auth/forgot-password`, { email });
+        return res.data;
+    } catch (error) {
+        throw error.response?.data || error.message || 'Lỗi khi gửi email khôi phục mật khẩu';
+    }
+};
+
+const resetPassword = async ({ email, token, newPassword }) => {
+    try {
+        const res = await api.post('/accounts/auth/reset-password', {
+            email,
+            token,
+            newPassword
+        });
+        return res.data;
+    } catch (error) {
+        throw error.response?.data || error.message || 'Lỗi không xác định';
+    }
+};
+
 
 const logout = () => {
     localStorage.removeItem("jwt_token");
@@ -83,4 +105,6 @@ export default {
     updatePassword,
     updateInformation,
     signUp, 
+    forgotPassword,
+    resetPassword
 };

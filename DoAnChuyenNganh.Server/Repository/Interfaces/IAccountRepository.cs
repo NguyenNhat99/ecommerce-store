@@ -10,5 +10,7 @@ namespace DoAnChuyenNganh.Server.Repository.Interfaces
         public Task<AccountModel> GetCurrentUser();
         public Task<bool> UpdatePasswordAsync(ChangePasswordModel model);
         public Task<bool> UpdateInformationAsync(UpdateInformationModel model);
+        Task<bool> ForgotPasswordAsync(string email);
+        Task<bool> ResetPasswordAsync(ResetPasswordModel model);
     }
 }

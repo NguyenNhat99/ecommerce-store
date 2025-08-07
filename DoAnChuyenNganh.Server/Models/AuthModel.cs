@@ -55,5 +55,23 @@ namespace DoAnChuyenNganh.Server.Models
         public string CurrentPassword { get; set; } = string.Empty;
         public string NewPassword { get; set; } = string.Empty;
     }
+    public class ForgotPasswordModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+    }
+    public class ResetPasswordModel
+    {
+        [Required]
+        public string Email { get; set; }
+
+        [Required]
+        public string Token { get; set; }
+
+        [Required]
+        [MinLength(6)]
+        public string NewPassword { get; set; }
+    }
 
 }

@@ -11,6 +11,8 @@ const adminlayout = lazy(() => import("./layouts/adminlayout"));
 const Login = lazy(() => import("./page/auth/login"));
 const Register = lazy(() => import("./page/auth/Register"));
 const ForgotPassword = lazy(() => import("./page/auth/ForgotPassword"));
+const RessetPassword = lazy(() => import("./page/auth/ResetPassword"));
+
 
 //page user
 const Homepage = lazy(() => import("./page/user/homepage"));
@@ -37,6 +39,10 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.AUTH.FORGOTPASSWORD,
         component: <ForgotPassword />,
+    },
+    {
+        path: ROUTERS.AUTH.RESSETPASSWORD,
+        component: <RessetPassword />,
     },
     {
         path: ROUTERS.USER.HOME,
