@@ -209,5 +209,43 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
 
             return result.Succeeded;
         }
+        /// <summary>
+        /// Lấy danh sách tài khoản (ngoại trừ role Admin)
+        /// </summary>
+        public async Task<List<AccountModel>> GetAllAsync()
+        {
+            var users = userManager.Users.ToList();
+            var result = new List<AccountModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                if (!roles.Contains(UserRole.Admin))
+                {
+                    var model = mapper.Map<AccountModel>(user);
+                    model.Role = roles.FirstOrDefault() ?? "";
+                    result.Add(model);
+                }
+            }
+            return result;
+        }
+        /// <summary>
+        /// Lấy thông tin tài khoản theo Email (không trả về Admin)
+        /// </summary>
+        public async Task<AccountModel?> GetById(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) return null;
+
+            var roles = await userManager.GetRolesAsync(user);
+            if (roles.Contains(UserRole.Admin))
+                return null; 
+
+            var model = mapper.Map<AccountModel>(user);
+            model.Role = roles.FirstOrDefault() ?? "";
+            return model;
+        }
+
+
     }
 }

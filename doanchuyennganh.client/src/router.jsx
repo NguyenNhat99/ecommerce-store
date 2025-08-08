@@ -25,6 +25,8 @@ const ListProduct = lazy(() => import("./page/admin/products/ListProduct"));
 const Brands = lazy(() => import("./page/admin/brands/Index"));
 const Categories = lazy(() => import("./page/admin/categories/Index"));
 const Profile = lazy(() => import("./page/admin/profile/index"));
+const ListAccount = lazy(() => import("./page/admin/accounts/ListAccount"));
+const DetailAccount = lazy(() => import("./page/admin/accounts/DetailAccount"));
 
 
 const ROUTES_CONFIG = [
@@ -88,6 +90,20 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.ADMIN.PROFILE,
         component: <Profile />,
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
+    }
+    ,
+    {
+        path: ROUTERS.ADMIN.ACCOUNTS,
+        component: <ListAccount />,
+        layout: adminlayout,
+        roles: ["Admin", "Staff"]
+    }
+    ,
+    {
+        path: ROUTERS.ADMIN.ACCOUNT_DETAIL,
+        component: <DetailAccount />,
         layout: adminlayout,
         roles: ["Admin", "Staff"]
     }

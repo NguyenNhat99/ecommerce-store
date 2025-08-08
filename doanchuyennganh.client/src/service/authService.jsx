@@ -86,6 +86,22 @@ const resetPassword = async ({ email, token, newPassword }) => {
         throw error.response?.data || error.message || 'Lỗi không xác định';
     }
 };
+const getAllAccounts = async () => {
+    try {
+        const res = await api.get('/accounts/auth/list');
+        return res.data; // Đây là mảng AccountModel
+    } catch (error) {
+        throw error.response?.data || error.message || 'Không thể lấy danh sách tài khoản!';
+    }
+};
+const getAccountDetail = async (email) => {
+    try {
+        const res = await api.get(`/accounts/auth/detail/${encodeURIComponent(email)}`);
+        return res.data;
+    } catch (error) {
+        throw error.response?.data || error.message || 'Không thể lấy chi tiết tài khoản!';
+    }
+};
 
 
 const logout = () => {
@@ -106,5 +122,7 @@ export default {
     updateInformation,
     signUp, 
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getAllAccounts,
+    getAccountDetail
 };

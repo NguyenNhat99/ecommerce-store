@@ -176,6 +176,53 @@ namespace DoAnChuyenNganh.Server.Controllers
 
             }
         }
+        /// <summary>
+        /// API lấy danh sách tài khoản (ngoại trừ Admin)
+        /// </summary>
+        /// <returns>
+        /// Http 200: Trả về danh sách tài khoản
+        /// Http 500: Lỗi server
+        /// </returns>
+        [HttpGet("auth/list")]
+        [Authorize(Roles = "Admin,Staff")] // hoặc chỉ [Authorize(Roles = "Admin")] nếu muốn
+        public async Task<IActionResult> GetAllAccounts()
+        {
+            try
+            {
+                var accounts = await _accountRepository.GetAllAsync();
+                return Ok(accounts);
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
+            }
+        }
+
+        /// <summary>
+        /// API lấy chi tiết tài khoản (không trả về Admin)
+        /// </summary>
+        /// <param name="email">Email tài khoản</param>
+        /// <returns>
+        /// Http 200: Trả về tài khoản
+        /// Http 404: Không tìm thấy hoặc là Admin
+        /// Http 500: Lỗi server
+        /// </returns>
+        [HttpGet("auth/detail/{email}")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> GetAccountById(string email)
+        {
+            try
+            {
+                var account = await _accountRepository.GetById(email);
+                if (account == null)
+                    return NotFound(new { message = "Không tìm thấy tài khoản!" });
+                return Ok(account);
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau!" });
+            }
+        }
 
 
     }

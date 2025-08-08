@@ -2,19 +2,20 @@
 import {
     Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
     Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, Grid, Tooltip, InputAdornment, Pagination, Breadcrumbs, Link,
-    Snackbar, Alert, CircularProgress
+    Paper, Grid, Tooltip, InputAdornment, Breadcrumbs, Link,
+    Snackbar, Alert, CircularProgress, IconButton, TablePagination
 } from '@mui/material';
 import { Add, Edit, Delete, Refresh, Search } from '@mui/icons-material';
 import categoryService from '../../../service/categoryService';
 
-const rowsPerPage = 5;
+const rowsPerPageOptions = [5, 10, 25, 50, 100];
 
 const ManageCategories = () => {
     const [categories, setCategories] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const [page, setPage] = useState(1);
-    const [loading, setLoading] = useState(true); // loading state
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [loading, setLoading] = useState(true);
 
     const [open, setOpen] = useState(false);
     const [editCategory, setEditCategory] = useState(null);
@@ -27,9 +28,9 @@ const ManageCategories = () => {
         try {
             const data = await categoryService.getAll();
             setCategories(data);
-            setPage(1);
+            setPage(0);
         } catch (error) {
-            showSnackbar(error, 'error');
+            showSnackbar(error?.toString() || 'Lỗi tải dữ liệu', 'error');
         } finally {
             setLoading(false);
         }
@@ -46,9 +47,9 @@ const ManageCategories = () => {
     }, [categories, searchText]);
 
     const displayedCategories = useMemo(() => {
-        const start = (page - 1) * rowsPerPage;
+        const start = page * rowsPerPage;
         return filteredCategories.slice(start, start + rowsPerPage);
-    }, [filteredCategories, page]);
+    }, [filteredCategories, page, rowsPerPage]);
 
     const showSnackbar = (message, severity = 'success') => {
         setSnackbar({ open: true, message, severity });
@@ -79,7 +80,6 @@ const ManageCategories = () => {
             showSnackbar('Tên loại sản phẩm không được bỏ trống', 'warning');
             return;
         }
-
         try {
             if (editCategory) {
                 await categoryService.updateOne(editCategory.id, form);
@@ -92,25 +92,24 @@ const ManageCategories = () => {
             }
             handleClose();
         } catch (err) {
-            showSnackbar(err, 'error');
+            showSnackbar(err?.toString() || 'Lỗi', 'error');
         }
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm("Bạn chắc chắn muốn xóa loại sản phẩm này?")) return;
-
         try {
             await categoryService.deleteOne(id);
             setCategories(prev => prev.filter(c => c.id !== id));
             showSnackbar('Xóa thành công');
         } catch (err) {
-            showSnackbar(err, 'error');
+            showSnackbar(err?.toString() || 'Lỗi', 'error');
         }
     };
 
     const handleResetSearch = () => {
         setSearchText('');
-        setPage(1);
+        setPage(0);
     };
 
     return (
@@ -134,14 +133,14 @@ const ManageCategories = () => {
                         fullWidth
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && setPage(1)}
+                        onKeyDown={(e) => e.key === 'Enter' && setPage(0)}
                         InputProps={{
                             endAdornment: <InputAdornment position="end"><Search /></InputAdornment>,
                         }}
                     />
                 </Grid>
                 <Grid item xs={12} md={6} display="flex" justifyContent="flex-end">
-                    <Button variant="contained" onClick={() => setPage(1)} sx={{ mr: 1 }}>Tìm kiếm</Button>
+                    <Button variant="contained" onClick={() => setPage(0)} sx={{ mr: 1 }}>Tìm kiếm</Button>
                     <Button variant="outlined" onClick={handleResetSearch} sx={{ mr: 1 }}>Xóa lọc</Button>
                     <Button variant="outlined" startIcon={<Refresh />} onClick={fetchCategories}>Làm mới</Button>
                 </Grid>
@@ -154,12 +153,12 @@ const ManageCategories = () => {
             ) : (
                 <TableContainer component={Paper}>
                     <Table>
-                        <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                        <TableHead>
                             <TableRow>
-                                <TableCell><strong>ID</strong></TableCell>
-                                <TableCell><strong>Tên loại</strong></TableCell>
-                                <TableCell><strong>Mô tả</strong></TableCell>
-                                <TableCell align="center"><strong>Thao tác</strong></TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>STT</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Tên loại</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Mô tả</TableCell>
+                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Hành động</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -170,19 +169,24 @@ const ManageCategories = () => {
                             ) : (
                                 displayedCategories.map((c, i) => (
                                     <TableRow key={c.id} sx={{ backgroundColor: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                                        <TableCell>{c.id}</TableCell>
+                                        <TableCell>{page * rowsPerPage + i + 1}</TableCell>
                                         <TableCell>{c.categoryName}</TableCell>
                                         <TableCell>{c.description}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip title="Sửa">
-                                                <Button size="small" onClick={() => handleOpen(c)}>
-                                                    <Edit fontSize="small" />
-                                                </Button>
+                                                <IconButton color="info" onClick={() => handleOpen(c)}>
+                                                    <Edit />
+                                                </IconButton>
                                             </Tooltip>
                                             <Tooltip title="Xóa">
-                                                <Button size="small" color="error" onClick={() => handleDelete(c.id)}>
-                                                    <Delete fontSize="small" />
-                                                </Button>
+                                                <span>
+                                                    <IconButton
+                                                        color="error"
+                                                        onClick={() => handleDelete(c.id)}
+                                                    >
+                                                        <Delete />
+                                                    </IconButton>
+                                                </span>
                                             </Tooltip>
                                         </TableCell>
                                     </TableRow>
@@ -190,18 +194,20 @@ const ManageCategories = () => {
                             )}
                         </TableBody>
                     </Table>
-                </TableContainer>
-            )}
-
-            {!loading && (
-                <Box mt={2} display="flex" justifyContent="center">
-                    <Pagination
-                        count={Math.ceil(filteredCategories.length / rowsPerPage)}
+                    <TablePagination
+                        component="div"
+                        count={filteredCategories.length}
                         page={page}
-                        onChange={(e, value) => setPage(value)}
-                        color="primary"
+                        onPageChange={(e, newPage) => setPage(newPage)}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={e => {
+                            setRowsPerPage(parseInt(e.target.value, 10));
+                            setPage(0);
+                        }}
+                        labelRowsPerPage="Số dòng/trang:"
+                        rowsPerPageOptions={rowsPerPageOptions}
                     />
-                </Box>
+                </TableContainer>
             )}
 
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>

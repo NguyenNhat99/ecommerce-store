@@ -1,4 +1,4 @@
-export const ROUTERS = {
+﻿export const ROUTERS = {
     USER: {
         HOME: ""
     },
@@ -17,6 +17,7 @@ export const ROUTERS = {
         BRANDS: "admin/thuong-hieu",
         CATEGORIES: "admin/loai-san-pham",
         PROFILE: "admin/thong-tin-ca-nhan",
-        ACCOUNTS: "admin/quan-ly-tai-khoan"
+        ACCOUNTS: "admin/quan-ly-tai-khoan",
+        ACCOUNT_DETAIL: "admin/quan-ly-tai-khoan/chi-tiet/:email", // hoặc .../:id nếu muốn dùng id
     },
 };
