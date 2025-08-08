@@ -16,6 +16,7 @@ export const ROUTERS = {
         INSERTPRODUCT: "admin/san-pham/them",
         BRANDS: "admin/thuong-hieu",
         CATEGORIES: "admin/loai-san-pham",
-        PROFILE: "admin/thong-tin-ca-nhan"
+        PROFILE: "admin/thong-tin-ca-nhan",
+        ACCOUNTS: "admin/quan-ly-tai-khoan"
     },
 };
