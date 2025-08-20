@@ -37,7 +37,6 @@ namespace DoAnChuyenNganh.Server.Helpers
             // ProductColor -> ProductColorModel
             CreateMap<ProductColor, ProductColorModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Color.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Color.Name))
                 .ForMember(dest => dest.CodeColor, opt => opt.MapFrom(src => src.Color.CodeColor));
 
             CreateMap<Color, ColorModel>().ReverseMap();

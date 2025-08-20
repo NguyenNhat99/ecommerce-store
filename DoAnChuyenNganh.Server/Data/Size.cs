@@ -9,7 +9,7 @@ namespace DoAnChuyenNganh.Server.Data
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { set; get; }
-        [MaxLength(200)]
+        [MaxLength(10)]
         public string Name { set; get; } = null!;
         public virtual ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
     }
