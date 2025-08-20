@@ -24,6 +24,8 @@ namespace DoAnChuyenNganh.Server.Data
         public int BrandId { get; set; }
         public bool IsActive { get; set; } = true;
         public string? Avatar { get; set; }
+        [MaxLength(20)]
+        public string SizeConversion { get; set; }
         public virtual Category? Category { get; set; }
         public virtual Brand? Brand { get; set; }
         public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();

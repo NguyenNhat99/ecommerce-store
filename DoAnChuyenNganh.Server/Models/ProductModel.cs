@@ -17,6 +17,7 @@ namespace DoAnChuyenNganh.Server.Models
         public int BrandId { get; set; }
         public bool IsActive { get; set; } = true;
         public string Avatar { get; set; } = string.Empty;
+        public string SizeConversion { get; set; }
         public List<ProductColorModel> ProductColors { get; set; } = new List<ProductColorModel>();
         public List<ProductSizeModel> ProductSizes { get; set; } = new List<ProductSizeModel>();
         public List<ProductImageModel> Images { get; set; } = new List<ProductImageModel>(); // Danh sách hình ảnh từ bảng ProductImages
@@ -47,6 +48,8 @@ namespace DoAnChuyenNganh.Server.Models
 
         public bool IsActive { get; set; } = true;
 
+        [MaxLength(20)]
+        public string SizeConversion { get; set; }
         /// <summary>
         /// Ảnh đại diện (hình chính)
         /// </summary>

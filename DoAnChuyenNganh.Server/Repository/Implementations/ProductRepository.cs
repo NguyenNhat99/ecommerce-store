@@ -70,7 +70,6 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
                     {
                         var color = new Color
                         {
-                            Name = "",
                             CodeColor = colorCode + ""
                         };
                         _context.Colors.Add(color);
@@ -153,6 +152,7 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
             existingProduct.Stock = model.Stock;
             existingProduct.CategoryId = model.CategoryId;
             existingProduct.BrandId = model.BrandId;
+            existingProduct.SizeConversion = model.SizeConversion;
 
             #region Cập nhật ảnh đại diện (avatar)
             if (model.Avatar != null)
@@ -206,7 +206,7 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
                     var existingColor = await _context.Colors.FirstOrDefaultAsync(c => c.CodeColor == colorCode);
                     if (existingColor == null)
                     {
-                        existingColor = new Color { CodeColor = colorCode, Name = "" };
+                        existingColor = new Color { CodeColor = colorCode };
                         _context.Colors.Add(existingColor);
                         await _context.SaveChangesAsync();
                     }
