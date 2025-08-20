@@ -1,0 +1,10 @@
+﻿/* Hiệu ứng mượt cho menu chính */
+.category-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.category-collapse.show {
+    max-height: 1000px; /* đủ lớn để chứa menu */
+}

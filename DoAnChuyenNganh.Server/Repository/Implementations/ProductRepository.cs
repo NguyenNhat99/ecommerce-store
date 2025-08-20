@@ -152,6 +152,7 @@ namespace DoAnChuyenNganh.Server.Repository.Implementations
             existingProduct.Stock = model.Stock;
             existingProduct.CategoryId = model.CategoryId;
             existingProduct.BrandId = model.BrandId;
+            existingProduct.SizeConversion = model.SizeConversion;
 
             #region Cập nhật ảnh đại diện (avatar)
             if (model.Avatar != null)
