@@ -48,6 +48,7 @@ const AddProductForm = () => {
     const priceRef = useRef();
     const originPriceRef = useRef();
     const stockRef = useRef();
+    const sizeConversionRef = useRef();
     const mainImageRef = useRef();
     const additionalImagesRef = useRef();
 
@@ -93,6 +94,10 @@ const AddProductForm = () => {
 
         if (!descriptionRef.current?.value) {
             newErrors.description = "Vui lòng nhập mô tả";
+        }
+
+        if (!sizeConversionRef.current?.value) {
+            newErrors.sizeConversion = "Không được bỏ trống";
         }
 
         if (!priceRef.current?.value || Number(priceRef.current.value) <= 0) {
@@ -189,6 +194,7 @@ const AddProductForm = () => {
             formData.append("price", priceRef.current.value);
             formData.append("originalPrice", originPriceRef.current.value);
             formData.append("stock", stockRef.current.value);
+            formData.append("sizeConversion", sizeConversionRef.current.value);
             formData.append("categoryId", categoryId);
             formData.append("brandId", brandId);
             formData.append("avatar", mainImageRef.current.files[0]);
@@ -200,7 +206,7 @@ const AddProductForm = () => {
             });
 
             // Gọi API ở đây (ví dụ)
-            console.log("form: " + formData)
+            console.log(formData)
             await productService.createOne(formData);
 
             setNotification({
@@ -316,6 +322,18 @@ const AddProductForm = () => {
                             inputProps: { min: 0 }
                         }}
                     />
+                    <TextField
+                        label="Size Conversion"
+                        inputRef={sizeConversionRef}
+                        error={!!errors.sizeConversion}
+                        helperText={errors.sizeConversion}
+                        fullWidth
+                        required
+                        InputProps={{
+                            inputProps: { min: 0 }
+                        }}
+                    />
+                  
                 </Box>
 
                 <Box sx={{ display: "flex", gap: 2, mt: 2 }}>

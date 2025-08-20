@@ -8,6 +8,7 @@ const productService = {
                     "Content-Type": "multipart/form-data",
                 },
             });
+            console.log(response)
             return response.data;
         } catch (error) {
             return Promise.reject("Tạo sản phẩm thất bại");
