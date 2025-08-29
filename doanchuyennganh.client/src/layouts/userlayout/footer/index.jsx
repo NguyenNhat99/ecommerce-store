@@ -1,5 +1,6 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
+import BackToTop from '../../../components/common/BackToTop';
 
 const Footer = () => {
     return (

@@ -1,8 +1,18 @@
-﻿import { useState } from "react";
-import "./CategoryMenu.css"; // Thêm file CSS để làm mượt
+﻿import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import "./CategoryMenu.css";
 
 export default function CategoryMenu() {
-    const [isOpen, setIsOpen] = useState(true);
+    const location = useLocation();
+    const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        if (location.pathname === "/") {
+            setIsOpen(true);   // Home mở mặc định
+        } else {
+            setIsOpen(false);  // Shop đóng mặc định
+        }
+    }, [location.pathname]);
 
     const categories = [
         { name: "Đầm váy" },
@@ -18,7 +28,7 @@ export default function CategoryMenu() {
     ];
 
     return (
-        <div className="col-lg-3 d-none d-lg-block">
+        <div className="col-lg-3 d-none d-lg-block position-relative">
             {/* Nút toggle */}
             <button
                 className="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100"
@@ -26,25 +36,18 @@ export default function CategoryMenu() {
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <h6 className="m-0">Danh mục</h6>
-                <i
-                    className={`fa fa-angle-${isOpen ? "up" : "down"} text-dark`}
-                ></i>
+                <i className={`fa fa-angle-${isOpen ? "up" : "down"} text-dark`}></i>
             </button>
 
-            {/* Menu */}
-            <div
-                className={`category-collapse ${isOpen ? "show" : ""}`}
-            >
-                <nav className="navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0">
-                    <div
-                        className="navbar-nav w-100 overflow-hidden"
-                        style={{ height: "410px" }}
-                    >
-                        {categories.map((cat, idx) =>                          
-                                <a href="#" className="nav-item nav-link" key={idx}>
-                                    {cat.name}
-                                </a>
-                        )}
+            {/* Menu overlay */}
+            <div className={`category-overlay ${isOpen ? "show" : ""} ${location.pathname === "/" ? "home" : "shop"}`}>
+                <nav className="navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0 bg-white">
+                    <div className="navbar-nav w-100 overflow-auto" style={{ maxHeight: "410px" }}>
+                        {categories.map((cat, idx) => (
+                            <a href="#" className="nav-item nav-link" key={idx}>
+                                {cat.name}
+                            </a>
+                        ))}
                     </div>
                 </nav>
             </div>

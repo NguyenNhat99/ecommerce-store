@@ -1,10 +1,20 @@
 ﻿import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import DropdownHover from "../../../components/common/DropdownHover";
 import CategoryMenu from "../../../components/common/CategoryMenu";
 import HeroCarousel from "../../../components/common/HeroCarousel";
 
 const Header = () => {
+    const location = useLocation();
+    const { pathname } = useLocation();
+
+    const isHome = pathname === "/";
+
+    const isActive = (path, exact = false) => {
+        if (exact) return location.pathname === path;
+        return location.pathname.startsWith(path);
+    };
+
     return (
         <>
             {/* Topbar */}
@@ -67,42 +77,85 @@ const Header = () => {
             </div>
 
             {/* Navbar */}
-            <div className="container-fluid mb-5">
+            <div className="container-fluid mb-0">
                 <div className="row border-top px-xl-5">
                     <CategoryMenu />
                     <div className="col-lg-9">
-                        <nav className="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+                        <nav className="navbar navbar-expand-lg bg-light navbar-light py-5 py-lg-0 px-0">
                             <Link to="/" className="text-decoration-none d-block d-lg-none">
                                 <h1 className="m-0 display-5 font-weight-semi-bold">
-                                    <span className="text-primary font-weight-bold border px-3 mr-1">E</span>Shopper
+                                    <span className="text-primary font-weight-bold border px-3 mr-1">
+                                        E
+                                    </span>
+                                    Shopper
                                 </h1>
                             </Link>
-                            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                            <button
+                                className="navbar-toggler"
+                                type="button"
+                                data-toggle="collapse"
+                                data-target="#navbarCollapse"
+                            >
                                 <span className="navbar-toggler-icon"></span>
                             </button>
 
-                            <div className="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                            <div
+                                className="collapse navbar-collapse justify-content-between"
+                                id="navbarCollapse"
+                            >
                                 <div className="navbar-nav mr-auto py-0">
-                                    <Link to="/" className="nav-item nav-link">Trang chủ</Link>
-                                    <Link to="/shop" className="nav-item nav-link">Cửa hàng</Link>
-                                    <Link to="/detail" className="nav-item nav-link">Chi tiết</Link>
-                                    <DropdownHover
-                                        title="Trang"
-                                        items={[
-                                            { to: "/cart", label: "Giỏ hàng" },
-                                            { to: "/checkout", label: "Thanh toán" }
-                                        ]}
-                                    />
-                                    <Link to="/contact" className="nav-item nav-link">Liên hệ</Link>
+                                    <Link to="/" className={`nav-item nav-link ${isActive("/", true) ? "active" : ""}`}>
+                                        Trang chủ
+                                    </Link>
+                                    <Link
+                                        to="/cua-hang"
+                                        className={`nav-item nav-link ${isActive("/cua-hang") ? "active" : ""
+                                            }`}
+                                    >
+                                        Cửa hàng
+                                    </Link>
+                                    <Link
+                                        to="/gio-hang"
+                                        className={`nav-item nav-link ${isActive("/gio-hang") ? "active" : ""
+                                            }`}
+                                    >
+                                        Giỏ hàng
+                                    </Link>
+                                    <Link
+                                        to="/thanh-toan"
+                                        className={`nav-item nav-link ${isActive("/thanh-toan") ? "active" : ""
+                                            }`}
+                                    >
+                                        Thanh toán
+                                    </Link>
+                                    <Link
+                                        to="/lien-he"
+                                        className={`nav-item nav-link ${isActive("/lien-he") ? "active" : ""
+                                            }`}
+                                    >
+                                        Liên hệ
+                                    </Link>
                                 </div>
 
                                 <div className="navbar-nav ml-auto py-0">
-                                    <Link to="/login" className="nav-item nav-link">Đăng nhập</Link>
-                                    <Link to="/register" className="nav-item nav-link">Đăng ký</Link>
+                                    <Link
+                                        to="/dang-nhap"
+                                        className={`nav-item nav-link ${isActive("/dang-nhap") ? "active" : ""
+                                            }`}
+                                    >
+                                        Đăng nhập
+                                    </Link>
+                                    <Link
+                                        to="/dang-ky-tai-khoan"
+                                        className={`nav-item nav-link ${isActive("/dang-ky-tai-khoan") ? "active" : ""
+                                            }`}
+                                    >
+                                        Đăng ký
+                                    </Link>
                                 </div>
                             </div>
                         </nav>
-                        <HeroCarousel />
+                        {isHome && <HeroCarousel />}
                     </div>
                 </div>
             </div>

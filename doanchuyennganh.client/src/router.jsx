@@ -16,6 +16,11 @@ const RessetPassword = lazy(() => import("./page/auth/ResetPassword"));
 
 //page user
 const Homepage = lazy(() => import("./page/user/homepage"));
+const ProductPage = lazy(() => import("./page/user/productpage"));
+const ProductDetail = lazy(() => import("./page/user/ProductDetail"));
+const ContactPage = lazy(() => import("./page/user/contact"));
+const CartPage = lazy(() => import("./page/user/cartpage"));
+const CheckoutPage = lazy(() => import("./page/user/checkoutpage"));
 
 //page admin
 const Dashboard = lazy(() => import("./page/admin/dashboard"));
@@ -49,6 +54,31 @@ const ROUTES_CONFIG = [
     {
         path: ROUTERS.USER.HOME,
         component: <Homepage />,
+        layout: userlayout,
+    },
+    {
+        path: ROUTERS.USER.SHOP,
+        component: <ProductPage />,
+        layout: userlayout,
+    },
+    {
+        path: ROUTERS.USER.PRODUCT_DETAIL,
+        component: <ProductDetail />,
+        layout: userlayout,
+    },
+    {
+        path: ROUTERS.USER.CONTACT,
+        component: <ContactPage />,
+        layout: userlayout,
+    },
+    {
+        path: ROUTERS.USER.CART,
+        component: <CartPage />,
+        layout: userlayout,
+    },
+    {
+        path: ROUTERS.USER.CHECKOUT,
+        component: <CheckoutPage />,
         layout: userlayout,
     },
     {

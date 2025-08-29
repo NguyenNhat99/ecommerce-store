@@ -1,7 +1,42 @@
-﻿import React from "react";
+﻿import React, { useEffect, useState } from "react";
 import VendorCarousel from "../../components/common/VendorCarousel";
+import productService from "../../service/productService";
+
+const IMG_BASE = "https://localhost:7097/Assets/Products/";
 
 export default function HomePage() {
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await productService.getAll();
+                const list = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
+                setProducts(list);
+            } catch (err) {
+                console.error("Lỗi khi load sản phẩm:", err);
+                setProducts([]);
+            }
+        })();
+    }, []);
+
+    const buildImg = (avatar) => {
+        if (!avatar) return "/img/placeholder.png";
+        return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
+    };
+
+    // Cắt 8 sản phẩm đầu tiên
+    const featuredProducts = products.slice(0, 8);
+
+    // Lấy 8 sản phẩm mới nhất theo createAt
+    const newProducts = [...products]
+        .sort((a, b) => {
+            const tb = Date.parse(b?.createAt ?? b?.createdAt ?? 0) || 0;
+            const ta = Date.parse(a?.createAt ?? a?.createdAt ?? 0) || 0;
+            return tb - ta;
+        })
+        .slice(0, 8);
+
     return (
         <>
             {/* Featured Start */}
@@ -108,23 +143,25 @@ export default function HomePage() {
                     </h2>
                 </div>
                 <div className="row px-xl-5 pb-3">
-                    {Array.from({ length: 8 }).map((_, idx) => (
-                        <div key={idx} className="col-lg-3 col-md-6 col-sm-12 pb-1">
+                    {featuredProducts.map((p) => (
+                        <div key={p?.id} className="col-lg-3 col-md-6 col-sm-12 pb-1">
                             <div className="card product-item border-0 mb-4">
                                 <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                                     <img
                                         className="img-fluid w-100"
-                                        src={`/eshopper-ui/img/product-${(idx % 8) + 1}.jpg`}
-                                        alt="product"
+                                        src={buildImg(p?.avatar)}
+                                        alt={p?.name}
                                     />
                                 </div>
                                 <div className="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                    <h6 className="text-truncate mb-3">Áo sơ mi thời trang</h6>
+                                    <h6 className="text-truncate mb-3">{p?.name}</h6>
                                     <div className="d-flex justify-content-center">
-                                        <h6>123.000₫</h6>
-                                        <h6 className="text-muted ml-2">
-                                            <del>150.000₫</del>
-                                        </h6>
+                                        <h6>{Number(p?.price || 0).toLocaleString("vi-VN")} ₫</h6>
+                                        {p?.originalPrice ? (
+                                            <h6 className="text-muted ml-2">
+                                                <del>{Number(p?.originalPrice).toLocaleString("vi-VN")} ₫</del>
+                                            </h6>
+                                        ) : null}
                                     </div>
                                 </div>
                                 <div className="card-footer d-flex justify-content-between bg-light border">
@@ -179,23 +216,25 @@ export default function HomePage() {
                     </h2>
                 </div>
                 <div className="row px-xl-5 pb-3">
-                    {Array.from({ length: 8 }).map((_, idx) => (
-                        <div key={idx} className="col-lg-3 col-md-6 col-sm-12 pb-1">
+                    {newProducts.map((p) => (
+                        <div key={p?.id} className="col-lg-3 col-md-6 col-sm-12 pb-1">
                             <div className="card product-item border-0 mb-4">
                                 <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                                     <img
                                         className="img-fluid w-100"
-                                        src={`/eshopper-ui/img/product-${(idx % 8) + 1}.jpg`}
-                                        alt="product"
+                                        src={buildImg(p?.avatar)}
+                                        alt={p?.name}
                                     />
                                 </div>
                                 <div className="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                    <h6 className="text-truncate mb-3">Áo sơ mi thời trang</h6>
+                                    <h6 className="text-truncate mb-3">{p?.name}</h6>
                                     <div className="d-flex justify-content-center">
-                                        <h6>123.000₫</h6>
-                                        <h6 className="text-muted ml-2">
-                                            <del>150.000₫</del>
-                                        </h6>
+                                        <h6>{Number(p?.price || 0).toLocaleString("vi-VN")} ₫</h6>
+                                        {p?.originalPrice ? (
+                                            <h6 className="text-muted ml-2">
+                                                <del>{Number(p?.originalPrice).toLocaleString("vi-VN")} ₫</del>
+                                            </h6>
+                                        ) : null}
                                     </div>
                                 </div>
                                 <div className="card-footer d-flex justify-content-between bg-light border">
