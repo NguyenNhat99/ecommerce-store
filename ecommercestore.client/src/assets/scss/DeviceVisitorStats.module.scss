@@ -1,0 +1,13 @@
+@import "variable.scss";
+
+.device_visitor_stats {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-content);
+    border: 1px solid var(--border-color);
+}
+body[data-theme="dark"] {
+    .device_visitor_stats {
+        border-color: var(--border-color) !important;
+    }
+}
