@@ -42,11 +42,18 @@ namespace EcommerceStore.Server.Helpers
             CreateMap<Color, ColorModel>().ReverseMap();
 
             CreateMap<User, AccountModel>()
-                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
-                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender));
+                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Gender))
+                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                 // các field liên quan lockout:
+                 .ForMember(dest => dest.LockoutEnabled, opt => opt.MapFrom(src => src.LockoutEnabled))
+                 .ForMember(dest => dest.LockoutEnd, opt => opt.MapFrom(src => src.LockoutEnd))
+                 // Role sẽ set sau (vì cần async), nên ignore ở đây để tránh nhầm lẫn:
+                 .ForMember(dest => dest.Role, opt => opt.Ignore());
             // CartItem -> CartItemView
             CreateMap<CartItem, CartItemView>()
                 .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.Id))

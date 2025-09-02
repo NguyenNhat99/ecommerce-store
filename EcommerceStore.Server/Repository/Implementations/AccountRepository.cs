@@ -3,6 +3,7 @@ using EcommerceStore.Server.Data;
 using EcommerceStore.Server.Helpers;
 using EcommerceStore.Server.Models;
 using EcommerceStore.Server.Repository.Interfaces;
+using EcommerceStore.Server.Services.EmailService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -72,29 +73,39 @@ namespace EcommerceStore.Server.Repository.Implementations
         public async Task<string> SignInAsync(SignInModel model)
         {
             var user = await userManager.FindByEmailAsync(model.Email);
-            var passwordValid = await userManager.CheckPasswordAsync(user, model.Password);
-            if (user == null || !passwordValid)
+            if (user == null) return string.Empty;
+
+            if (await userManager.IsLockedOutAsync(user))
+                throw new InvalidOperationException("Tài khoản đang bị khóa.");
+
+            var result = await signInManager.PasswordSignInAsync(
+                user, model.Password, isPersistent: false, lockoutOnFailure: true);
+
+            if (!result.Succeeded)
             {
+                if (result.IsLockedOut)
+                    throw new InvalidOperationException("Tài khoản đã bị khóa do đăng nhập sai nhiều lần.");
                 return string.Empty;
             }
+
+            await userManager.ResetAccessFailedCountAsync(user);
+
             var authClaim = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),         
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),      
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(ClaimTypes.Email, user.Email ?? model.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
             var userRoles = await userManager.GetRolesAsync(user);
             foreach (var role in userRoles)
-            {
-                authClaim.Add(new Claim(ClaimTypes.Role, role.ToString()));
-            }
-            var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
+                authClaim.Add(new Claim(ClaimTypes.Role, role));
 
+            var authenKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]));
             var token = new JwtSecurityToken(
                 issuer: configuration["JWT:ValidIssuer"],
                 audience: configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddMinutes(20),
+                expires: DateTime.UtcNow.AddMinutes(20), // nên dùng UTC
                 claims: authClaim,
                 signingCredentials: new SigningCredentials(authenKey, SecurityAlgorithms.HmacSha512Signature)
             );
@@ -248,6 +259,56 @@ namespace EcommerceStore.Server.Repository.Implementations
             return model;
         }
 
+        public async Task<bool> LockAsync(string email, DateTimeOffset? until = null)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) return false;
 
+            if (!user.LockoutEnabled)
+            {
+                var enable = await userManager.SetLockoutEnabledAsync(user, true);
+                if (!enable.Succeeded) return false;
+            }
+            if(until == null)
+            {
+                var span = TimeSpan.FromMinutes(15);
+                until = DateTimeOffset.UtcNow.Add(span);
+            }
+            var res = await userManager.SetLockoutEndDateAsync(user, until.Value);
+
+            return res.Succeeded;
+        }
+
+        public async Task<bool> UnlockAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if(user == null) return false;
+
+            if (user.LockoutEnabled)
+            {
+                var unlock = await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow);
+                if (!unlock.Succeeded) return false;
+            }
+            await userManager.ResetAccessFailedCountAsync(user);
+            return true;
+        }
+
+        public async Task<bool> SetLockoutEnabledAsync(string email, bool enabled)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) return false;
+
+            var res = await userManager.SetLockoutEnabledAsync(user, enabled);
+            return res.Succeeded;
+        }
+
+        public async Task<bool> ResetAccessFailedAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) return false;
+
+            var res = await userManager.ResetAccessFailedCountAsync(user);
+            return true;
+        }
     }
 }

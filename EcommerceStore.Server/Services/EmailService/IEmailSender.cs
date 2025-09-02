@@ -1,4 +1,4 @@
-﻿namespace EcommerceStore.Server.Repository.Interfaces
+﻿namespace EcommerceStore.Server.Services.EmailService
 {
     public interface IEmailSender
     {

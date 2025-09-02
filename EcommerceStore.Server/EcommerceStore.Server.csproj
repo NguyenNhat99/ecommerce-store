@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Services\VnPayService\" />
     <Folder Include="wwwroot\Assets\Articles\" />
   </ItemGroup>
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using EcommerceStore.Server.Repository.Interfaces;
-using EcommerceStore.Server.Repository.Implementations;
 using EcommerceStore.Server.Helpers;
+using EcommerceStore.Server.Repository.Implementations;
+using EcommerceStore.Server.Repository.Interfaces;
 
 namespace EcommerceStore.Server.Repository
 {
@@ -14,9 +14,7 @@ namespace EcommerceStore.Server.Repository
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<IAccountRepository, AccountRepository>();
-            services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<ICartRepository, CartRepository>();
-
         }
     }
 }

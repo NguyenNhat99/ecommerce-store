@@ -63,6 +63,26 @@ namespace EcommerceStore.Server.Controllers
                 }
                 return Ok(result);
             }
+            catch (InvalidOperationException ex)
+            {
+                // Khi repo ném "Tài khoản đang bị khóa." hoặc
+                // "Tài khoản đã bị khóa do đăng nhập sai nhiều lần."
+                // cố gắng lấy LockoutEnd để FE hiển thị thời điểm mở khóa
+                DateTimeOffset? until = null;
+                try
+                {
+                    var acc = await _accountRepository.GetById(model.Email); // AccountModel có LockoutEnd
+                    until = acc?.LockoutEnd;
+                }
+                catch { /* bỏ qua nếu không lấy được */ }
+
+                // 423 Locked
+                return StatusCode(423, new
+                {
+                    message = ex.Message,
+                    until = until?.UtcDateTime
+                });
+            }
             catch
             {
                 return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau !" });
@@ -224,6 +244,26 @@ namespace EcommerceStore.Server.Controllers
             }
         }
 
+        [HttpPost("lock")]
+        public async Task<IActionResult> Lock([FromBody] LockAccountDto dto)
+        {
+            // dto.Email, dto.Until (nullable)
+            var ok = await _accountRepository.LockAsync(dto.Email, dto.Until);
+            return ok ? Ok() : NotFound();
+        }
 
+        [HttpPost("unlock")]
+        public async Task<IActionResult> Unlock([FromBody] UnlockAccountDto dto)
+        {
+            var ok = await _accountRepository.UnlockAsync(dto.Email);
+            return ok ? Ok() : NotFound();
+        }
+
+        [HttpPost("lockout-enabled")]
+        public async Task<IActionResult> SetLockoutEnabled([FromBody] SetLockoutEnabledDto dto)
+        {
+            var ok = await _accountRepository.SetLockoutEnabledAsync(dto.Email, dto.Enabled);
+            return ok ? Ok() : NotFound();
+        }
     }
 }

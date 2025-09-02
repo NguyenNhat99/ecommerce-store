@@ -1,8 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Net;
-using EcommerceStore.Server.Repository.Interfaces;
 
-namespace EcommerceStore.Server.Repository.Implementations
+namespace EcommerceStore.Server.Services.EmailService
 {
     public class EmailSender : IEmailSender
     {

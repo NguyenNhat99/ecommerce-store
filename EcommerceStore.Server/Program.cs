@@ -1,5 +1,6 @@
 ﻿using EcommerceStore.Server.Data;
 using EcommerceStore.Server.Repository;
+using EcommerceStore.Server.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,12 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<EcommerceStoreContext>()
     .AddDefaultTokenProviders();
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.AllowedForNewUsers = true;
+});
 
 builder.Services.AddDbContext<EcommerceStoreContext>(options =>
 {
@@ -55,6 +62,7 @@ builder.Services.AddDbContext<EcommerceStoreContext>(options =>
 });
 
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddServices();
 builder.Services.AddRepositories();
 
 builder.Services.AddAuthentication(options =>
@@ -76,6 +84,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
+
 
 var app = builder.Build();
 

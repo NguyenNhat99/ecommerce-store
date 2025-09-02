@@ -12,7 +12,13 @@ namespace EcommerceStore.Server.Models
         public string PhoneNumber { set; get; } = string.Empty;
         public string Role { set; get; } = string.Empty;
         public string Address { set; get; } = string.Empty;
+        public bool LockoutEnabled { get; set; }
+        public DateTimeOffset? LockoutEnd { get; set; }
+        public bool IsLocked => LockoutEnd.HasValue && LockoutEnd.Value > DateTimeOffset.UtcNow;
     }
+    public record LockAccountDto(string Email, DateTimeOffset? Until);
+    public record UnlockAccountDto(string Email);
+    public record SetLockoutEnabledDto(string Email, bool Enabled);
     public class SignInModel
     {
         [Required]

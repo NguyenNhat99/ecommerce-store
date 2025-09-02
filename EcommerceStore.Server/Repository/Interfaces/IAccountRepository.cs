@@ -14,5 +14,10 @@ namespace EcommerceStore.Server.Repository.Interfaces
         Task<bool> ResetPasswordAsync(ResetPasswordModel model);
         Task<List<AccountModel>> GetAllAsync();
         Task<AccountModel?> GetById(string email);
+
+        Task<bool> LockAsync(string email, DateTimeOffset? until = null); // null = dùng DefaultLockoutTimeSpan
+        Task<bool> UnlockAsync(string email);
+        Task<bool> SetLockoutEnabledAsync(string email, bool enabled);
+        Task<bool> ResetAccessFailedAsync(string email);
     }
 }
