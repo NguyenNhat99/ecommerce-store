@@ -44,6 +44,8 @@ const ListProduct = lazy(() => import("./pages/admin/products/ListProduct"));
 const InsertProduct = lazy(() => import("./pages/admin/products/InsertProduct"));
 const UpdateProduct = lazy(() => import("./pages/admin/products/UpdateProduct"));
 const Profile = lazy(() => import("./pages/admin/profile/index"));
+const Accounts = lazy(() => import("./pages/admin/accounts/index"));
+const DetailAccount = lazy(() => import("./pages/admin/accounts/detailAccount"));
 
 //auth page
 const Login = lazy(() => import("./pages/auth/login"));
@@ -67,6 +69,8 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.ADMIN.INSERTPRODUCT, component: <InsertProduct />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.UPDATEPRODUCT, component: <UpdateProduct />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.PROFILE, component: <Profile />, layout: adminlayout, },
+    { path: ROUTERS.ADMIN.ACCOUNTS, component: <Accounts />, layout: adminlayout, },
+    { path: ROUTERS.ADMIN.ACCOUNT_DETAIL, component: <DetailAccount />, layout: adminlayout, },
     {
         path: "/components/buttons",
         component: <Buttons />, layout: adminlayout

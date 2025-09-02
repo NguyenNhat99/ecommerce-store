@@ -15,6 +15,7 @@
   <ItemGroup>
     <Folder Include="src\pages\admin\brands\" />
     <Folder Include="src\pages\admin\categories\" />
+    <Folder Include="src\pages\admin\accounts\" />
     <Folder Include="src\pages\admin\profile\" />
     <Folder Include="src\pages\admin\products\" />
     <Folder Include="src\pages\auth\" />

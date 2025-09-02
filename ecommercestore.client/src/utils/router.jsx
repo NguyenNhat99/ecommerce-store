@@ -23,6 +23,6 @@
         CATEGORIES: "admin/loai-san-pham",
         PROFILE: "admin/thong-tin-ca-nhan",
         ACCOUNTS: "admin/quan-ly-tai-khoan",
-        ACCOUNT_DETAIL: "admin/quan-ly-tai-khoan/chi-tiet/:email", // hoặc .../:id nếu muốn dùng id
+        ACCOUNT_DETAIL: "admin/quan-ly-tai-khoan/chi-tiet/:email",
     },
 };
