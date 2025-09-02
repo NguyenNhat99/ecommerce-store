@@ -20,9 +20,14 @@ namespace EcommerceStore.Server.Repository.Interfaces
         //// Xóa toàn bộ giỏ
         //Task<bool> ClearAsync(string? userId, string cartKey);
 
-        public Task<CartView> GetAllAsync();
-        public Task<CartView> AddItemAsync(AddCart model);
-        public Task<CartView> UpdateItemAsync(int productId, int quantity);
-        public Task<CartView> RemoveItemAsync(int productId);
+        Task<CartView> GetAllAsync();
+        Task<CartView> AddItemAsync(AddCart model);
+        Task<CartView> UpdateItemAsync(int productId, int quantity);
+        Task<CartView> RemoveItemAsync(int productId);
+        Task MergeAnonymousToUserAsync();
+
+        // NEW
+        Task<CartView> ClearAsync();
+
     }
 }

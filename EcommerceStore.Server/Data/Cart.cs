@@ -13,7 +13,10 @@ namespace EcommerceStore.Server.Data
         public string? UserId { get; set; }
         public bool Status { set; get; }
         public virtual User? User { get; set; }
+        [MaxLength(64)]
+        public string? AnonymousId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public virtual ICollection<CartItem> Items { get; set; } = new List<CartItem>();
+
     }
 }
