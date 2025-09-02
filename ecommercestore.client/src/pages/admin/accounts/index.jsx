@@ -14,7 +14,7 @@ import {
     Pagination as RBPagination,
     Badge,
 } from "react-bootstrap";
-import authService from "../../../services/authService"; // giữ nguyên path
+import authService from "../../../services/authService";
 import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 10;
@@ -41,7 +41,9 @@ export default function ManagerAccountBootstrap() {
     const [deletingId, setDeletingId] = useState(null);
     const [confirm, setConfirm] = useState({ show: false, user: null });
 
-    // fetch data
+    // busy từng dòng cho lock/unlock
+    const [rowBusy, setRowBusy] = useState({}); // { [email]: 'lock' | 'unlock' }
+
     const fetchAccounts = useCallback(async () => {
         setLoading(true);
         setError("");
@@ -60,15 +62,29 @@ export default function ManagerAccountBootstrap() {
         fetchAccounts();
     }, [fetchAccounts]);
 
+    // utils
+    const isLocked = (u) => {
+        if (!u?.lockoutEnd) return false;
+        const t = new Date(u.lockoutEnd).getTime();
+        return Number.isFinite(t) && t > Date.now();
+    };
+    const fmt = (d) => {
+        try {
+            return new Date(d).toLocaleString("vi-VN");
+        } catch {
+            return d;
+        }
+    };
+
     // filter
     const filtered = useMemo(() => {
         if (!search.trim()) return accounts;
         const q = search.toLowerCase();
         return accounts.filter(
             (u) =>
-                u.firstName.toLowerCase().includes(q) ||
-                u.lastName.toLowerCase().includes(q) ||
-                u.email.toLowerCase().includes(q)
+                (u.firstName || "").toLowerCase().includes(q) ||
+                (u.lastName || "").toLowerCase().includes(q) ||
+                (u.email || "").toLowerCase().includes(q)
         );
     }, [accounts, search]);
 
@@ -83,7 +99,7 @@ export default function ManagerAccountBootstrap() {
         setPage(p);
     };
 
-    // xoá
+    // xoá (demo)
     const handleDelete = async () => {
         if (!confirm.user) return;
         setDeletingId(confirm.user.email);
@@ -99,31 +115,54 @@ export default function ManagerAccountBootstrap() {
         }
     };
 
+    // hành động nhanh: khóa 15' / mở khóa
+    const handleQuickLock = async (u) => {
+        setRowBusy((m) => ({ ...m, [u.email]: "lock" }));
+        try {
+            await authService.lockAccount(u.email); // không truyền until -> backend mặc định 15'
+            await fetchAccounts(); // refresh
+        } catch (err) {
+            alert(err?.message || "Khóa tài khoản thất bại!");
+        } finally {
+            setRowBusy((m) => {
+                const n = { ...m };
+                delete n[u.email];
+                return n;
+            });
+        }
+    };
+
+    const handleQuickUnlock = async (u) => {
+        setRowBusy((m) => ({ ...m, [u.email]: "unlock" }));
+        try {
+            await authService.unlockAccount(u.email);
+            await fetchAccounts();
+        } catch (err) {
+            alert(err?.message || "Mở khóa tài khoản thất bại!");
+        } finally {
+            setRowBusy((m) => {
+                const n = { ...m };
+                delete n[u.email];
+                return n;
+            });
+        }
+    };
+
     // component phân trang bootstrap
     const Pagination = () => {
         const items = [];
         for (let i = 1; i <= totalPages; i++) {
             items.push(
-                <RBPagination.Item
-                    key={i}
-                    active={i === page}
-                    onClick={() => changePage(i)}
-                >
+                <RBPagination.Item key={i} active={i === page} onClick={() => changePage(i)}>
                     {i}
                 </RBPagination.Item>
             );
         }
         return (
             <RBPagination className="mb-0">
-                <RBPagination.Prev
-                    disabled={page === 1}
-                    onClick={() => changePage(page - 1)}
-                />
+                <RBPagination.Prev disabled={page === 1} onClick={() => changePage(page - 1)} />
                 {items}
-                <RBPagination.Next
-                    disabled={page === totalPages}
-                    onClick={() => changePage(page + 1)}
-                />
+                <RBPagination.Next disabled={page === totalPages} onClick={() => changePage(page + 1)} />
             </RBPagination>
         );
     };
@@ -194,55 +233,112 @@ export default function ManagerAccountBootstrap() {
                                                         </td>
                                                     </tr>
                                                 ) : (
-                                                    pageItems.map((u, idx) => (
-                                                        <tr key={u.email}>
-                                                            <td>{startIndex + idx + 1}</td>
-                                                            <td>{u.firstName} {u.lastName}</td>
-                                                            <td>{u.email}</td>
-                                                            <td>
-                                                                <Badge bg={ROLE_DISPLAY[u.role]?.variant || "secondary"}>
-                                                                    {ROLE_DISPLAY[u.role]?.label || u.role}
-                                                                </Badge>
-                                                            </td>
-                                                            <td>
-                                                                <span className="text-success">Hoạt động</span>
-                                                            </td>
-                                                            <td>{u.address}</td>
-                                                            <td>
-                                                                <div className="d-flex gap-2">
-                                                                    <Button
-                                                                        size="sm"
-                                                                        variant="outline-info"
-                                                                        onClick={() => navigate(`/admin/quan-ly-tai-khoan/chi-tiet/${u.email}`)}
-                                                                    >
-                                                                        Chi tiết
-                                                                    </Button>
-                                                                    <Button
-                                                                        size="sm"
-                                                                        variant="outline-danger"
-                                                                        disabled={u.role === "Admin" || deletingId === u.email}
-                                                                        onClick={() => setConfirm({ show: true, user: u })}
-                                                                    >
-                                                                        {deletingId === u.email ? (
-                                                                            <>
-                                                                                <Spinner animation="border" size="sm" className="me-1" />
-                                                                                Đang xoá...
-                                                                            </>
+                                                    pageItems.map((u, idx) => {
+                                                        const locked = isLocked(u);
+                                                        const busy = rowBusy[u.email];
+                                                        return (
+                                                            <tr key={u.email}>
+                                                                <td>{startIndex + idx + 1}</td>
+                                                                <td>{u.firstName} {u.lastName}</td>
+                                                                <td>{u.email}</td>
+                                                                <td>
+                                                                    <Badge bg={ROLE_DISPLAY[u.role]?.variant || "secondary"}>
+                                                                        {ROLE_DISPLAY[u.role]?.label || u.role}
+                                                                    </Badge>
+                                                                </td>
+                                                                <td>
+                                                                    {locked ? (
+                                                                        <>
+                                                                            <Badge bg="warning">Đang khóa</Badge>
+                                                                            {" "}
+                                                                            {u.lockoutEnd && (
+                                                                                <small className="text-muted">
+                                                                                    (đến {fmt(u.lockoutEnd)})
+                                                                                </small>
+                                                                            )}
+                                                                        </>
+                                                                    ) : (
+                                                                        <Badge bg="success">Hoạt động</Badge>
+                                                                    )}
+                                                                    {!u.lockoutEnabled && (
+                                                                        <span className="ms-2">
+                                                                            <Badge bg="secondary">Lockout tắt</Badge>
+                                                                        </span>
+                                                                    )}
+                                                                </td>
+                                                                <td>{u.address}</td>
+                                                                <td>
+                                                                    <div className="d-flex gap-2">
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline-info"
+                                                                            onClick={() => navigate(`/admin/quan-ly-tai-khoan/chi-tiet/${u.email}`)}
+                                                                        >
+                                                                            Chi tiết
+                                                                        </Button>
+
+                                                                        {/* Hành động nhanh: Khóa 15' / Mở khóa */}
+                                                                        {!locked ? (
+                                                                            <Button
+                                                                                size="sm"
+                                                                                variant="outline-warning"
+                                                                                onClick={() => handleQuickLock(u)}
+                                                                                disabled={!!busy}
+                                                                            >
+                                                                                {busy === "lock" ? (
+                                                                                    <>
+                                                                                        <Spinner animation="border" size="sm" className="me-1" />
+                                                                                        Khóa…
+                                                                                    </>
+                                                                                ) : (
+                                                                                    "Khóa 15’"
+                                                                                )}
+                                                                            </Button>
                                                                         ) : (
-                                                                            "Xoá"
+                                                                            <Button
+                                                                                size="sm"
+                                                                                variant="outline-success"
+                                                                                onClick={() => handleQuickUnlock(u)}
+                                                                                disabled={!!busy}
+                                                                            >
+                                                                                {busy === "unlock" ? (
+                                                                                    <>
+                                                                                        <Spinner animation="border" size="sm" className="me-1" />
+                                                                                        Mở khóa…
+                                                                                    </>
+                                                                                ) : (
+                                                                                    "Mở khóa"
+                                                                                )}
+                                                                            </Button>
                                                                         )}
-                                                                    </Button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    ))
+
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline-danger"
+                                                                            disabled={u.role === "Admin" || deletingId === u.email}
+                                                                            onClick={() => setConfirm({ show: true, user: u })}
+                                                                        >
+                                                                            {deletingId === u.email ? (
+                                                                                <>
+                                                                                    <Spinner animation="border" size="sm" className="me-1" />
+                                                                                    Đang xoá...
+                                                                                </>
+                                                                            ) : (
+                                                                                "Xoá"
+                                                                            )}
+                                                                        </Button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })
                                                 )}
                                             </tbody>
                                         </RBTable>
                                     </div>
                                     <div className="d-flex justify-content-between align-items-center mt-3">
                                         <div className="text-muted small">
-                                            Hiển thị {startIndex + 1}–{Math.min(endIndex, filtered.length)} /{" "}
+                                            Hiển thị {filtered.length === 0 ? 0 : startIndex + 1}–{Math.min(endIndex, filtered.length)} /{" "}
                                             {filtered.length}
                                         </div>
                                         <Pagination />

@@ -18,7 +18,6 @@
     <Folder Include="src\pages\admin\accounts\" />
     <Folder Include="src\pages\admin\profile\" />
     <Folder Include="src\pages\admin\products\" />
-    <Folder Include="src\pages\auth\" />
     <Folder Include="src\pages\user\profile\" />
     <Folder Include="src\utils\" />
   </ItemGroup>

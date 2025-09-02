@@ -53,6 +53,10 @@ const Layouts = ({children }) => {
                         <i className="fa fa-dashboard" />
                         <span>Quản lý tài khoản</span>
                     </MenuItem>
+                    <MenuItem routeLink={`/`}>
+                        <i className="fa fa-dashboard" />
+                        <span>Doanh thu</span>
+                    </MenuItem>
                     <SubMenu
                         label="Components"
                         icon={<i className="fa fa-puzzle-piece" />}

@@ -51,11 +51,13 @@ const DetailAccount = lazy(() => import("./pages/admin/accounts/detailAccount"))
 const Login = lazy(() => import("./pages/auth/login"));
 const Register = lazy(() => import("./pages/auth/register"));
 const ForgotPassword = lazy(() => import("./pages/auth/forgotPassword"));
+const RessetPassword = lazy(() => import("./pages/auth/resetPassword"));
 
 const ROUTES_CONFIG = [
     { path: ROUTERS.AUTH.LOGIN, component: <Login /> },
     { path: ROUTERS.AUTH.REGISTER, component: <Register /> },
     { path: ROUTERS.AUTH.FORGOTPASSWORD, component: <ForgotPassword /> },
+    { path: ROUTERS.AUTH.RESSETPASSWORD, component: <RessetPassword /> },
     {path: ROUTERS.USER.HOME,component: <Homepage />,layout: userlayout},
     {path: ROUTERS.USER.SHOP,component: <ProductPage />,layout: userlayout},
     {path: ROUTERS.USER.PRODUCT_DETAIL,component: <ProductDetail />,layout: userlayout,},

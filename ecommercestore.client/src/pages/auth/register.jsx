@@ -1,11 +1,16 @@
 ﻿import { useState } from "react";
 import {
-    Container, Row, Col, Card, Form, Button, InputGroup, Spinner,
-    Toast, ToastContainer, Badge, FloatingLabel
+    Container, Row, Col, Form, Button, InputGroup, Spinner,
+    Toast, ToastContainer, FloatingLabel
 } from "react-bootstrap";
-import { ArrowLeft, Eye, EyeSlash, Lock } from "react-bootstrap-icons";
+import { Eye, EyeSlash, Lock } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import authService from "../../services/authService"; // chỉnh path cho đúng
+import authService from "../../services/authService";
+
+// components auth
+import AuthCard from "../../components/auth/AuthCard";
+import AuthCardHeader from "../../components/auth/AuthCardHeader";
+import AuthHero from "../../components/auth/AuthHero";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\d{9,11}$/;
@@ -23,7 +28,7 @@ export default function RegisterBootstrap() {
         confirmPassword: "",
     });
 
-    const [showPw, setShowPw] = useState(false); // dùng chung cho 2 ô password
+    const [showPw, setShowPw] = useState(false);
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState({ open: false, msg: "", bg: "danger" });
 
@@ -70,7 +75,7 @@ export default function RegisterBootstrap() {
         }
     };
 
-    // BG gradient + glass card
+    // Nền gradient
     const bgStyle = {
         minHeight: "100vh",
         background:
@@ -78,255 +83,159 @@ export default function RegisterBootstrap() {
             "radial-gradient(1200px 600px at 110% 110%, rgba(168,85,247,.25), transparent 50%), " +
             "linear-gradient(180deg, #0f172a, #0b1220 35%, #0b1220)",
     };
-    const glassCardStyle = {
-        border: "1px solid rgba(255,255,255,.08)",
-        background: "rgba(255,255,255,.06)",
-        backdropFilter: "blur(10px)",
-        WebkitBackdropFilter: "blur(10px)",
-    };
 
     return (
-        <div style={bgStyle} className="text-white d-flex">
+        <div style={bgStyle} className="auth-page text-white d-flex">
             <Container fluid className="px-0">
                 <Row className="g-0 min-vh-100">
                     {/* HERO */}
                     <Col lg={6} className="d-none d-lg-flex align-items-center justify-content-center">
-                        <div className="p-5" style={{ maxWidth: 520 }}>
-                            <div className="d-flex align-items-center gap-2 mb-4">
-                                <img
-                                    src="/logo.svg"
-                                    alt="Logo"
-                                    width={40}
-                                    height={40}
-                                    style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,.25))" }}
-                                />
-                                <h4 className="mb-0 fw-semibold">YourBrand</h4>
-                            </div>
-                            <h1 className="display-6 fw-bold mb-3">Tạo tài khoản mới ✨</h1>
-                            <p className="text-white-50 mb-4">
-                                Chỉ vài bước nhanh gọn để bắt đầu trải nghiệm hệ thống quản trị hiện đại của bạn.
-                            </p>
-                            <div className="d-flex flex-wrap gap-2">
-                                <Badge bg="primary" pill>RB v5</Badge>
-                                <Badge bg="info" pill>Form Validation</Badge>
-                                <Badge bg="secondary" pill>Responsive</Badge>
-                            </div>
-                        </div>
+                        <AuthHero
+                            title="Tạo tài khoản mới ✨"
+                            subtitle="Chỉ vài bước nhanh gọn để bắt đầu trải nghiệm hệ thống quản trị hiện đại của bạn."
+                            badges={[
+                                { text: "RB v5", variant: "primary" },
+                                { text: "Form Validation", variant: "info" },
+                                { text: "Responsive", variant: "secondary" },
+                            ]}
+                        />
                     </Col>
 
                     {/* FORM */}
                     <Col lg={6} className="d-flex align-items-center justify-content-center">
                         <div className="w-100 px-3 px-sm-4" style={{ maxWidth: 520 }}>
-                            <Card className="shadow-lg text-white" style={glassCardStyle}>
-                                <Card.Header className="border-0 d-flex justify-content-between align-items-center" style={{ background: "transparent" }}>
-                                    <Button variant="outline-light" size="sm" onClick={() => navigate(-1)} className="rounded-pill px-3">
-                                        <ArrowLeft className="me-1" /> Quay lại
-                                    </Button>
-                                    <div className="rounded-circle d-flex align-items-center justify-content-center"
-                                        style={{ width: 40, height: 40, background: "rgba(255,255,255,.08)" }}>
-                                        👤
-                                    </div>
-                                </Card.Header>
+                            <AuthCard>
+                                <AuthCardHeader icon="👤" />
 
-                                <Card.Body className="pt-0">
+                                <Form className="pt-0 px-3" onSubmit={handleSubmit} noValidate>
                                     <h4 className="fw-semibold mb-2">Đăng ký tài khoản</h4>
-                                    <p className="text-white-50 mb-4">Điền thông tin bên dưới để tạo tài khoản mới.</p>
+                                    <p className="text-white-50 mb-4">
+                                        Điền thông tin bên dưới để tạo tài khoản mới.
+                                    </p>
 
-                                    <Form onSubmit={handleSubmit} noValidate>
-                                        {/* Họ & Tên */}
-                                        <Row className="g-2">
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="firstName" label="Họ" className="mb-2">
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder=" "
-                                                        value={form.firstName}
-                                                        onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-                                                        isInvalid={!!errors.firstName}
-                                                        className="bg-white text-dark"
-                                                        style={{ borderColor: "rgba(0,0,0,.1)" }}
-                                                    />
-                                                </FloatingLabel>
-                                                {errors.firstName && <div className="invalid-feedback d-block mb-2">{errors.firstName}</div>}
-                                            </Col>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="lastName" label="Tên" className="mb-2">
-                                                    <Form.Control
-                                                        type="text"
-                                                        placeholder=" "
-                                                        value={form.lastName}
-                                                        onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-                                                        isInvalid={!!errors.lastName}
-                                                        className="bg-white text-dark"
-                                                        style={{ borderColor: "rgba(0,0,0,.1)" }}
-                                                    />
-                                                </FloatingLabel>
-                                                {errors.lastName && <div className="invalid-feedback d-block mb-2">{errors.lastName}</div>}
-                                            </Col>
-                                        </Row>
+                                    <Row className="g-2">
+                                        <Col md={6}>
+                                            <FloatingLabel controlId="firstName" label="Họ" className="mb-2">
+                                                <Form.Control
+                                                    type="text"
+                                                    value={form.firstName}
+                                                    onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
+                                                    isInvalid={!!errors.firstName}
+                                                    className="bg-white text-dark"
+                                                />
+                                                {errors.firstName && <div className="invalid-feedback d-block">{errors.firstName}</div>}
+                                            </FloatingLabel>
+                                        </Col>
+                                        <Col md={6}>
+                                            <FloatingLabel controlId="lastName" label="Tên" className="mb-2">
+                                                <Form.Control
+                                                    type="text"
+                                                    value={form.lastName}
+                                                    onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
+                                                    isInvalid={!!errors.lastName}
+                                                    className="bg-white text-dark"
+                                                />
+                                                {errors.lastName && <div className="invalid-feedback d-block">{errors.lastName}</div>}
+                                            </FloatingLabel>
+                                        </Col>
+                                    </Row>
 
-                                        {/* Giới tính (Floating + đồng bộ chiều cao) */}
-                                        <FloatingLabel controlId="gender" label="Giới tính" className="mb-3">
-                                            <Form.Select
-                                                value={form.gender}
-                                                onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}
-                                                className="bg-white text-dark"
-                                                style={{ borderColor: "rgba(0,0,0,.1)" }}
-                                            >
-                                                <option value="true">Nam</option>
-                                                <option value="false">Nữ</option>
-                                            </Form.Select>
-                                        </FloatingLabel>
+                                    {/* Giới tính */}
+                                    <FloatingLabel controlId="gender" label="Giới tính" className="mb-3">
+                                        <Form.Select
+                                            value={form.gender}
+                                            onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))}
+                                            className="bg-white text-dark"
+                                        >
+                                            <option value="true">Nam</option>
+                                            <option value="false">Nữ</option>
+                                        </Form.Select>
+                                    </FloatingLabel>
 
-                                        {/* Email */}
-                                        <FloatingLabel controlId="email" label="Email" className="mb-2">
-                                            <Form.Control
-                                                type="email"
-                                                placeholder=" "
-                                                value={form.email}
-                                                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                                                isInvalid={!!errors.email}
-                                                className="bg-white text-dark"
-                                                style={{ borderColor: "rgba(0,0,0,.1)" }}
-                                                autoComplete="username"
-                                            />
-                                        </FloatingLabel>
-                                        {errors.email && <div className="invalid-feedback d-block mb-2">{errors.email}</div>}
+                                    {/* Email */}
+                                    <FloatingLabel controlId="email" label="Email" className="mb-2">
+                                        <Form.Control
+                                            type="email"
+                                            value={form.email}
+                                            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                                            isInvalid={!!errors.email}
+                                            className="bg-white text-dark"
+                                            autoComplete="username"
+                                        />
+                                        {errors.email && <div className="invalid-feedback d-block">{errors.email}</div>}
+                                    </FloatingLabel>
 
-                                        {/* Số điện thoại */}
-                                        <FloatingLabel controlId="phoneNumber" label="Số điện thoại" className="mb-2">
-                                            <Form.Control
-                                                type="tel"
-                                                placeholder=" "
-                                                value={form.phoneNumber}
-                                                onChange={(e) => setForm((f) => ({ ...f, phoneNumber: e.target.value }))}
-                                                isInvalid={!!errors.phoneNumber}
-                                                className="bg-white text-dark"
-                                                style={{ borderColor: "rgba(0,0,0,.1)" }}
-                                            />
-                                        </FloatingLabel>
-                                        {errors.phoneNumber && <div className="invalid-feedback d-block mb-2">{errors.phoneNumber}</div>}
+                                    {/* Phone */}
+                                    <FloatingLabel controlId="phoneNumber" label="Số điện thoại" className="mb-2">
+                                        <Form.Control
+                                            type="tel"
+                                            value={form.phoneNumber}
+                                            onChange={(e) => setForm((f) => ({ ...f, phoneNumber: e.target.value }))}
+                                            isInvalid={!!errors.phoneNumber}
+                                            className="bg-white text-dark"
+                                        />
+                                        {errors.phoneNumber && <div className="invalid-feedback d-block">{errors.phoneNumber}</div>}
+                                    </FloatingLabel>
 
-                                        {/* Mật khẩu */}
-                                        <Form.Label className="text-white-50">Mật khẩu</Form.Label>
-                                        <InputGroup className="mb-2" hasValidation>
-                                            <InputGroup.Text
-                                                style={{
-                                                    backgroundColor: "rgba(0,0,0,0.25)",
-                                                    borderColor: "rgba(0,0,0,0.15)",
-                                                    color: "#fff",
-                                                    borderRight: 0,
-                                                    borderTopRightRadius: 0,
-                                                    borderBottomRightRadius: 0,
-                                                }}
-                                            >
-                                                <Lock />
-                                            </InputGroup.Text>
-
-                                            <Form.Control
-                                                type={showPw ? "text" : "password"}
-                                                placeholder="••••••••"
-                                                value={form.password}
-                                                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                                                isInvalid={!!errors.password}
-                                                autoComplete="new-password"
-                                                style={{
-                                                    backgroundColor: "rgba(255,255,255,0.9)",
-                                                    color: "#000",
-                                                    borderColor: "rgba(0,0,0,0.15)",
-                                                    borderLeft: 0,
-                                                    borderRight: 0,
-                                                    borderRadius: 0,
-                                                }}
-                                            />
-
-                                            <Button
-                                                type="button"
-                                                className="d-flex align-items-center"
-                                                onClick={() => setShowPw((v) => !v)}
-                                                style={{
-                                                    backgroundColor: "rgba(255,255,255,0.9)",
-                                                    color: "#000",
-                                                    borderColor: "rgba(0,0,0,0.15)",
-                                                    borderLeft: 0,
-                                                    borderTopLeftRadius: 0,
-                                                    borderBottomLeftRadius: 0,
-                                                    paddingInline: ".75rem",
-                                                    boxShadow: "none",
-                                                }}
-                                            >
-                                                {showPw ? <EyeSlash /> : <Eye />}
-                                            </Button>
-                                        </InputGroup>
-                                        {errors.password && <div className="invalid-feedback d-block mb-2">{errors.password}</div>}
-
-                                        {/* Xác nhận mật khẩu */}
-                                        <Form.Label className="text-white-50">Xác nhận mật khẩu</Form.Label>
-                                        <InputGroup className="mb-3" hasValidation>
-                                            <InputGroup.Text
-                                                style={{
-                                                    backgroundColor: "rgba(0,0,0,0.25)",
-                                                    borderColor: "rgba(0,0,0,0.15)",
-                                                    color: "#fff",
-                                                    borderRight: 0,
-                                                    borderTopRightRadius: 0,
-                                                    borderBottomRightRadius: 0,
-                                                }}
-                                            >
-                                                <Lock />
-                                            </InputGroup.Text>
-
-                                            <Form.Control
-                                                type={showPw ? "text" : "password"}
-                                                placeholder="••••••••"
-                                                value={form.confirmPassword}
-                                                onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
-                                                isInvalid={!!errors.confirmPassword}
-                                                autoComplete="new-password"
-                                                style={{
-                                                    backgroundColor: "rgba(255,255,255,0.9)",
-                                                    color: "#000",
-                                                    borderColor: "rgba(0,0,0,0.15)",
-                                                    borderLeft: 0,
-                                                    borderRight: 0,
-                                                    borderRadius: 0,
-                                                }}
-                                            />
-
-                                            <Button
-                                                type="button"
-                                                className="d-flex align-items-center"
-                                                onClick={() => setShowPw((v) => !v)}
-                                                style={{
-                                                    backgroundColor: "rgba(255,255,255,0.9)",
-                                                    color: "#000",
-                                                    borderColor: "rgba(0,0,0,0.15)",
-                                                    borderLeft: 0,
-                                                    borderTopLeftRadius: 0,
-                                                    borderBottomLeftRadius: 0,
-                                                    paddingInline: ".75rem",
-                                                    boxShadow: "none",
-                                                }}
-                                            >
-                                                {showPw ? <EyeSlash /> : <Eye />}
-                                            </Button>
-                                        </InputGroup>
-                                        {errors.confirmPassword && <div className="invalid-feedback d-block mb-2">{errors.confirmPassword}</div>}
-
-                                        {/* Submit */}
-                                        <Button type="submit" className="w-100 rounded-3" disabled={loading}>
-                                            {loading ? (<><Spinner size="sm" className="me-2" /> Đang đăng ký...</>) : "Đăng ký"}
+                                    {/* Password */}
+                                    <Form.Label className="text-white-50">Mật khẩu</Form.Label>
+                                    <InputGroup className="mb-2">
+                                        <InputGroup.Text>
+                                            <Lock />
+                                        </InputGroup.Text>
+                                        <Form.Control
+                                            type={showPw ? "text" : "password"}
+                                            value={form.password}
+                                            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                                            isInvalid={!!errors.password}
+                                            autoComplete="new-password"
+                                            className="bg-white text-dark"
+                                        />
+                                        <Button type="button" onClick={() => setShowPw((v) => !v)}>
+                                            {showPw ? <EyeSlash /> : <Eye />}
                                         </Button>
+                                    </InputGroup>
+                                    {errors.password && <div className="invalid-feedback d-block">{errors.password}</div>}
 
-                                        <div className="text-center mt-3">
-                                            <small className="text-white-50">
-                                                Đã có tài khoản? <a href="/dang-nhap" className="link-light">Đăng nhập</a>
-                                            </small>
-                                        </div>
-                                    </Form>
-                                </Card.Body>
-                            </Card>
+                                    {/* Confirm Password */}
+                                    <Form.Label className="text-white-50">Xác nhận mật khẩu</Form.Label>
+                                    <InputGroup className="mb-3">
+                                        <InputGroup.Text>
+                                            <Lock />
+                                        </InputGroup.Text>
+                                        <Form.Control
+                                            type={showPw ? "text" : "password"}
+                                            value={form.confirmPassword}
+                                            onChange={(e) => setForm((f) => ({ ...f, confirmPassword: e.target.value }))}
+                                            isInvalid={!!errors.confirmPassword}
+                                            autoComplete="new-password"
+                                            className="bg-white text-dark"
+                                        />
+                                        <Button type="button" onClick={() => setShowPw((v) => !v)}>
+                                            {showPw ? <EyeSlash /> : <Eye />}
+                                        </Button>
+                                    </InputGroup>
+                                    {errors.confirmPassword && <div className="invalid-feedback d-block">{errors.confirmPassword}</div>}
 
+                                    <Button type="submit" className="w-100 rounded-3" disabled={loading}>
+                                        {loading ? (
+                                            <>
+                                                <Spinner size="sm" className="me-2" /> Đang đăng ký...
+                                            </>
+                                        ) : (
+                                            "Đăng ký"
+                                        )}
+                                    </Button>
+
+                                    <div className="text-center mt-3">
+                                        <small className="text-white-50">
+                                            Đã có tài khoản? <a href="/dang-nhap" className="link-light">Đăng nhập</a>
+                                        </small>
+                                    </div>
+                                </Form>
+                            </AuthCard>
+
+                            {/* Footer */}
                             <div className="text-center mt-3 text-white-50 small">
                                 © {new Date().getFullYear()} YourBrand. All rights reserved.
                             </div>

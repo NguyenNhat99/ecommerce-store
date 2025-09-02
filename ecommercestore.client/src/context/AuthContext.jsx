@@ -13,30 +13,15 @@ const AuthContext = createContext({
 export default AuthContext;
 
 export function AuthProvider({ children }) {
-    // Rehydrate để tránh flicker
-    const [user, setUser] = useState(() => {
-        try {
-            const raw = localStorage.getItem("auth_user");
-            return raw ? JSON.parse(raw) : null;
-        } catch {
-            return null;
-        }
-    });
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const persistUser = (u) => {
-        if (u) localStorage.setItem("auth_user", JSON.stringify(u));
-        else localStorage.removeItem("auth_user");
-    };
 
     const refreshUser = useCallback(async () => {
         try {
-            const me = await authService.getCurrentUser();  // GET /accounts/auth/GetUser
+            const me = await authService.getCurrentUser(); // GET /accounts/auth/GetUser
             setUser(me || null);
-            persistUser(me || null);
         } catch {
             setUser(null);
-            persistUser(null);
         } finally {
             setLoading(false);
         }
@@ -56,11 +41,10 @@ export function AuthProvider({ children }) {
     );
 
     const logout = useCallback(async () => {
-        // service đã xóa token + reload; nếu không muốn reload, có thể tự xử lý:
-        // authService.logout() // sẽ reload
+        // nếu authService.logout() có xóa token thì gọi luôn
+        // authService.logout();
         localStorage.removeItem("jwt_token");
         setUser(null);
-        persistUser(null);
         setLoading(false);
     }, []);
 

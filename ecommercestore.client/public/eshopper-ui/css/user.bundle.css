@@ -1,5 +1,5 @@
-﻿@import '../../../public/eshopper-ui/lib/owlcarousel/assets/owl.carousel.min.css';
-@import '../../../public/eshopper-ui/css/style.css';
+﻿@import url("/eshopper-ui/lib/owlcarousel/assets/owl.carousel.min.css");
+@import url("/eshopper-ui/css/style.css");
 
 :root {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -213,4 +213,14 @@ button {
         height: 300px;
     }
 }
-/*-------------------- Hero Carousel CSS end --------------------*/
+
+.auth-page {
+    color: #fff; /* màu text mặc định */
+    background-color: #0b1220;
+}
+
+    .auth-page input,
+    .auth-page .form-control {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
