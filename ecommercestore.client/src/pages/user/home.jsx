@@ -3,6 +3,8 @@ import VendorCarousel from "../../components/common/VendorCarousel";
 import productService from "../../services/productService";
 import cartService from "../../services/cartService"; // <-- thêm
 import { useNavigate } from "react-router-dom";
+import ToastMessage from "../../components/common/ToastMessage";
+import { useCart } from "../../context/CartContext";
 
 const IMG_BASE = "https://localhost:7097/Assets/Products/";
 
@@ -10,6 +12,7 @@ export default function HomePage() {
     const [products, setProducts] = useState([]);
     const [addingId, setAddingId] = useState(null); // id sản phẩm đang thêm
     const [message, setMessage] = useState(null);   // thông báo ngắn
+    const { setCartQty } = useCart();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -48,17 +51,23 @@ export default function HomePage() {
         try {
             setAddingId(productId);
             setMessage(null);
-            const cart = await cartService.addItem(productId, qty);
-            // Có thể cập nhật global cart badge ở đây nếu bạn có context/store
-            setMessage({ type: "success", text: "Đã thêm vào giỏ hàng." });
+            await cartService.addItem(productId, qty);
+            // cập nhật badge
+            const total = await cartService.getTotalQty();
+            setCartQty(total);
+
+            setMessage({
+                type: "success",
+                text: "Đã thêm vào giỏ hàng.",
+                showGoCart: true,
+            });
         } catch (err) {
-            // Nếu API yêu cầu đăng nhập, có thể redirect:
-            // navigate("/dang-nhap", { replace: true });
-            setMessage({ type: "danger", text: err || "Thêm vào giỏ hàng thất bại." });
+            setMessage({
+                type: "danger",
+                text: err?.message || "Thêm vào giỏ hàng thất bại.",
+            });
         } finally {
             setAddingId(null);
-            // Ẩn thông báo sau 2.5s
-            setTimeout(() => setMessage(null), 2500);
         }
     };
 
@@ -194,6 +203,9 @@ export default function HomePage() {
                 </div>
             </div>
             {/* Products End */}
+
+            {/* Toast hiển thị */}
+            <ToastMessage message={message} onClose={() => setMessage(null)} />
 
             {/* Subscribe Start */}
             <div className="container-fluid bg-secondary my-5">

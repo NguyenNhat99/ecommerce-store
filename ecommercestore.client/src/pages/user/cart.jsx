@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useMemo, useState, useCallback } from "react";
 import cartService from "../../services/cartService";
 import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
 
 const formatVND = (n) =>
     (Number(n || 0)).toLocaleString("vi-VN", { maximumFractionDigits: 0 }) + " ₫";
@@ -20,6 +21,7 @@ export default function CartPage() {
     const [busyIds, setBusyIds] = useState(new Set());
     const [message, setMessage] = useState(null);
     const [clearing, setClearing] = useState(false);
+    const { setCartQty } = useCart();
     const navigate = useNavigate();
 
     const refreshCart = useCallback(async () => {
@@ -79,6 +81,10 @@ export default function CartPage() {
         try {
             const updated = await cartService.updateItem(productId, next);
             setCart(updated);
+
+            // cập nhật badge
+            const total = await cartService.getTotalQty();
+            setCartQty(total);
         } catch {
             setMessage({ type: "danger", text: "Cập nhật số lượng thất bại." });
         } finally {
@@ -93,6 +99,11 @@ export default function CartPage() {
         try {
             const updated = await cartService.removeItem(productId);
             setCart(updated);
+
+            // cập nhật badge
+            const total = await cartService.getTotalQty();
+            setCartQty(total);
+
             setMessage({ type: "success", text: "Đã xóa sản phẩm khỏi giỏ." });
         } catch {
             setMessage({ type: "danger", text: "Xóa sản phẩm thất bại." });
@@ -110,6 +121,10 @@ export default function CartPage() {
         try {
             const updated = await cartService.clear(); // API trả CartView rỗng
             setCart(updated);
+
+            // cập nhật badge
+            setCartQty(0);
+
             setMessage({ type: "success", text: "Đã xóa toàn bộ giỏ hàng." });
         } catch {
             // Fallback: nếu BE chưa hỗ trợ /carts, xóa từng item

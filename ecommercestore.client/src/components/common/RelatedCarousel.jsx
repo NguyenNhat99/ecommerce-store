@@ -6,6 +6,11 @@ import "swiper/css/autoplay";
 export default function RelatedCarousel({ products }) {
     const IMG_BASE = "https://localhost:7097/Assets/Products/";
 
+    const buildImg = (avatar) => {
+        if (!avatar) return "/img/placeholder.png";
+        return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
+    };
+
     return (
         <div className="row px-xl-5">
             <div className="col">
@@ -28,7 +33,7 @@ export default function RelatedCarousel({ products }) {
                                     <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                                         <img
                                             className="img-fluid w-100"
-                                            src={p.avatar ? IMG_BASE + p.avatar : "/img/placeholder.png"}
+                                            src={buildImg(p?.avatar)}
                                             alt={p.name ?? "Sản phẩm"}
                                         />
                                     </div>

@@ -2,8 +2,12 @@
 import { useParams } from "react-router-dom";
 import productService from "../../services/productService";
 import RelatedCarousel from "../../components/common/RelatedCarousel";
+import SizeGuideModal from "../../components/common/SizeGuideModal";
+import ToastMessage from "../../components/common/ToastMessage";
+import cartService from "../../services/cartService";
+import { useCart } from "../../context/CartContext";
 
-const IMG_BASE = "https://localhost:7097/Assets/Products/";
+const IMG_BASE = "https://localhost:7235/Assets/Products/";
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -13,6 +17,15 @@ export default function ProductDetail() {
     const [related, setRelated] = useState([]);
     const [selectedSize, setSelectedSize] = useState(null);
     const [selectedColor, setSelectedColor] = useState(null);
+    const [showSizeGuide, setShowSizeGuide] = useState(false);
+    const [adding, setAdding] = useState(null);
+    const [message, setMessage] = useState(null);
+    const { setCartQty } = useCart();
+
+    const buildImg = (avatar) => {
+        if (!avatar) return "/img/placeholder.png";
+        return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
+    };
 
     useEffect(() => {
         (async () => {
@@ -39,6 +52,31 @@ export default function ProductDetail() {
             </div>
         );
     }
+
+    // ==== Handler: Thêm vào giỏ ====
+    const handleAddToCart = async () => {
+        try {
+            setAdding(true);
+            setMessage(null);
+            await cartService.addItem(product.id, quantity);
+            // cập nhật badge
+            const total = await cartService.getTotalQty();
+            setCartQty(total);
+
+            setMessage({
+                type: "success",
+                text: "Đã thêm vào giỏ hàng.",
+                showGoCart: true,
+            });
+        } catch (err) {
+            setMessage({
+                type: "danger",
+                text: err?.message || "Thêm vào giỏ hàng thất bại.",
+            });
+        } finally {
+            setAdding(false);
+        }
+    };
 
     const price = Number(product.price) || 0;
     const original = Number(product.originalPrice) || null;
@@ -81,7 +119,7 @@ export default function ProductDetail() {
                                         <img
                                             className="w-100 h-100"
                                             style={{ objectFit: "contain" }}
-                                            src={product.avatar ? IMG_BASE + product.avatar : "/img/placeholder.png"}
+                                            src={buildImg(product?.avatar)}
                                             alt={product.name}
                                         />
                                     </div>
@@ -225,9 +263,14 @@ export default function ProductDetail() {
                                         </button>
                                     </div>
                                 </div>
-                                <button className="btn btn-primary px-3">
-                                    <i className="fa fa-shopping-cart mr-1"></i>{" "}
-                                    Thêm giỏ hàng
+                                <button
+                                    type="button"
+                                    className="btn btn-primary px-3"
+                                    onClick={handleAddToCart}
+                                    disabled={adding}
+                                >
+                                    <i className="fa fa-shopping-cart mr-1"></i>
+                                    {adding ? "Đang thêm..." : "Thêm giỏ hàng"}
                                 </button>
                             </div>
 
@@ -237,6 +280,19 @@ export default function ProductDetail() {
                             >
                                 ← Quay lại
                             </button>
+                            <button
+                                className="btn btn-primary mb-3 ml-4"
+                                onClick={() => setShowSizeGuide(true)}
+                            >
+                                Hướng dẫn chọn size
+                            </button>
+
+                            {showSizeGuide && (
+                                <SizeGuideModal
+                                    type={product.sizeConversion}
+                                    onClose={() => setShowSizeGuide(false)}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
@@ -250,6 +306,8 @@ export default function ProductDetail() {
                 </div>
                 <RelatedCarousel products={related} />
             </div>
+
+            <ToastMessage message={message} onClose={() => setMessage(null)} />
         </>
     );
 }

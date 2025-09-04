@@ -3,20 +3,17 @@ import { Route, Routes } from "react-router";
 import { ROUTERS } from "./utils/router";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-
-
 //layout 
 const userlayout = lazy(() => import("./layouts/user/index"));
 const adminlayout = lazy(() => import("./layouts/admin/index"));
 
-
 //page user
 const Homepage = lazy(() => import("./pages/user/home"));
-const ProductPage = lazy(() => import("./pages/user/productpage"));
-const ProductDetail = lazy(() => import("./pages/user/ProductDetail"));
+const ProductPage = lazy(() => import("./pages/user/product"));
+const ProductDetail = lazy(() => import("./pages/user/productdetail"));
 const ContactPage = lazy(() => import("./pages/user/contact"));
-const CartPage = lazy(() => import("./pages/user/cartpage"));
-const CheckoutPage = lazy(() => import("./pages/user/checkoutpage"));
+const CartPage = lazy(() => import("./pages/user/cart"));
+const CheckoutPage = lazy(() => import("./pages/user/checkout"));
 
 //page admin
 import Dashboard from "./pages/admin/Dashboard";

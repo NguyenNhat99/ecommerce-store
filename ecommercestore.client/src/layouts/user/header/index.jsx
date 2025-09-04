@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import CategoryMenu from "../../../components/common/CategoryMenu";
 import HeroCarousel from "../../../components/common/HeroCarousel";
 import AuthContext from "../../../context/AuthContext";
+import { useCart } from "../../../context/CartContext";
 
 // Placeholder cố định kích thước để tránh CLS khi đang loading
 const AuthSlotSkeleton = () => (
@@ -36,6 +37,7 @@ const Header = () => {
     const { pathname } = useLocation();
     const { user, logout, loading } = useContext(AuthContext); // lấy loading từ context
     const isHome = pathname === "/";
+    const { cartQty } = useCart();
 
     const isActive = (path, exact = false) => {
         if (exact) return location.pathname === path;
@@ -129,13 +131,14 @@ const Header = () => {
                     </div>
 
                     <div className="col-lg-3 col-6 text-right">
-                        <Link to="/wishlist" className="btn border">
-                            <i className="fas fa-heart text-primary" />
-                            <span style={{ marginLeft: "4px" }}>0</span>
-                        </Link>
-                        <Link to="/cart" className="btn border">
+                        <Link to="/gio-hang" className="btn border position-relative">
                             <i className="fas fa-shopping-cart text-primary" />
-                            <span style={{ marginLeft: "4px" }}>0</span>
+                            <span
+                                className="badge badge-primary position-absolute"
+                                style={{ top: "-8px", right: "-8px" }}
+                            >
+                                {cartQty}
+                            </span>
                         </Link>
                     </div>
                 </div>

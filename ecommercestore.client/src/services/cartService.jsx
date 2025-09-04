@@ -38,6 +38,12 @@ const cartService = {
         const { data } = await api.post("/carts/merge");
         return data;
     },
+
+    // Lấy số lượng sản phẩm trong giỏ
+    getTotalQty: async () => {
+        const cart = await cartService.getCart();
+        return cart?.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
+    }
 };
 
 export default cartService;

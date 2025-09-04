@@ -1,6 +1,9 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import productService from "../../services/productService";
 import { useNavigate } from "react-router-dom";
+import ToastMessage from "../../components/common/ToastMessage";
+import cartService from "../../services/cartService";
+import { useCart } from "../../context/CartContext";
 
 const IMG_BASE = "https://localhost:7097/Assets/Products/";
 
@@ -13,6 +16,9 @@ export default function ProductPage() {
     const [priceRange, setPriceRange] = useState("all");
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedSizes, setSelectedSizes] = useState([]);
+    const [addingId, setAddingId] = useState(null);
+    const [message, setMessage] = useState(null);
+    const { setCartQty } = useCart();
 
     useEffect(() => {
         (async () => {
@@ -112,6 +118,31 @@ export default function ProductPage() {
                 ? prev.filter(c => c !== color)
                 : [...prev, color]
         );
+    };
+
+    // ==== Handler: Thêm vào giỏ ====
+    const handleAddToCart = async (productId, qty = 1) => {
+        try {
+            setAddingId(productId);
+            setMessage(null);
+            await cartService.addItem(productId, qty);
+            // cập nhật badge
+            const total = await cartService.getTotalQty();
+            setCartQty(total);
+
+            setMessage({
+                type: "success",
+                text: "Đã thêm vào giỏ hàng.",
+                showGoCart: true,
+            });
+        } catch (err) {
+            setMessage({
+                type: "danger",
+                text: err?.message || "Thêm vào giỏ hàng thất bại.",
+            });
+        } finally {
+            setAddingId(null);
+        }
     };
 
     return (
@@ -294,14 +325,24 @@ export default function ProductPage() {
                                                 >
                                                     <i className="fas fa-eye text-primary mr-1" />Chi tiết
                                                 </button>
-                                                <a href="#" className="btn btn-sm text-dark p-0">
-                                                    <i className="fas fa-shopping-cart text-primary mr-1" />Thêm giỏ hàng
-                                                </a>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm text-dark p-0"
+                                                    onClick={() => handleAddToCart(p.id, 1)}
+                                                    disabled={addingId === p.id}
+                                                    aria-busy={addingId === p.id}
+                                                >
+                                                    <i className="fas fa-shopping-cart text-primary mr-1"></i>
+                                                    {addingId === p.id ? "Đang thêm..." : "Thêm"}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 );
                             })}
+
+                            {/* Toast hiển thị */}
+                            <ToastMessage message={message} onClose={() => setMessage(null)} />
 
                             {/* Pagination (giữ nguyên) */}
                             <div className="col-12 pb-1">

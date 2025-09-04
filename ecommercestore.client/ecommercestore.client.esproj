@@ -10,7 +10,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="src\NewFolder\**" />
+    <None Remove="src\pages\user\profile\**" />
     <TypeScriptConfiguration Remove="src\NewFolder\**" />
+    <TypeScriptConfiguration Remove="src\pages\user\profile\**" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\pages\admin\brands\" />
@@ -18,7 +20,6 @@
     <Folder Include="src\pages\admin\accounts\" />
     <Folder Include="src\pages\admin\profile\" />
     <Folder Include="src\pages\admin\products\" />
-    <Folder Include="src\pages\user\profile\" />
     <Folder Include="src\utils\" />
   </ItemGroup>
 </Project>
