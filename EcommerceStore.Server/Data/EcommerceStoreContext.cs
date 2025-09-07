@@ -21,6 +21,9 @@ namespace EcommerceStore.Server.Data
         public DbSet<Size> Sizes { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Cart> Carts { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -53,6 +56,37 @@ namespace EcommerceStore.Server.Data
                 entity.HasOne(ps => ps.Product)
                     .WithMany(ps => ps.ProductSizes)
                     .HasForeignKey(ps => ps.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+            builder.Entity<OrderItem>(entity =>
+            {
+                entity.HasOne(oi => oi.Order)
+                    .WithMany(o => o.OrderItems)
+                    .HasForeignKey(oi => oi.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(oi => oi.Product)
+                    .WithMany()
+                    .HasForeignKey(oi => oi.ProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(oi => oi.Color)
+                    .WithMany()
+                    .HasForeignKey(oi => oi.ColorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(oi => oi.Size)
+                    .WithMany()
+                    .HasForeignKey(oi => oi.SizeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // PaymentTransaction configuration
+            builder.Entity<PaymentTransaction>(entity =>
+            {
+                entity.HasOne(pt => pt.Order)
+                    .WithMany()
+                    .HasForeignKey(pt => pt.OrderId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
         }
