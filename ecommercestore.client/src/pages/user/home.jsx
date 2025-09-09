@@ -1,12 +1,14 @@
 ﻿import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import VendorCarousel from "../../components/common/VendorCarousel";
 import productService from "../../services/productService";
 import cartService from "../../services/cartService"; // <-- thêm
 import { useNavigate } from "react-router-dom";
 import ToastMessage from "../../components/common/ToastMessage";
 import { useCart } from "../../context/CartContext";
+import RatingSummary from "../../components/common/RatingSummary";
 
-const IMG_BASE = "https://localhost:7097/Assets/Products/";
+const IMG_BASE = "https://localhost:7235/Assets/Products/";
 
 export default function HomePage() {
     const [products, setProducts] = useState([]);
@@ -100,31 +102,6 @@ export default function HomePage() {
             </div>
             {/* Featured End */}
 
-            {/* Categories Start */}
-            <div className="container-fluid pt-5">
-                <div className="row px-xl-5 pb-3">
-                    {[
-                        { img: "/eshopper-ui/img/cat-1.jpg", name: "Thời trang nam", qty: 15 },
-                        { img: "/eshopper-ui/img/cat-2.jpg", name: "Thời trang nữ", qty: 15 },
-                        { img: "/eshopper-ui/img/cat-3.jpg", name: "Thời trang trẻ em", qty: 15 },
-                        { img: "/eshopper-ui/img/cat-4.jpg", name: "Phụ kiện", qty: 15 },
-                        { img: "/eshopper-ui/img/cat-5.jpg", name: "Túi xách", qty: 15 },
-                        { img: "/eshopper-ui/img/cat-6.jpg", name: "Giày dép", qty: 15 },
-                    ].map((cat, idx) => (
-                        <div key={idx} className="col-lg-4 col-md-6 pb-1">
-                            <div className="cat-item d-flex flex-column border mb-4" style={{ padding: 30 }}>
-                                <p className="text-right">{cat.qty} sản phẩm</p>
-                                <a href="#" className="cat-img position-relative overflow-hidden mb-3">
-                                    <img className="img-fluid" src={cat.img} alt={cat.name} />
-                                </a>
-                                <h5 className="font-weight-semi-bold m-0">{cat.name}</h5>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-            {/* Categories End */}
-
             {/* Offer Start */}
             <div className="container-fluid offer pt-5">
                 <div className="row px-xl-5">
@@ -145,9 +122,12 @@ export default function HomePage() {
                                 <div className="col-6 text-center text-md-right py-5 px-4">
                                     <h5 className="text-uppercase text-primary mb-3">Giảm 20% cho tất cả đơn</h5>
                                     <h1 className="mb-4 font-weight-semi-bold">{offer.title}</h1>
-                                    <a href="#" className="btn btn-outline-primary py-md-2 px-md-3">
+                                    <Link
+                                        to="/cua-hang"
+                                        className={`btn btn-outline-primary py-md-2 px-md-3`}
+                                    >
                                         Mua ngay
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -182,9 +162,18 @@ export default function HomePage() {
                                     </div>
                                 </div>
                                 <div className="card-footer d-flex justify-content-between bg-light border">
-                                    <button type="button" className="btn btn-sm text-dark p-0">
-                                        <i className="fas fa-eye text-primary mr-1"></i>Xem
+                                    <button
+                                        className="btn btn-sm text-dark p-0"
+                                        onClick={() => navigate(`/chi-tiet/${p.id}`)}
+                                    >
+                                        <i className="fas fa-eye text-primary mr-1" />Xem
                                     </button>
+
+                                    <RatingSummary
+                                        productId={p.id}
+                                        compact={true}
+                                        showEmpty={false}
+                                    />
 
                                     <button
                                         type="button"
@@ -196,6 +185,7 @@ export default function HomePage() {
                                         <i className="fas fa-shopping-cart text-primary mr-1"></i>
                                         {addingId === p.id ? "Đang thêm..." : "Thêm"}
                                     </button>
+
                                 </div>
                             </div>
                         </div>
@@ -256,9 +246,18 @@ export default function HomePage() {
                                     </div>
                                 </div>
                                 <div className="card-footer d-flex justify-content-between bg-light border">
-                                    <button type="button" className="btn btn-sm text-dark p-0">
-                                        <i className="fas fa-eye text-primary mr-1"></i>Xem
+                                    <button
+                                        className="btn btn-sm text-dark p-0"
+                                        onClick={() => navigate(`/chi-tiet/${p.id}`)}
+                                    >
+                                        <i className="fas fa-eye text-primary mr-1" />Xem
                                     </button>
+
+                                    <RatingSummary
+                                        productId={p.id}
+                                        compact={true}
+                                        showEmpty={false}
+                                    />
 
                                     <button
                                         type="button"

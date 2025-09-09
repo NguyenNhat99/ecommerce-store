@@ -1,15 +1,17 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import productService from "../../services/productService";
-import { useNavigate } from "react-router-dom";
-import ToastMessage from "../../components/common/ToastMessage";
+import categoryService from "../../services/categoryService";
 import cartService from "../../services/cartService";
+import ToastMessage from "../../components/common/ToastMessage";
 import { useCart } from "../../context/CartContext";
-import RatingSummary from "../../components/common/RatingSummary";
 
 const IMG_BASE = "https://localhost:7235/Assets/Products/";
 
-export default function ProductPage() {
+export default function CategoryPage() {
+    const { id } = useParams(); // lấy id category từ URL
     const navigate = useNavigate();
+    const [category, setCategory] = useState(null);
     const [products, setProducts] = useState([]);
     const [search, setSearch] = useState("");
     const [sort, setSort] = useState("");
@@ -22,20 +24,27 @@ export default function ProductPage() {
     const { setCartQty } = useCart();
 
     useEffect(() => {
+        if (!id) return;
+
         (async () => {
             try {
-                const res = await productService.getAll(); // phải trả về MẢNG
-                // Trường hợp phòng hờ: nếu lỡ trả về object, bóc mảng ra
-                const list = Array.isArray(res) ? res : (Array.isArray(res?.data) ? res.data : []);
-                setProducts(list);
+                // Lấy thông tin category
+                const cat = await categoryService.getOne(id);
+                setCategory(cat);
+
+                // Lấy toàn bộ sản phẩm rồi lọc theo categoryId
+                const all = await productService.getAll();
+                const list = Array.isArray(all) ? all : (all?.data || []);
+                const filtered = list.filter(p => p.categoryId === Number(id));
+                setProducts(filtered);
             } catch (err) {
-                console.error("Lỗi khi load sản phẩm:", err);
-                setProducts([]); // không để undefined
+                console.error("Lỗi khi load sản phẩm theo category:", err);
+                setProducts([]);
             }
         })();
-    }, []);
+    }, [id]);
 
-    // Gom tất cả size từ DB
+    // gom sizes
     const allSizes = useMemo(() => {
         const set = new Set();
         products.forEach(p => {
@@ -43,10 +52,10 @@ export default function ProductPage() {
                 if (s?.sizeName) set.add(s.sizeName);
             });
         });
-        return Array.from(set); // ví dụ ["S","M","L","XL"]
+        return Array.from(set);
     }, [products]);
 
-    // Gom tất cả màu từ sản phẩm (tránh trùng)
+    // gom colors
     const allColors = useMemo(() => {
         const set = new Set();
         products.forEach(p => {
@@ -57,37 +66,30 @@ export default function ProductPage() {
         return Array.from(set);
     }, [products]);
 
+    // lọc search, màu, size, giá, sắp xếp
     const filteredProducts = useMemo(() => {
-        const items = Array.isArray(products) ? products : [];
-        const q = (search || "").trim().toLowerCase();
+        let arr = [...products];
+        const q = search.trim().toLowerCase();
 
-        let arr = items.filter((p) => ((p?.name ?? "") + "").toLowerCase().includes(q));
+        arr = arr.filter(p => (p?.name ?? "").toLowerCase().includes(q));
 
-        // lọc theo giá
         arr = arr.filter((p) => {
             const price = Number(p?.price) || 0;
             switch (priceRange) {
-                case "under500":
-                    return price < 500000;
-                case "500to1m":
-                    return price >= 500000 && price <= 1000000;
-                case "1mto2m":
-                    return price > 1000000 && price <= 2000000;
-                case "above2m":
-                    return price > 2000000;
-                default:
-                    return true;
+                case "under500": return price < 500000;
+                case "500to1m": return price >= 500000 && price <= 1000000;
+                case "1mto2m": return price > 1000000 && price <= 2000000;
+                case "above2m": return price > 2000000;
+                default: return true;
             }
         });
 
-        // lọc theo màu
         if (selectedColors.length > 0) {
             arr = arr.filter(p =>
                 p?.productColors?.some(c => selectedColors.includes(c.codeColor))
             );
         }
 
-        // lọc theo size
         if (selectedSizes.length > 0) {
             arr = arr.filter(p => {
                 const sizes = (p?.productSizes || []).map(s => s.sizeName);
@@ -95,52 +97,41 @@ export default function ProductPage() {
             });
         }
 
-        // sắp xếp
         if (sort === "latest") {
-            arr = [...arr].sort((a, b) => {
-                const tb = Date.parse(b?.createAt ?? b?.createdAt ?? 0) || 0;
-                const ta = Date.parse(a?.createAt ?? a?.createdAt ?? 0) || 0;
+            arr = arr.sort((a, b) => {
+                const tb = Date.parse(b?.createdAt ?? 0) || 0;
+                const ta = Date.parse(a?.createdAt ?? 0) || 0;
                 return tb - ta;
             });
         }
+
         return arr;
     }, [products, search, sort, priceRange, selectedColors, selectedSizes]);
 
-    // Helper an toàn để render ảnh
+    // helper ảnh
     const buildImg = (avatar) => {
         if (!avatar) return "/img/placeholder.png";
         return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
     };
 
-    // Toggle chọn màu
+    // toggle color
     const toggleColor = (color) => {
         setSelectedColors(prev =>
-            prev.includes(color)
-                ? prev.filter(c => c !== color)
-                : [...prev, color]
+            prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
         );
     };
 
-    // ==== Handler: Thêm vào giỏ ====
+    // handler add giỏ
     const handleAddToCart = async (productId, qty = 1) => {
         try {
             setAddingId(productId);
             setMessage(null);
             await cartService.addItem(productId, qty);
-            // cập nhật badge
             const total = await cartService.getTotalQty();
             setCartQty(total);
-
-            setMessage({
-                type: "success",
-                text: "Đã thêm vào giỏ hàng.",
-                showGoCart: true,
-            });
+            setMessage({ type: "success", text: "Đã thêm vào giỏ hàng.", showGoCart: true });
         } catch (err) {
-            setMessage({
-                type: "danger",
-                text: err?.message || "Thêm vào giỏ hàng thất bại.",
-            });
+            setMessage({ type: "danger", text: err?.message || "Thêm vào giỏ hàng thất bại." });
         } finally {
             setAddingId(null);
         }
@@ -148,14 +139,14 @@ export default function ProductPage() {
 
     return (
         <>
-            {/* Page Header */}
+            {/* Header */}
             <div className="container-fluid bg-secondary mb-5">
                 <div className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: "300px" }}>
-                    <h1 className="font-weight-semi-bold text-uppercase mb-3">Cửa Hàng</h1>
+                    <h1 className="font-weight-semi-bold text-uppercase mb-3">{category?.categoryName || "Danh mục sản phẩm"}</h1>
                     <div className="d-inline-flex">
                         <p className="m-0"><a href="/">Trang chủ</a></p>
                         <p className="m-0 px-2">-</p>
-                        <p className="m-0">Cửa hàng</p>
+                        <p className="m-0">Danh mục</p>
                     </div>
                 </div>
             </div>
@@ -165,7 +156,7 @@ export default function ProductPage() {
                 <div className="row px-xl-5">
                     {/* Sidebar */}
                     <div className="col-lg-3 col-md-12">
-                        {/* Lọc theo giá */ }
+                        {/* Lọc theo giá */}
                         <div className="border-bottom mb-4 pb-4">
                             <h5 className="font-weight-semi-bold mb-4">Lọc theo giá</h5>
                             <form>
@@ -303,40 +294,31 @@ export default function ProductPage() {
                                 const price = Number(p?.price) || 0;
                                 const original = Number(p?.originalPrice) || null;
                                 return (
-                                    <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={p?.id ?? Math.random()}>
+                                    <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={p?.id}>
                                         <div className="card product-item border-0 mb-4">
                                             <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                                                <img className="img-fluid w-100" src={buildImg(p?.avatar)} alt={p?.name ?? "Sản phẩm"} />
+                                                <img className="img-fluid w-100" src={buildImg(p?.avatar)} alt={p?.name} />
                                             </div>
                                             <div className="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                                <h6 className="text-truncate mb-3">{p?.name ?? "Sản phẩm"}</h6>
+                                                <h6 className="text-truncate mb-3">{p?.name}</h6>
                                                 <div className="d-flex justify-content-center">
                                                     <h6>{price.toLocaleString("vi-VN")} ₫</h6>
-                                                    {original ? (
+                                                    {original && (
                                                         <h6 className="text-muted ml-2">
                                                             <del>{original.toLocaleString("vi-VN")} ₫</del>
                                                         </h6>
-                                                    ) : null}
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="card-footer d-flex justify-content-between bg-light border">
-                                                <button
-                                                    className="btn btn-sm text-dark p-0"
-                                                    onClick={() => navigate(`/chi-tiet/${p.id}`)}
-                                                >
+                                                <button className="btn btn-sm text-dark p-0" onClick={() => navigate(`/chi-tiet/${p.id}`)}>
                                                     <i className="fas fa-eye text-primary mr-1" />Chi tiết
                                                 </button>
-                                                <RatingSummary
-                                                    productId={p.id}
-                                                    compact={true}
-                                                    showEmpty={false}
-                                                />
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm text-dark p-0"
                                                     onClick={() => handleAddToCart(p.id, 1)}
                                                     disabled={addingId === p.id}
-                                                    aria-busy={addingId === p.id}
                                                 >
                                                     <i className="fas fa-shopping-cart text-primary mr-1"></i>
                                                     {addingId === p.id ? "Đang thêm..." : "Thêm"}
@@ -347,29 +329,8 @@ export default function ProductPage() {
                                 );
                             })}
 
-                            {/* Toast hiển thị */}
+                            {/* ToastMessage */}
                             <ToastMessage message={message} onClose={() => setMessage(null)} />
-
-                            {/* Pagination (giữ nguyên) */}
-                            <div className="col-12 pb-1">
-                                <nav aria-label="Page navigation">
-                                    <ul className="pagination justify-content-center mb-3">
-                                        <li className="page-item disabled">
-                                            <a className="page-link" href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                                        <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                        <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                        <li className="page-item">
-                                            <a className="page-link" href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
                         </div>
                     </div>
                 </div>

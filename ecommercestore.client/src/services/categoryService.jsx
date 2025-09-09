@@ -3,11 +3,11 @@
 const categoryService = {
     getAll: async () => {
         try {
-            const response = await api.get('/category');
-            return response.data;
+            const response = await api.get("/category");
+            return response.data || [];  // luôn trả về array
         } catch (error) {
-            const message = error.response?.data?.message || "Lấy danh sách thể loại thất bại";
-            return Promise.reject(message);
+            console.error("API category error:", error);
+            return []; // fallback về mảng rỗng để không bị undefined
         }
     },
 

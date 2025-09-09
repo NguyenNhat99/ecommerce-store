@@ -17,13 +17,13 @@ export default function HeroCarousel() {
             img: '/eshopper-ui/img/carousel-1.jpg',
             subtitle: 'Giảm 10% cho đơn hàng đầu',
             title: 'Thời trang mới',
-            link: '/shop',
+            link: '/cua-hang',
         },
         {
             img: '/eshopper-ui/img/carousel-2.jpg',
             subtitle: 'Giảm 10% cho đơn hàng đầu',
             title: 'Giá hợp lý',
-            link: '/shop',
+            link: '/cua-hang',
         },
     ];
 

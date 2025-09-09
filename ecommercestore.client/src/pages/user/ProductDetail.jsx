@@ -6,6 +6,8 @@ import SizeGuideModal from "../../components/common/SizeGuideModal";
 import ToastMessage from "../../components/common/ToastMessage";
 import cartService from "../../services/cartService";
 import { useCart } from "../../context/CartContext";
+import ProductRating from "../../components/common/ProductRating";
+import RatingSummary from "../../components/common/RatingSummary";
 
 const IMG_BASE = "https://localhost:7235/Assets/Products/";
 
@@ -21,6 +23,8 @@ export default function ProductDetail() {
     const [adding, setAdding] = useState(null);
     const [message, setMessage] = useState(null);
     const { setCartQty } = useCart();
+    const [ratingSummary, setRatingSummary] = useState(null);
+
 
     const buildImg = (avatar) => {
         if (!avatar) return "/img/placeholder.png";
@@ -154,9 +158,13 @@ export default function ProductDetail() {
 
                         {/* Thông tin sản phẩm */}
                         <div className="col-lg-7 pb-5">
-                            <h3 className="font-weight-semi-bold">
-                                {product.name}
-                            </h3>
+                            <h3 className="font-weight-semi-bold">{product.name}</h3>
+                            <RatingSummary
+                                avg={ratingSummary?.avg}
+                                count={ratingSummary?.count}
+                                showEmpty={true}
+                                compact={false}
+                            />
                             <h3 className="font-weight-semi-bold mb-4">
                                 {price.toLocaleString("vi-VN")} ₫
                                 {original ? (
@@ -298,6 +306,9 @@ export default function ProductDetail() {
                 </div>
                 {/* Shop Detail End */}
             </div>
+
+            {/* Đánh giá */}
+            <ProductRating productId={id} onSummaryChange={setRatingSummary} />
 
             {/* Related */}
             <div className="container-fluid py-5">
