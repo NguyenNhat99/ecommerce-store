@@ -1,0 +1,9 @@
+﻿namespace DoAnChuyenNganh.Server.Helpers
+{
+    public static class UserRole
+    {
+        public const string Admin = "Admin";
+        public const string Staff = "Staff";
+        public const string Customer = "Customer";
+    }
+}

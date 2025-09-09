@@ -12,7 +12,7 @@ export default function AuthCardHeader({ icon }) {
             <Button
                 variant="outline-light"
                 size="sm"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/")}
                 className="rounded-pill px-3"
             >
                 <ArrowLeft className="me-1" /> Quay lại

@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import ToastMessage from "../../components/common/ToastMessage";
 import cartService from "../../services/cartService";
 import { useCart } from "../../context/CartContext";
+import RatingSummary from "../../components/common/RatingSummary";
 
-const IMG_BASE = "https://localhost:7097/Assets/Products/";
+const IMG_BASE = "https://localhost:7235/Assets/Products/";
 
 export default function ProductPage() {
     const navigate = useNavigate();
@@ -325,6 +326,11 @@ export default function ProductPage() {
                                                 >
                                                     <i className="fas fa-eye text-primary mr-1" />Chi tiết
                                                 </button>
+                                                <RatingSummary
+                                                    productId={p.id}
+                                                    compact={true}
+                                                    showEmpty={false}
+                                                />
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm text-dark p-0"

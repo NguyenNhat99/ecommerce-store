@@ -6,6 +6,9 @@
         CONTACT: "/lien-he",
         CART: "/gio-hang",
         CHECKOUT: "/thanh-toan",
+        CATEGORY: "/danh-muc/:id",
+        PROFILE: "/thong-tin",
+        CHANGE_PASSWORD: "/doi-mat-khau",
     },
     AUTH: {
         LOGIN: "dang-nhap",

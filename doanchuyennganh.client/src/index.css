@@ -1,0 +1,210 @@
+﻿:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+/*  display: flex;*/
+/*  place-items: center;*/
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/*-------------------- Vendor Carousel CSS begin --------------------*/
+/* đảm bảo Swiper không bị template override */
+.vendor-carousel-outer {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ép Swiper wrapper / slide về behavior chuẩn flex */
+.vendor-swiper .swiper-wrapper {
+    display: flex !important;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* đảm bảo mỗi slide không bị kéo to, dùng flex basis do Swiper vẫn can thiệp */
+.vendor-swiper .swiper-slide {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ảnh vendor: giữ tỷ lệ, không tràn */
+.vendor-slide-img {
+    max-height: 80px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* thêm padding wrapper để tránh bị kéo sát mép */
+.vendor-swiper {
+    padding: 0 6px;
+}
+/*-------------------- Vendor Carousel CSS end --------------------*/
+
+
+/*-------------------- Hero Carousel CSS begin --------------------*/
+/* Full-bleed: kéo ra full ngang ngoài .container của Bootstrap */
+.hero-swiper {
+    width: 100%;
+    height: 410px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ép wrapper / slide của hero đúng behavior (tránh bị CSS global ghi đè) */
+.hero-swiper .swiper-wrapper {
+    display: flex !important;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+.hero-swiper .swiper-slide {
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+/* ảnh */
+.hero-slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* caption */
+.hero-caption {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none; /* tránh chặn click navigation nếu cần */
+}
+
+.hero-caption-inner {
+    max-width: 700px;
+    padding: 1rem;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;       /* canh chữ và nút vào giữa */
+    justify-content: center;
+}
+
+/* nút next/prev style (cụ thể cho hero) */
+.hero-swiper .swiper-button-next,
+.hero-swiper .swiper-button-prev {
+    background: rgba(0, 0, 0, 0.28); /* mờ nhẹ */
+    width: 40px; /* nhỏ hơn 45px */
+    height: 40px;
+    border-radius: 50%; /* bo tròn cho đẹp */
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color .18s ease, transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    opacity: 0.88;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    z-index: 30;
+}
+
+.hero-swiper .swiper-button-prev:hover,
+.hero-swiper .swiper-button-next:hover,
+.hero-swiper .swiper-button-prev:focus,
+.hero-swiper .swiper-button-next:focus {
+    background: rgba(0, 0, 0, 0.82); /* đậm hơn khi hover */
+    transform: translateY(-2px) scale(1.04);
+    opacity: 1;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+    outline: none;
+}
+
+.hero-swiper .swiper-button-prev::after,
+.hero-swiper .swiper-button-next::after {
+  font-size: 14px;     /* icon nhỏ hơn */
+  color: #fff;
+  opacity: 1;
+  line-height: 1;
+}
+
+.hero-swiper .swiper-pagination-bullet {
+    background: #fff;
+    visibility: hidden;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+    .hero-swiper {
+        height: 300px;
+    }
+}
+/*-------------------- Hero Carousel CSS end --------------------*/

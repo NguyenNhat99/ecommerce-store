@@ -14,6 +14,9 @@ const ProductDetail = lazy(() => import("./pages/user/productdetail"));
 const ContactPage = lazy(() => import("./pages/user/contact"));
 const CartPage = lazy(() => import("./pages/user/cart"));
 const CheckoutPage = lazy(() => import("./pages/user/checkout"));
+const CategoryPage = lazy(() => import("./pages/user/category"));
+const ProfilePage = lazy(() => import("./pages/user/profile"));
+const ChangePassword = lazy(() => import("./pages/user/changepassword"));
 
 //page admin
 import Dashboard from "./pages/admin/Dashboard";
@@ -60,7 +63,10 @@ const ROUTES_CONFIG = [
     {path: ROUTERS.USER.PRODUCT_DETAIL,component: <ProductDetail />,layout: userlayout,},
     {path: ROUTERS.USER.CONTACT,component: <ContactPage />,layout: userlayout,},
     {path: ROUTERS.USER.CART,component: <CartPage />,layout: userlayout,},
-    { path: ROUTERS.USER.CHECKOUT, component: <CheckoutPage />, layout: userlayout, },
+    {path: ROUTERS.USER.CHECKOUT, component: <CheckoutPage />, layout: userlayout,},
+    { path: ROUTERS.USER.CATEGORY, component: <CategoryPage />, layout: userlayout, },
+    { path: ROUTERS.USER.PROFILE, component: <ProfilePage />, layout: userlayout, },
+    { path: ROUTERS.USER.CHANGE_PASSWORD, component: <ChangePassword />, layout: userlayout, },
     { path: ROUTERS.ADMIN.DASHBOARD, component: <Dashboard />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.BRANDS, component: <Brands />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.CATEGORIES, component: <Categories />, layout: adminlayout, },
