@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-# DoAnChuyenNganh
-=======
 # EcommerceStore
->>>>>>> thanhtoan
