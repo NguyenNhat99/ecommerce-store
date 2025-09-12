@@ -69,16 +69,6 @@ namespace EcommerceStore.Server.Data
                     .WithMany()
                     .HasForeignKey(oi => oi.ProductId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(oi => oi.Color)
-                    .WithMany()
-                    .HasForeignKey(oi => oi.ColorId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(oi => oi.Size)
-                    .WithMany()
-                    .HasForeignKey(oi => oi.SizeId)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // PaymentTransaction configuration

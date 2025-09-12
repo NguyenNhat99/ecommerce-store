@@ -10,7 +10,7 @@ namespace EcommerceStore.Server.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public int OrderId { get; set; }
+        public string OrderId { get; set; } = null!;
         public virtual Order Order { get; set; } = null!;
 
         [MaxLength(50)]

@@ -40,6 +40,7 @@ namespace EcommerceStore.Server.Helpers
                 .ForMember(dest => dest.CodeColor, opt => opt.MapFrom(src => src.Color.CodeColor));
 
             CreateMap<Color, ColorModel>().ReverseMap();
+            CreateMap<Order, OrderResponseModel>();
 
             CreateMap<User, AccountModel>()
                  .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))

@@ -1,6 +1,7 @@
 ﻿using EcommerceStore.Server.Data;
 using EcommerceStore.Server.Repository;
 using EcommerceStore.Server.Services;
+using EcommerceStore.Server.Services.VnPayService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +16,10 @@ var MyCors = "_MyCors";
 builder.Services.AddCors(opts =>
 {
     opts.AddPolicy(MyCors, p => p
-        .WithOrigins(
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-            "https://localhost:5173" // nếu FE chạy https
-        )
+        .WithOrigins("http://localhost:5173", "https://localhost:5173")
         .AllowAnyHeader()
         .AllowAnyMethod()
-        .AllowCredentials()
+        .AllowCredentials() 
     );
 });
 
@@ -60,7 +57,6 @@ builder.Services.AddDbContext<EcommerceStoreContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("EcommerceStore"));
 });
-
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddServices();
 builder.Services.AddRepositories();
@@ -84,6 +80,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
+builder.Services.Configure<VnPayOptions>(builder.Configuration.GetSection("VnPay"));
 
 
 var app = builder.Build();

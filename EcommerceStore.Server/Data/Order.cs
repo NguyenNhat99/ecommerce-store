@@ -7,8 +7,7 @@ namespace EcommerceStore.Server.Data
     public class Order
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public string Id { get; set; } = null!;
 
         [MaxLength(450)]
         public string? UserId { get; set; }
@@ -20,7 +19,7 @@ namespace EcommerceStore.Server.Data
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
         [MaxLength(20)]
-        public string OrderStatus { get; set; } = "Pending"; // Pending, Processing, Shipped, Delivered, Cancelled
+        public string OrderStatus { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }

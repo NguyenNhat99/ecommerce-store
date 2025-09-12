@@ -20,11 +20,7 @@ namespace EcommerceStore.Server.Repository.Implementations
 
         private const string CART_COOKIE = "cart_id";
 
-        public CartRepository(
-            EcommerceStoreContext context,
-            IHttpContextAccessor httpContextAccessor,
-            UserManager<User> userManager,
-            IMapper mapper)
+        public CartRepository(EcommerceStoreContext context,IHttpContextAccessor httpContextAccessor,UserManager<User> userManager,IMapper mapper)
         {
             _context = context;
             _http = httpContextAccessor;
@@ -50,7 +46,7 @@ namespace EcommerceStore.Server.Repository.Implementations
         /// - Nếu chưa đăng nhập nhưng có cookie: theo AnonymousId.
         /// - Nếu không có cả 2: trả null (tuyệt đối không vớ giỏ của người khác).
         /// </summary>
-        private async Task<Cart?> FindOpenCartAsync(string? userId, string? anonId)
+        public async Task<Cart?> FindOpenCartAsync(string? userId, string? anonId)
         {
             if (!string.IsNullOrEmpty(userId))
             {

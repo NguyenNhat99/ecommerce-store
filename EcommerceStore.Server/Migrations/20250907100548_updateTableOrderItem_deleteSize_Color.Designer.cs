@@ -3,6 +3,7 @@ using System;
 using EcommerceStore.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EcommerceStore.Server.Migrations
 {
     [DbContext(typeof(EcommerceStoreContext))]
-    partial class EcommerceStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250907100548_updateTableOrderItem_deleteSize_Color")]
+    partial class updateTableOrderItem_deleteSize_Color
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

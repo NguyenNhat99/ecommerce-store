@@ -3,6 +3,7 @@ using System;
 using EcommerceStore.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EcommerceStore.Server.Migrations
 {
     [DbContext(typeof(EcommerceStoreContext))]
-    partial class EcommerceStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250907071341_updateTableOrder_id")]
+    partial class updateTableOrder_id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,6 +223,9 @@ namespace EcommerceStore.Server.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ColorId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("OrderId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -230,14 +236,21 @@ namespace EcommerceStore.Server.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("SizeId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ColorId");
+
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("SizeId");
 
                     b.ToTable("OrderItem");
                 });
@@ -711,6 +724,11 @@ namespace EcommerceStore.Server.Migrations
 
             modelBuilder.Entity("EcommerceStore.Server.Data.OrderItem", b =>
                 {
+                    b.HasOne("EcommerceStore.Server.Data.Color", "Color")
+                        .WithMany()
+                        .HasForeignKey("ColorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("EcommerceStore.Server.Data.Order", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
@@ -723,9 +741,18 @@ namespace EcommerceStore.Server.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("EcommerceStore.Server.Data.Size", "Size")
+                        .WithMany()
+                        .HasForeignKey("SizeId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Color");
+
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Size");
                 });
 
             modelBuilder.Entity("EcommerceStore.Server.Data.PaymentTransaction", b =>

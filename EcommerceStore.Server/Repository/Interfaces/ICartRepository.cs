@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using EcommerceStore.Server.Data;
 using EcommerceStore.Server.Models;
 
 namespace EcommerceStore.Server.Repository.Interfaces
@@ -11,5 +12,6 @@ namespace EcommerceStore.Server.Repository.Interfaces
         Task<CartView> RemoveItemAsync(int productId);
         Task MergeAnonymousToUserAsync();
         Task<CartView> ClearAsync();
+        Task<Cart?> FindOpenCartAsync(string? userId, string? anonId);
     }
 }

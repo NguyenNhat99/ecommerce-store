@@ -14,6 +14,8 @@ const ProductDetail = lazy(() => import("./pages/user/productdetail"));
 const ContactPage = lazy(() => import("./pages/user/contact"));
 const CartPage = lazy(() => import("./pages/user/cart"));
 const CheckoutPage = lazy(() => import("./pages/user/checkout"));
+const CheckoutSuccess = lazy(() => import("./pages/user/checkoutSuccess"));
+const VnPayReturn = lazy(() => import("./pages/user/VnPayReturn"));
 
 //page admin
 import Dashboard from "./pages/admin/Dashboard";
@@ -43,6 +45,8 @@ const UpdateProduct = lazy(() => import("./pages/admin/products/UpdateProduct"))
 const Profile = lazy(() => import("./pages/admin/profile/index"));
 const Accounts = lazy(() => import("./pages/admin/accounts/index"));
 const DetailAccount = lazy(() => import("./pages/admin/accounts/detailAccount"));
+const OrderPage = lazy(() => import("./pages/admin/orders/index"));
+const OrderDetail = lazy(() => import("./pages/admin/orders/detail"));
 
 //auth page
 const Login = lazy(() => import("./pages/auth/login"));
@@ -61,6 +65,8 @@ const ROUTES_CONFIG = [
     {path: ROUTERS.USER.CONTACT,component: <ContactPage />,layout: userlayout,},
     {path: ROUTERS.USER.CART,component: <CartPage />,layout: userlayout,},
     { path: ROUTERS.USER.CHECKOUT, component: <CheckoutPage />, layout: userlayout, },
+    { path: ROUTERS.USER.CHECKOUTSUCCESS, component: <CheckoutSuccess />, layout: userlayout, },
+    { path: ROUTERS.USER.PAYMENT, component: <VnPayReturn />, layout: userlayout, },
     { path: ROUTERS.ADMIN.DASHBOARD, component: <Dashboard />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.BRANDS, component: <Brands />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.CATEGORIES, component: <Categories />, layout: adminlayout, },
@@ -70,6 +76,8 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.ADMIN.PROFILE, component: <Profile />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.ACCOUNTS, component: <Accounts />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.ACCOUNT_DETAIL, component: <DetailAccount />, layout: adminlayout, },
+    { path: ROUTERS.ADMIN.ORDERS, component: <OrderPage />, layout: adminlayout, },
+    { path: ROUTERS.ADMIN.ORDERDETAIL, component: <OrderDetail />, layout: adminlayout, },
     {
         path: "/components/buttons",
         component: <Buttons />, layout: adminlayout
