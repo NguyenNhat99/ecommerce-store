@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import ToastMessage from "../../components/common/ToastMessage";
 import { useCart } from "../../context/CartContext";
 import RatingSummary from "../../components/common/RatingSummary";
+import WeatherSuggestionWidget from "../../components/common/WeatherSuggestionWidget";
 
 const IMG_BASE = "https://localhost:7235/Assets/Products/";
 
@@ -102,39 +103,10 @@ export default function HomePage() {
             </div>
             {/* Featured End */}
 
-            {/* Offer Start */}
-            <div className="container-fluid offer pt-5">
-                <div className="row px-xl-5">
-                    {[
-                        { img: "/eshopper-ui/img/offer-1.png", title: "Bộ sưu tập mùa xuân" },
-                        { img: "/eshopper-ui/img/offer-2.png", title: "Bộ sưu tập mùa đông" },
-                    ].map((offer, idx) => (
-                        <div key={idx} className="col-md-6 pb-4">
-                            <div className="row align-items-center bg-secondary text-white m-0">
-                                <div className="col-6 p-0" style={{ minHeight: "300px" }}>
-                                    <img
-                                        src={offer.img}
-                                        alt={offer.title}
-                                        className="img-fluid w-100 h-100"
-                                        style={{ objectFit: "cover" }}
-                                    />
-                                </div>
-                                <div className="col-6 text-center text-md-right py-5 px-4">
-                                    <h5 className="text-uppercase text-primary mb-3">Giảm 20% cho tất cả đơn</h5>
-                                    <h1 className="mb-4 font-weight-semi-bold">{offer.title}</h1>
-                                    <Link
-                                        to="/cua-hang"
-                                        className={`btn btn-outline-primary py-md-2 px-md-3`}
-                                    >
-                                        Mua ngay
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            {/* Widget gợi ý theo thời tiết */}
+            <div className="container-fluid px-xl-5">
+                <WeatherSuggestionWidget />
             </div>
-            {/* Offer End */}
 
             {/* Products Start */}
             <div className="container-fluid pt-5">
