@@ -6,8 +6,14 @@
         CONTACT: "/lien-he",
         CART: "/gio-hang",
         CHECKOUT: "/thanh-toan",
+<<<<<<< HEAD
         CHECKOUTSUCCESS: "/dat-hang-thanh-cong",
         PAYMENT: "/payment/vnpay-return"
+=======
+        CATEGORY: "/danh-muc/:id",
+        PROFILE: "/thong-tin",
+        CHANGE_PASSWORD: "/doi-mat-khau",
+>>>>>>> 425bf63bcc860173941ee01b9843fdb3b8e79e11
     },
     AUTH: {
         LOGIN: "dang-nhap",

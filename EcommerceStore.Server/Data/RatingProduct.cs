@@ -9,11 +9,11 @@ namespace EcommerceStore.Server.Data
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { set; get; }
-        public string Email { set; get; } = null!;
         public int ProductId { set; get; } 
         public int Rating { set; get; }
         public string Comment { set; get; } = string.Empty;
-        public virtual Product Product { set; get; } = null!;
-        public virtual User User { set; get; } = null!;
+        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+        public virtual Product? Product { set; get; }
+        public virtual User? User { set; get; }
     }
 }

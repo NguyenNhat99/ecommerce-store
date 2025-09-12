@@ -70,6 +70,13 @@ namespace EcommerceStore.Server.Helpers
                 // map sang List<CartItemView> (sử dụng mapping ở trên)
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
             // TotalItems & Subtotal tự động tính trong getter => không cần map
+
+            // RatingProduct <-> RatingProductModel
+            CreateMap<RatingProduct, RatingProductModel>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User != null ? src.User.Email : null))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User != null ? src.User.Id : null))
+                .ReverseMap()
+                .ForMember(dest => dest.User, opt => opt.Ignore());
         }
     }
 }

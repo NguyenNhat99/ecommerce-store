@@ -271,26 +271,31 @@ const Header = () => {
                                                     >
                                                         {initials || "U"}
                                                     </div>
-                                                )}
-                                                <span className="ml-2">
-                                                    {user.fullName || user.userName || "Tài khoản"}
-                                                </span>
+                                                    )}
+                                                <span className="ml-2">{user.firstName} {user.lastName}</span>
                                             </a>
 
                                             <div
                                                 className="dropdown-menu dropdown-menu-right"
                                                 aria-labelledby="userDropdown"
                                             >
-                                                <Link className="dropdown-item" to="/tai-khoan/thong-tin">
+                                                <Link className="dropdown-item" to="/thong-tin">
                                                     Thông tin
                                                 </Link>
-                                                <Link className="dropdown-item" to="/tai-khoan/don-hang">
+                                                <Link className="dropdown-item" to="/don-hang">
                                                     Đơn hàng đã mua
                                                 </Link>
                                                 <div className="dropdown-divider"></div>
-                                                <button className="dropdown-item" type="button" onClick={logout}>
-                                                    Đăng xuất
-                                                </button>
+                                                    <button
+                                                        className="dropdown-item"
+                                                        type="button"
+                                                        onClick={() => {
+                                                            logout();
+                                                            window.location.href = "/";
+                                                        }}
+                                                    >
+                                                        Đăng xuất
+                                                    </button>
                                             </div>
                                         </div>
                                     )}
