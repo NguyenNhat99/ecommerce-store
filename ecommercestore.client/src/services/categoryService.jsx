@@ -3,7 +3,7 @@
 const categoryService = {
     getAll: async () => {
         try {
-            const response = await api.get("/category");
+            const response = await api.get("/categories");
             return response.data || [];  // luôn trả về array
         } catch (error) {
             console.error("API category error:", error);
@@ -13,7 +13,7 @@ const categoryService = {
 
     getOne: async (id) => {
         try {
-            const response = await api.get(`/category/${id}`);
+            const response = await api.get(`/categories/${id}`);
             return response.data;
         } catch (error) {
             const message = error.response?.data?.message || "Lấy thể loại thất bại";
@@ -23,7 +23,7 @@ const categoryService = {
 
     createOne: async (data) => {
         try {
-            const response = await api.post('/category', data);
+            const response = await api.post('/categories', data);
             return response.data;
         } catch (error) {
             const message = error.response?.data?.message || "Tạo thể loại thất bại";
@@ -34,7 +34,7 @@ const categoryService = {
     updateOne: async (id, data) => {
         try {
             const payload = { ...data, id };
-            await api.put(`/category/${id}`, payload);
+            await api.put(`/categories/${id}`, payload);
             return Promise.resolve("Cập nhật thành công");
         } catch (error) {
             const message = error.response?.data?.message || "Cập nhật thể loại thất bại";
@@ -44,7 +44,7 @@ const categoryService = {
 
     deleteOne: async (id) => {
         try {
-            await api.delete(`/category?id=${id}`);
+            await api.delete(`/categories?id=${id}`);
             return Promise.resolve("Xóa thành công");
         } catch (error) {
             const message = error.response?.data?.message || "Xóa thể loại thất bại";

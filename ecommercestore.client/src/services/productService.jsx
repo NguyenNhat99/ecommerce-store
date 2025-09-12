@@ -11,7 +11,7 @@ const productService = {
             console.log(response)
             return response.data;
         } catch (error) {
-            return Promise.reject("Tạo sản phẩm thất bại");
+            return Promise.reject("Tạo sản phẩm thất bại", error);
         }
     },
 
@@ -24,7 +24,7 @@ const productService = {
             });
             return response.data;
         } catch (error) {
-            return Promise.reject("Cập nhật sản phẩm thất bại");
+            return Promise.reject("Cập nhật sản phẩm thất bại", error);
         }
     },
 
@@ -33,7 +33,7 @@ const productService = {
             const response = await api.get(`/products`);
             return response.data;
         } catch (error) {
-            return Promise.reject("Lấy sản phẩm thất bại");
+            return Promise.reject("Lấy sản phẩm thất bại", error);
         }
     },
 
@@ -42,7 +42,7 @@ const productService = {
             const response = await api.get(`/products/${id}`);
             return response.data;
         } catch (error) {
-            return Promise.reject("Lấy sản phẩm thất bại");
+            return Promise.reject("Lấy sản phẩm thất bại", error);
         }
     },
 
@@ -51,7 +51,7 @@ const productService = {
             await api.delete(`/products/${id}`);
             return Promise.resolve();
         } catch (error) {
-            return Promise.reject("Xóa sản phẩm thất bại");
+            return Promise.reject("Xóa sản phẩm thất bại", error);
         }
     },
 };
