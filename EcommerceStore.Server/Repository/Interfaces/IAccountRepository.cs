@@ -19,5 +19,7 @@ namespace EcommerceStore.Server.Repository.Interfaces
         Task<bool> UnlockAsync(string email);
         Task<bool> SetLockoutEnabledAsync(string email, bool enabled);
         Task<bool> ResetAccessFailedAsync(string email);
+        Task<bool> SetSingleRoleAsync(string email, string roleName);
+
     }
 }

@@ -4,6 +4,7 @@ using EcommerceStore.Server.Models;
 using EcommerceStore.Server.Repository.Implementations;
 using EcommerceStore.Server.Repository.Interfaces;
 using EcommerceStore.Server.Services.VnPayService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -229,7 +230,39 @@ namespace EcommerceStore.Server.Controllers
                 return StatusCode(500, new { message = "Lỗi server ! Vui lòng thử lại sau" });
             }
         }
+        // DTOs gọn
+        public record UpdatePaymentStatusDto(string PaymentStatus);
+        public record UpdateOrderStatusDto(string OrderStatus);
 
+        /// <summary>
+        /// Cập nhật trạng thái thanh toán: Pending | Paid | Failed | Refunded | Processing
+        /// </summary>
+        [HttpPatch("{id}/payment-status")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> UpdatePaymentStatus(string id, [FromBody] UpdatePaymentStatusDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(dto?.PaymentStatus))
+                return BadRequest(new { message = "Thiếu tham số" });
+
+            var ok = await _orderRepository.UpdatePaymentStatusAsync(id, dto.PaymentStatus);
+            return ok ? Ok(new { message = "Cập nhật PaymentStatus thành công", id, paymentStatus = dto.PaymentStatus })
+                      : BadRequest(new { message = "PaymentStatus không hợp lệ hoặc đơn không tồn tại" });
+        }
+
+        /// <summary>
+        /// Cập nhật trạng thái đơn hàng: awaitpay | pend | processing | shipped | success | cancel | err
+        /// </summary>
+        [HttpPatch("{id}/order-status")]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> UpdateOrderStatus(string id, [FromBody] UpdateOrderStatusDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(dto?.OrderStatus))
+                return BadRequest(new { message = "Thiếu tham số" });
+
+            var ok = await _orderRepository.UpdateOrderStatusAsync(id, dto.OrderStatus);
+            return ok ? Ok(new { message = "Cập nhật OrderStatus thành công", id, orderStatus = dto.OrderStatus })
+                      : BadRequest(new { message = "OrderStatus không hợp lệ hoặc đơn không tồn tại" });
+        }
 
     }
 }

@@ -5,7 +5,7 @@ import {
     ListGroup, Toast, ToastContainer
 } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import orderService from "../../../services/orderService"; // chỉnh path nếu khác
+import orderService from "../../../services/orderService"; // giữ path theo dự án
 
 // Map & helpers
 const PAYMENT_STATUS_VARIANT = {
@@ -33,21 +33,24 @@ const ORDER_STATUS_LABEL = {
     cancel: "Đã hủy",
     err: "Lỗi",
 };
-const PAYMENT_METHOD_LABEL = {
-    vnp: "VNPay",
-    cod: "COD",
-};
-const toVnd = (n) => new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Number(n || 0)) + " ₫";
+const PAYMENT_METHOD_LABEL = { vnp: "VNPay", cod: "COD" };
+
+const toVnd = (n) =>
+    new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Number(n || 0)) + " ₫";
 const fmtDateTime = (s) => {
     if (!s) return "";
     const d = new Date(s);
     if (isNaN(d)) return String(s);
-    return d.toLocaleString("vi-VN", { hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleString("vi-VN", {
+        hour12: false, year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+    });
 };
 
 export default function OrderDetailBootstrap() {
     const { id } = useParams();
     const navigate = useNavigate();
+
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadErr, setLoadErr] = useState("");
@@ -62,28 +65,25 @@ export default function OrderDetailBootstrap() {
             setLoadErr("");
             const data = await orderService.getOne(id); // GET /orders/{id}
             setOrder(data);
-        } catch (e) {
+        } catch {
             setLoadErr("Không tải được đơn hàng.");
         } finally {
             setLoading(false);
         }
     }, [id]);
 
-    useEffect(() => {
-        fetchOrder();
-    }, [fetchOrder]);
+    useEffect(() => { fetchOrder(); }, [fetchOrder]);
 
-    // === ACTIONS (tạm mô phỏng trên FE; nối API PATCH/PUT khi bạn bổ sung ở BE) ===
+    // ====== ACTIONS: gọi API thật ======
     const updatePaymentStatus = async (next) => {
         if (!order) return;
         try {
             setBusy(true);
-            // TODO: call API PATCH /orders/{id}/payment-status { paymentStatus: next }
-            // await orderService.updatePaymentStatus(order.id, next);
-            setOrder((o) => ({ ...o, paymentStatus: next }));
+            await orderService.updatePaymentStatus(order.id, next); // PATCH /orders/{id}/payment-status
+            await fetchOrder(); // đồng bộ lại từ server
             showToast("Cập nhật Payment Status thành công!");
-        } catch {
-            showToast("Cập nhật Payment Status thất bại!", "danger");
+        } catch (e) {
+            showToast(typeof e === "string" ? e : "Cập nhật Payment Status thất bại!", "danger");
         } finally {
             setBusy(false);
         }
@@ -93,18 +93,17 @@ export default function OrderDetailBootstrap() {
         if (!order) return;
         try {
             setBusy(true);
-            // TODO: call API PATCH /orders/{id}/order-status { orderStatus: next }
-            // await orderService.updateOrderStatus(order.id, next);
-            setOrder((o) => ({ ...o, orderStatus: next }));
+            await orderService.updateOrderStatus(order.id, next); // PATCH /orders/{id}/order-status
+            await fetchOrder();
             showToast("Cập nhật Order Status thành công!");
-        } catch {
-            showToast("Cập nhật Order Status thất bại!", "danger");
+        } catch (e) {
+            showToast(typeof e === "string" ? e : "Cập nhật Order Status thất bại!", "danger");
         } finally {
             setBusy(false);
         }
     };
 
-    // Gợi ý flow thao tác dựa trên trạng thái hiện tại
+    // Gợi ý lệnh theo trạng thái hiện tại
     const actions = useMemo(() => {
         if (!order) return [];
         const a = [];
@@ -130,7 +129,7 @@ export default function OrderDetailBootstrap() {
             a.push({ key: "toSuccess", label: "Hoàn tất đơn", onClick: () => updateOrderStatus("success"), variant: "success" });
         }
         return a;
-    }, [order]);
+    }, [order]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (loading) {
         return (
@@ -230,12 +229,7 @@ export default function OrderDetailBootstrap() {
                             {actions.length === 0 ? (
                                 <div className="text-muted">Không có lệnh khả dụng cho trạng thái hiện tại.</div>
                             ) : actions.map(a => (
-                                <Button
-                                    key={a.key}
-                                    variant={a.variant}
-                                    disabled={busy}
-                                    onClick={a.onClick}
-                                >
+                                <Button key={a.key} variant={a.variant} disabled={busy} onClick={a.onClick}>
                                     {busy ? <Spinner animation="border" size="sm" className="me-2" /> : null}
                                     {a.label}
                                 </Button>
@@ -244,9 +238,7 @@ export default function OrderDetailBootstrap() {
                     </Card>
                 </Col>
 
-                {/* (Tuỳ chọn) Mục sản phẩm của đơn
-            Hiện OrderResponseModel chưa trả về OrderItems nên chưa render được.
-            Khi BE bổ sung, thêm 1 Card với bảng sản phẩm ở đây. */}
+                {/* (Tuỳ chọn) Sản phẩm trong đơn – khi BE trả OrderItems, thêm 1 Card hiển thị bảng ở đây */}
             </Row>
 
             <ToastContainer position="bottom-end" className="p-3">

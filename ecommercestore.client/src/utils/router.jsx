@@ -6,14 +6,13 @@
         CONTACT: "/lien-he",
         CART: "/gio-hang",
         CHECKOUT: "/thanh-toan",
-<<<<<<< HEAD
         CHECKOUTSUCCESS: "/dat-hang-thanh-cong",
-        PAYMENT: "/payment/vnpay-return"
-=======
+        PAYMENT: "/payment/vnpay-return",
         CATEGORY: "/danh-muc/:id",
         PROFILE: "/thong-tin",
         CHANGE_PASSWORD: "/doi-mat-khau",
->>>>>>> 425bf63bcc860173941ee01b9843fdb3b8e79e11
+        ORDERS: "/don-hang",
+        ORDERDETAIL: "/don-hang/:id",
     },
     AUTH: {
         LOGIN: "dang-nhap",
@@ -34,5 +33,6 @@
         ACCOUNT_DETAIL: "admin/quan-ly-tai-khoan/chi-tiet/:email",
         ORDERS: "admin/quan-ly-don-hang",
         ORDERDETAIL: "admin/quan-ly-don-hang/chi-tiet/:id",
+        REVENUE: "admin/quan-ly-doanh-thu",
     },
 };

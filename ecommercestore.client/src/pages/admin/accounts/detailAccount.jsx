@@ -1,22 +1,49 @@
-﻿import { useEffect, useState, useMemo } from "react";
+﻿// src/pages/admin/accounts/detailAccount.jsx
+import { useEffect, useState, useMemo } from "react";
 import {
     Container, Row, Col, Card, Button, Form, Spinner, Alert,
     Modal, Badge, Table, Pagination, Toast, ToastContainer
 } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import authService from "../../../services/authService";
+import orderService from "../../../services/orderService";
 
-const MOCK_ORDERS = [
-    { id: "HD001", status: "Delivered", total: 200000, date: "2024-07-10", address: "Hà Nội", items: [{ name: "Áo thun", qty: 2 }] },
-    { id: "HD002", status: "Shipping", total: 450000, date: "2024-07-15", address: "Đà Nẵng", items: [{ name: "Quần jeans", qty: 1 }] },
-    { id: "HD003", status: "Cancelled", total: 150000, date: "2024-07-18", address: "TP.HCM", items: [{ name: "Áo sơ mi", qty: 1 }] },
-];
-
-const ROLE_DISPLAY = {
-    Admin: { label: "Admin", variant: "danger" },
-    Staff: { label: "Nhân viên", variant: "info" },
-    Customer: { label: "Khách hàng", variant: "success" },
-    User: { label: "User", variant: "secondary" },
+// ====== Helpers & Mappings ======
+const PAYMENT_STATUS_VARIANT = {
+    Pending: "warning",
+    Paid: "success",
+    Failed: "danger",
+    Refunded: "secondary",
+    Processing: "info",
+};
+const ORDER_STATUS_VARIANT = {
+    awaitpay: "secondary",
+    pend: "primary",
+    processing: "warning",
+    shipped: "info",
+    success: "success",
+    cancel: "dark",
+    err: "danger",
+};
+const ORDER_STATUS_LABEL = {
+    awaitpay: "Chờ thanh toán",
+    pend: "Chờ xử lý",
+    processing: "Đang xử lý",
+    shipped: "Đã giao DVVC",
+    success: "Hoàn tất",
+    cancel: "Đã hủy",
+    err: "Lỗi",
+};
+const toVnd = (n) =>
+    new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Number(n || 0)) + " ₫";
+const fmtDateTime = (s) => {
+    if (!s) return "";
+    const d = new Date(s);
+    if (isNaN(d)) return String(s);
+    return d.toLocaleString("vi-VN", {
+        hour12: false, year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+    });
 };
 
 export default function DetailAccountBootstrap() {
@@ -27,7 +54,11 @@ export default function DetailAccountBootstrap() {
     const [form, setForm] = useState({
         firstName: "", lastName: "", email: "", phoneNumber: "", address: "", gender: "true",
     });
+
+    // ===== Role: chỉ hiện Select khi bấm "Phân quyền" =====
     const [role, setRole] = useState("");
+    const [editingRole, setEditingRole] = useState(false);
+    const [savingRole, setSavingRole] = useState(false);
 
     // lockout states
     const [lockoutEnabled, setLockoutEnabled] = useState(false);
@@ -53,17 +84,18 @@ export default function DetailAccountBootstrap() {
     const [unlockLoading, setUnlockLoading] = useState(false);
     const [toggleEnabledLoading, setToggleEnabledLoading] = useState(false);
 
-    // orders (mock)
+    // ===== Orders (real) =====
+    const [orders, setOrders] = useState([]);
+    const [ordersLoading, setOrdersLoading] = useState(true);
+    const [ordersErr, setOrdersErr] = useState("");
     const [page, setPage] = useState(1);
     const perPage = 5;
-    const orders = MOCK_ORDERS;
-    const totalPages = Math.ceil(orders.length / perPage);
-    const pagedOrders = orders.slice((page - 1) * perPage, page * perPage);
 
     // toast
     const [toast, setToast] = useState({ show: false, bg: "success", msg: "" });
     const showToast = (msg, bg = "success") => setToast({ show: true, msg, bg });
 
+    // ===== Fetch account =====
     useEffect(() => {
         if (!email) return;
         setLoading(true);
@@ -79,9 +111,8 @@ export default function DetailAccountBootstrap() {
                     address: data.address || "",
                     gender: data.gender ? "true" : "false",
                 });
-                setRole(data.role);
+                setRole(data.role || "Customer");
                 setLockoutEnabled(!!data.lockoutEnabled);
-                // data.lockoutEnd có thể null hoặc ISO
                 setLockoutEnd(data.lockoutEnd ?? null);
             })
             .catch((err) => {
@@ -91,20 +122,62 @@ export default function DetailAccountBootstrap() {
             .finally(() => setLoading(false));
     }, [email]);
 
+    // ===== Fetch orders for this account (filter by customerEmail) =====
+    useEffect(() => {
+        if (!account?.email) return;
+        const run = async () => {
+            setOrdersLoading(true);
+            setOrdersErr("");
+            try {
+                const data = await orderService.getAll(); // GET /orders
+                const list = Array.isArray(data) ? data : [];
+                const mine = list.filter(
+                    (o) => (o?.customerEmail || "").toLowerCase() === account.email.toLowerCase()
+                );
+                mine.sort((a, b) => new Date(b.orderDate ?? 0) - new Date(a.orderDate ?? 0));
+                setOrders(mine);
+                setPage(1);
+            } catch {
+                setOrdersErr("Không tải được danh sách đơn hàng của tài khoản.");
+            } finally {
+                setOrdersLoading(false);
+            }
+        };
+        run();
+    }, [account?.email]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm((f) => ({ ...f, [name]: value }));
     };
 
-    const handleSave = async () => {
+    const handleSaveInfo = async () => {
         setSaving(true);
         try {
             await authService.updateInformation(form);
-            showToast("Cập nhật thành công", "success");
+            showToast("Cập nhật thông tin thành công", "success");
         } catch {
-            showToast("Cập nhật thất bại", "danger");
+            showToast("Cập nhật thông tin thất bại", "danger");
         } finally {
             setSaving(false);
+        }
+    };
+
+    // ====== Save Role riêng (chỉ khi đang editingRole) ======
+    const handleSaveRole = async () => {
+        if (!email || !role) return;
+        setSavingRole(true);
+        try {
+            await authService.setRole(email, role); // POST /accounts/roles/set
+            const fresh = await authService.getAccountDetail(email);
+            setAccount(fresh);
+            setRole(fresh.role || role);
+            showToast("Cập nhật vai trò thành công", "success");
+            setEditingRole(false);
+        } catch (err) {
+            showToast(err?.message || "Cập nhật vai trò thất bại!", "danger");
+        } finally {
+            setSavingRole(false);
         }
     };
 
@@ -119,8 +192,7 @@ export default function DetailAccountBootstrap() {
     const computeUntilIso = () => {
         if (lockPreset === "custom") {
             if (!lockCustom) return null;
-            // datetime-local là local time, cần convert sang ISO chuẩn
-            const dt = new Date(lockCustom);
+            const dt = new Date(lockCustom); // local -> ISO
             if (isNaN(dt.getTime())) return null;
             return dt.toISOString();
         }
@@ -137,7 +209,6 @@ export default function DetailAccountBootstrap() {
         setLockLoading(true);
         try {
             await authService.lockAccount(email, until || undefined);
-            // cập nhật UI từ server
             const fresh = await authService.getAccountDetail(email);
             setLockoutEnabled(!!fresh.lockoutEnabled);
             setLockoutEnd(fresh.lockoutEnd ?? null);
@@ -204,6 +275,9 @@ export default function DetailAccountBootstrap() {
     ) : (
         <Badge bg="success" className="ms-2">Đang mở</Badge>
     );
+
+    const totalPages = Math.max(1, Math.ceil(orders.length / perPage));
+    const pageSlice = orders.slice((page - 1) * perPage, page * perPage);
 
     return (
         <Container fluid className="py-3">
@@ -275,18 +349,46 @@ export default function DetailAccountBootstrap() {
                                 </Col>
 
                                 <Col md={6}>
-                                    <Form.Group className="mb-3">
+                                    <Form.Group className="mb-1">
                                         <Form.Label>Vai trò</Form.Label>
-                                        <Form.Select value={role} onChange={(e) => setRole(e.target.value)}>
-                                            <option value="Staff">Nhân viên</option>
-                                            <option value="Customer">Khách hàng</option>
-                                        </Form.Select>
+                                        {!editingRole ? (
+                                            <div className="d-flex align-items-center gap-2">
+                                                <Form.Control value={role || ""} disabled readOnly style={{ maxWidth: 260 }} />
+                                                <Button variant="outline-primary" onClick={() => setEditingRole(true)}>
+                                                    Phân quyền
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <div className="d-flex align-items-center gap-2 flex-wrap">
+                                                <Form.Select
+                                                    value={role}
+                                                    onChange={(e) => setRole(e.target.value)}
+                                                    disabled={savingRole}
+                                                    style={{ maxWidth: 260 }}
+                                                >
+                                                    <option value="Staff">Nhân viên</option>
+                                                    <option value="Customer">Khách hàng</option>
+                                                </Form.Select>
+
+                                                <Button variant="primary" onClick={handleSaveRole} disabled={savingRole}>
+                                                    {savingRole ? "Đang lưu..." : "Lưu quyền"}
+                                                </Button>
+
+                                                <Button
+                                                    variant="outline-secondary"
+                                                    onClick={() => { setEditingRole(false); setRole(account.role || "Customer"); }}
+                                                    disabled={savingRole}
+                                                >
+                                                    Hủy
+                                                </Button>
+                                            </div>
+                                        )}
                                     </Form.Group>
                                 </Col>
                             </Row>
 
-                            <div className="d-flex gap-2">
-                                <Button onClick={handleSave} disabled={saving}>
+                            <div className="d-flex gap-2 mt-3">
+                                <Button onClick={handleSaveInfo} disabled={saving}>
                                     {saving ? "Đang lưu..." : "Lưu thông tin"}
                                 </Button>
 
@@ -307,60 +409,93 @@ export default function DetailAccountBootstrap() {
                         </Card.Body>
                     </Card>
 
+                    {/* ===== ĐƠN HÀNG CỦA TÀI KHOẢN ===== */}
                     <Card>
-                        <Card.Header>
+                        <Card.Header className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <strong>Đơn hàng</strong>
-                        </Card.Header>
-                        <Card.Body>
-                            <Table hover responsive>
-                                <thead>
-                                    <tr>
-                                        <th>Mã đơn</th>
-                                        <th>Ngày</th>
-                                        <th>Trạng thái</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {pagedOrders.map((o) => (
-                                        <tr key={o.id}>
-                                            <td>{o.id}</td>
-                                            <td>{o.date}</td>
-                                            <td>
-                                                <Badge
-                                                    bg={o.status === "Delivered" ? "success" : o.status === "Shipping" ? "info" : "danger"}
-                                                >
-                                                    {o.status}
-                                                </Badge>
-                                            </td>
-                                            <td>{o.total.toLocaleString()} đ</td>
-                                            <td>
-                                                <Button size="sm" variant="outline-info" onClick={() => setShowOrder({ show: true, order: o })}>
-                                                    Chi tiết
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {pagedOrders.length === 0 && (
-                                        <tr>
-                                            <td colSpan={5} className="text-center text-muted">Không có đơn hàng nào</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </Table>
-
-                            <div className="d-flex justify-content-end">
-                                <Pagination>
-                                    <Pagination.Prev disabled={page === 1} onClick={() => setPage(page - 1)} />
-                                    {Array.from({ length: totalPages }, (_, i) => (
-                                        <Pagination.Item key={i + 1} active={page === i + 1} onClick={() => setPage(i + 1)}>
-                                            {i + 1}
-                                        </Pagination.Item>
-                                    ))}
-                                    <Pagination.Next disabled={page === totalPages} onClick={() => setPage(page + 1)} />
-                                </Pagination>
+                            <div className="text-muted small">
+                                Tổng: <b>{orders.length}</b> đơn
                             </div>
+                        </Card.Header>
+
+                        <Card.Body>
+                            {ordersLoading ? (
+                                <div className="d-flex align-items-center justify-content-center py-4">
+                                    <Spinner animation="border" className="me-2" /> Đang tải đơn hàng...
+                                </div>
+                            ) : ordersErr ? (
+                                <Alert variant="danger" className="mb-0">{ordersErr}</Alert>
+                            ) : (
+                                <>
+                                    <Table hover responsive>
+                                        <thead>
+                                            <tr>
+                                                <th>Mã đơn</th>
+                                                <th>Ngày</th>
+                                                <th>Thanh toán</th>
+                                                <th>Trạng thái</th>
+                                                <th className="text-end">Tổng tiền</th>
+                                                <th>Hành động</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {pageSlice.map((o) => (
+                                                <tr key={o.id}>
+                                                    <td className="text-break">{o.id}</td>
+                                                    <td>{fmtDateTime(o.orderDate)}</td>
+                                                    <td>
+                                                        <Badge bg={PAYMENT_STATUS_VARIANT[o.paymentStatus] || "secondary"}>
+                                                            {o.paymentStatus || "-"}
+                                                        </Badge>
+                                                    </td>
+                                                    <td>
+                                                        <Badge bg={ORDER_STATUS_VARIANT[o.orderStatus] || "secondary"}>
+                                                            {ORDER_STATUS_LABEL[o.orderStatus] || o.orderStatus || "-"}
+                                                        </Badge>
+                                                    </td>
+                                                    <td className="text-end">{toVnd(o.totalAmount)}</td>
+                                                    <td>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline-info"
+                                                            onClick={() => navigate(`/admin/quan-ly-don-hang/chi-tiet/${o.id}`)}
+                                                            title="Xem chi tiết đơn"
+                                                        >
+                                                            Chi tiết
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                            {orders.length === 0 && (
+                                                <tr>
+                                                    <td colSpan={6} className="text-center text-muted">Tài khoản chưa có đơn hàng nào</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </Table>
+
+                                    {orders.length > 0 && (
+                                        <div className="d-flex justify-content-end">
+                                            <Pagination className="mb-0">
+                                                <Pagination.Prev disabled={page === 1} onClick={() => setPage(page - 1)} />
+                                                {Array.from({ length: totalPages }, (_, i) => (
+                                                    <Pagination.Item
+                                                        key={i + 1}
+                                                        active={page === i + 1}
+                                                        onClick={() => setPage(i + 1)}
+                                                    >
+                                                        {i + 1}
+                                                    </Pagination.Item>
+                                                ))}
+                                                <Pagination.Next
+                                                    disabled={page === totalPages}
+                                                    onClick={() => setPage(page + 1)}
+                                                />
+                                            </Pagination>
+                                        </div>
+                                    )}
+                                </>
+                            )}
                         </Card.Body>
                     </Card>
                 </Col>
@@ -410,7 +545,7 @@ export default function DetailAccountBootstrap() {
                                     value={lockCustom}
                                     onChange={(e) => setLockCustom(e.target.value)}
                                     disabled={lockLoading}
-                                    min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)} // tối thiểu +1 phút
+                                    min={new Date(Date.now() + 60_000).toISOString().slice(0, 16)}
                                 />
                                 <Form.Text className="text-muted">Thời gian sẽ được lưu theo UTC.</Form.Text>
                             </Form.Group>
@@ -430,7 +565,13 @@ export default function DetailAccountBootstrap() {
 
             {/* Toast */}
             <ToastContainer position="top-center" className="p-3">
-                <Toast bg={toast.bg} onClose={() => setToast((t) => ({ ...t, show: false }))} show={toast.show} delay={2800} autohide>
+                <Toast
+                    bg={toast.bg}
+                    onClose={() => setToast((t) => ({ ...t, show: false }))}
+                    show={toast.show}
+                    delay={2800}
+                    autohide
+                >
                     <Toast.Body className="text-white">{toast.msg}</Toast.Body>
                 </Toast>
             </ToastContainer>

@@ -14,14 +14,13 @@ const ProductDetail = lazy(() => import("./pages/user/productdetail"));
 const ContactPage = lazy(() => import("./pages/user/contact"));
 const CartPage = lazy(() => import("./pages/user/cart"));
 const CheckoutPage = lazy(() => import("./pages/user/checkout"));
-<<<<<<< HEAD
 const CheckoutSuccess = lazy(() => import("./pages/user/checkoutSuccess"));
 const VnPayReturn = lazy(() => import("./pages/user/VnPayReturn"));
-=======
 const CategoryPage = lazy(() => import("./pages/user/category"));
 const ProfilePage = lazy(() => import("./pages/user/profile"));
 const ChangePassword = lazy(() => import("./pages/user/changepassword"));
->>>>>>> 425bf63bcc860173941ee01b9843fdb3b8e79e11
+const OrdersHistory = lazy(() => import("./pages/user/orderhistory"));
+const DetailOrder = lazy(() => import("./pages/user/orderdetail"));
 
 //page admin
 import Dashboard from "./pages/admin/Dashboard";
@@ -53,6 +52,7 @@ const Accounts = lazy(() => import("./pages/admin/accounts/index"));
 const DetailAccount = lazy(() => import("./pages/admin/accounts/detailAccount"));
 const OrderPage = lazy(() => import("./pages/admin/orders/index"));
 const OrderDetail = lazy(() => import("./pages/admin/orders/detail"));
+const Revenue = lazy(() => import("./pages/admin/revenue/index"));
 
 //auth page
 const Login = lazy(() => import("./pages/auth/login"));
@@ -70,16 +70,14 @@ const ROUTES_CONFIG = [
     {path: ROUTERS.USER.PRODUCT_DETAIL,component: <ProductDetail />,layout: userlayout,},
     {path: ROUTERS.USER.CONTACT,component: <ContactPage />,layout: userlayout,},
     {path: ROUTERS.USER.CART,component: <CartPage />,layout: userlayout,},
-<<<<<<< HEAD
     { path: ROUTERS.USER.CHECKOUT, component: <CheckoutPage />, layout: userlayout, },
     { path: ROUTERS.USER.CHECKOUTSUCCESS, component: <CheckoutSuccess />, layout: userlayout, },
     { path: ROUTERS.USER.PAYMENT, component: <VnPayReturn />, layout: userlayout, },
-=======
-    {path: ROUTERS.USER.CHECKOUT, component: <CheckoutPage />, layout: userlayout,},
     { path: ROUTERS.USER.CATEGORY, component: <CategoryPage />, layout: userlayout, },
     { path: ROUTERS.USER.PROFILE, component: <ProfilePage />, layout: userlayout, },
     { path: ROUTERS.USER.CHANGE_PASSWORD, component: <ChangePassword />, layout: userlayout, },
->>>>>>> 425bf63bcc860173941ee01b9843fdb3b8e79e11
+    { path: ROUTERS.USER.ORDERS, component: <OrdersHistory />, layout: userlayout, },
+    { path: ROUTERS.USER.ORDERDETAIL, component: <DetailOrder />, layout: userlayout, },
     { path: ROUTERS.ADMIN.DASHBOARD, component: <Dashboard />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.BRANDS, component: <Brands />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.CATEGORIES, component: <Categories />, layout: adminlayout, },
@@ -91,6 +89,7 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.ADMIN.ACCOUNT_DETAIL, component: <DetailAccount />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.ORDERS, component: <OrderPage />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.ORDERDETAIL, component: <OrderDetail />, layout: adminlayout, },
+    { path: ROUTERS.ADMIN.REVENUE, component: <Revenue />, layout: adminlayout, },
     {
         path: "/components/buttons",
         component: <Buttons />, layout: adminlayout

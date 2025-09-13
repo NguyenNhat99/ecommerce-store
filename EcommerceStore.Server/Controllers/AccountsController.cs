@@ -265,5 +265,15 @@ namespace EcommerceStore.Server.Controllers
             var ok = await _accountRepository.SetLockoutEnabledAsync(dto.Email, dto.Enabled);
             return ok ? Ok() : NotFound();
         }
+        public record SetRoleDto(string Email, string Role);
+
+        [HttpPost("roles/set")]
+        public async Task<IActionResult> SetRole([FromBody] SetRoleDto dto)
+        {
+            var ok = await _accountRepository.SetSingleRoleAsync(dto.Email, dto.Role);
+            return ok ? Ok(new { message = "Cập nhật vai trò thành công" })
+                      : BadRequest(new { message = "Cập nhật vai trò thất bại" });
+        }
+
     }
 }

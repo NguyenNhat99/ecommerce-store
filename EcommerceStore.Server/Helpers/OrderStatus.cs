@@ -7,5 +7,9 @@
         public const string Success = "success";
         public const string Cancel = "cancel";
         public const string AwaitingPayment = "awaitpay";
+
+        // NEW
+        public const string Processing = "processing";
+        public const string Shipped = "shipped";
     }
 }

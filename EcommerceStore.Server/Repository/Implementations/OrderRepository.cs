@@ -309,5 +309,52 @@ namespace EcommerceStore.Server.Repository.Implementations
             var orders = await _context.Orders.Where(o => o.UserId.Equals(CurrentUserId)).ToListAsync();
             return _mapper.Map<List<OrderResponseModel>>(orders);
         }
+
+        public async Task<bool> UpdatePaymentStatusAsync(string id, string paymentStatus)
+        {
+            // Validate tập giá trị cho phép
+            var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        { PaymentStatus.Pending, PaymentStatus.Paid, PaymentStatus.Failed, PaymentStatus.Refunded, PaymentStatus.Processing };
+
+            if (!allowed.Contains(paymentStatus)) return false;
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+            if (order == null) return false;
+
+            // Nếu set Paid thì gán PaymentDate nếu chưa có
+            if (paymentStatus.Equals(PaymentStatus.Paid, StringComparison.OrdinalIgnoreCase) && order.PaymentDate == null)
+            {
+                order.PaymentDate = DateTime.UtcNow;
+
+                // Nếu trước đó là awaitpay thì đẩy sang pend (chờ xử lý)
+                if (order.OrderStatus.Equals(OrderStatus.AwaitingPayment, StringComparison.OrdinalIgnoreCase))
+                {
+                    order.OrderStatus = OrderStatus.Pending;
+                }
+            }
+
+            order.PaymentStatus = paymentStatus;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateOrderStatusAsync(string id, string orderStatus)
+        {
+            // Validate tập giá trị cho phép
+            var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            OrderStatus.AwaitingPayment, OrderStatus.Pending, OrderStatus.Processing,
+            OrderStatus.Shipped, OrderStatus.Success, OrderStatus.Cancel, OrderStatus.Error
+        };
+
+            if (!allowed.Contains(orderStatus)) return false;
+
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id);
+            if (order == null) return false;
+
+            order.OrderStatus = orderStatus;
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

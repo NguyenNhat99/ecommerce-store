@@ -310,5 +310,19 @@ namespace EcommerceStore.Server.Repository.Implementations
             var res = await userManager.ResetAccessFailedCountAsync(user);
             return true;
         }
+        public async Task<bool> SetSingleRoleAsync(string email, string roleName)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null) return false;
+            if (!await roleManager.RoleExistsAsync(roleName)) return false;
+
+            var current = await userManager.GetRolesAsync(user);
+            var remove = await userManager.RemoveFromRolesAsync(user, current);
+            if (!remove.Succeeded) return false;
+
+            var add = await userManager.AddToRoleAsync(user, roleName);
+            return add.Succeeded;
+        }
+
     }
 }

@@ -17,6 +17,7 @@ namespace EcommerceStore.Server.Repository
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IRatingRepository, RatingRepository>();
+            services.AddScoped<IRevenueRepository, RevenueRepository>();
         }
     }
 }

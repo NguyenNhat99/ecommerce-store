@@ -137,7 +137,14 @@ const setLockoutEnabled = async (email, enabled) => {
         throw error.response?.data || error.message || "Cập nhật lockout thất bại!";
     }
 };
-
+const setRole = async (email, role) => {
+    try {
+        const res = await api.post("/accounts/roles/set", { email, role });
+        return res.data; // { message: "Cập nhật vai trò thành công" }
+    } catch (error) {
+        throw error.response?.data || error.message || "Cập nhật vai trò thất bại!";
+    }
+};
 /* ========== TOKEN UTILS ========== */
 const logout = () => {
     localStorage.removeItem("jwt_token");
@@ -163,4 +170,5 @@ export default {
     lockAccount,
     unlockAccount,
     setLockoutEnabled,
+    setRole
 };

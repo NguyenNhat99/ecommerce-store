@@ -18,6 +18,7 @@
     <Folder Include="src\pages\admin\brands\" />
     <Folder Include="src\pages\admin\categories\" />
     <Folder Include="src\pages\admin\accounts\" />
+    <Folder Include="src\pages\admin\revenue\" />
     <Folder Include="src\pages\admin\orders\" />
     <Folder Include="src\pages\admin\profile\" />
     <Folder Include="src\pages\admin\products\" />

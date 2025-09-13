@@ -61,9 +61,17 @@ const Layouts = ({children }) => {
                         <i className="fa fa-dashboard" />
                         <span>Quản lý đơn hàng</span>
                     </MenuItem>
-                    <MenuItem routeLink={`/`}>
+                    <MenuItem routeLink={`/${ROUTERS.ADMIN.REVENUE}`}>
                         <i className="fa fa-dashboard" />
                         <span>Doanh thu</span>
+                    </MenuItem>
+                    <MenuItem routeLink={`/`}>
+                        <i className="fa fa-dashboard" />
+                        <span>Danh sách bài viết</span>
+                    </MenuItem>
+                    <MenuItem routeLink={`/`}>
+                        <i className="fa fa-dashboard" />
+                        <span>Thêm bài viết bài viết</span>
                     </MenuItem>
                  
                 </Menu>
