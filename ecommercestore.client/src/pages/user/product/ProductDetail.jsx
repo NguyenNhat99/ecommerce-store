@@ -1,15 +1,13 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import productService from "../../services/productService";
-import RelatedCarousel from "../../components/common/RelatedCarousel";
-import SizeGuideModal from "../../components/common/SizeGuideModal";
-import ToastMessage from "../../components/common/ToastMessage";
-import cartService from "../../services/cartService";
-import { useCart } from "../../context/CartContext";
-import ProductRating from "../../components/common/ProductRating";
-import RatingSummary from "../../components/common/RatingSummary";
-
-const IMG_BASE = "https://localhost:7235/Assets/Products/";
+import productService from "../../../services/productService";
+import RelatedCarousel from "../../../components/common/RelatedCarousel";
+import SizeGuideModal from "../../../components/common/SizeGuideModal";
+import ToastMessage from "../../../components/common/ToastMessage";
+import cartService from "../../../services/cartService";
+import { useCart } from "../../../context/CartContext";
+import ProductRating from "../../../components/common/ProductRating";
+import RatingSummary from "../../../components/common/RatingSummary";
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -24,12 +22,7 @@ export default function ProductDetail() {
     const [message, setMessage] = useState(null);
     const { setCartQty } = useCart();
     const [ratingSummary, setRatingSummary] = useState(null);
-
-
-    const buildImg = (avatar) => {
-        if (!avatar) return "/img/placeholder.png";
-        return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
-    };
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         (async () => {
@@ -95,14 +88,16 @@ export default function ProductDetail() {
                         style={{ minHeight: "300px" }}
                     >
                         <h1 className="font-weight-semi-bold text-uppercase mb-3">
-                            Chi tiết sản phẩm
+                            Sản phẩm
                         </h1>
                         <div className="d-inline-flex">
                             <p className="m-0">
                                 <a href="/">Trang chủ</a>
                             </p>
                             <p className="m-0 px-2">-</p>
-                            <p className="m-0">Chi tiết sản phẩm</p>
+                            <p className="m-0"><a href="/cua-hang">Sản phẩm</a></p>
+                            <p className="m-0 px-2">-</p>
+                            <p className="m-0 px-2">{product.name}</p>
                         </div>
                     </div>
                 </div>
@@ -112,47 +107,56 @@ export default function ProductDetail() {
                     <div className="row px-xl-5">
                         {/* Carousel ảnh */}
                         <div className="col-lg-5 pb-5">
+                            {/* Ảnh chính */}
                             <div
-                                id="product-carousel"
-                                className="carousel slide"
-                                data-ride="carousel"
+                                className="main-img d-flex align-items-center justify-content-center"
+                                style={{
+                                    width: "100%",
+                                    maxHeight: "60vh",
+                                    minHeight: "520px",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    background: "#fff",
+                                    overflow: "hidden"
+                                }}
                             >
-                                <div className="carousel-inner">
-                                    {/* Ảnh đại diện */}
-                                    <div className="carousel-item active" style={{ height: "550px" }}>
+                                <img
+                                    src={selectedImage || product?.avatar}
+                                    alt={product.name}
+                                    style={{
+                                        maxWidth: "100%",
+                                        maxHeight: "100%",
+                                        objectFit: "contain"
+                                    }}
+                                />
+                            </div>
+
+                            {/* Thumbnail gallery */}
+                            <div className="d-flex justify-content-center mt-2 flex-wrap">
+                                {[product.avatar, ...(product.images?.map(img => img.imageUrl) || [])].map((url, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="thumb mx-1"
+                                        style={{
+                                            width: 65,
+                                            height: 85,
+                                            cursor: "pointer",
+                                            overflow: "hidden",
+                                            border: selectedImage === url || (!selectedImage && idx === 0)
+                                                ? "2px solid #007bff"
+                                                : "1px solid #ddd",
+                                            borderRadius: "4px",
+                                            transition: "all 0.2s ease-in-out"
+                                        }}
+                                        onClick={() => setSelectedImage(url)}
+                                    >
                                         <img
-                                            className="w-100 h-100"
-                                            style={{ objectFit: "contain" }}
-                                            src={buildImg(product?.avatar)}
-                                            alt={product.name}
+                                            src={url}
+                                            alt={`thumb-${idx}`}
+                                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                         />
                                     </div>
-                                    {/* Các ảnh khác */}
-                                    {Array.isArray(product.images) &&
-                                        product.images.map((img, idx) => (
-                                            <div className="carousel-item" key={idx}>
-                                                <img
-                                                    className="w-100 h-100"
-                                                    src={IMG_BASE + img}
-                                                    alt={product.name}
-                                                />
-                                            </div>
-                                        ))}
-                                </div>
-                                <a
-                                    className="carousel-control-prev"
-                                    href="#product-carousel"
-                                    data-slide="prev"
-                                >
-                                    <i className="fa fa-2x fa-angle-left text-dark"></i>
-                                </a>
-                                <a
-                                    className="carousel-control-next"
-                                    href="#product-carousel"
-                                    data-slide="next"
-                                >
-                                    <i className="fa fa-2x fa-angle-right text-dark"></i>
-                                </a>
+                                ))}
                             </div>
                         </div>
 

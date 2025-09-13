@@ -9,8 +9,8 @@ const adminlayout = lazy(() => import("./layouts/admin/index"));
 
 //page user
 const Homepage = lazy(() => import("./pages/user/home"));
-const ProductPage = lazy(() => import("./pages/user/product"));
-const ProductDetail = lazy(() => import("./pages/user/productdetail"));
+const ProductPage = lazy(() => import("./pages/user/product/product"));
+const ProductDetail = lazy(() => import("./pages/user/product/ProductDetail"));
 const ContactPage = lazy(() => import("./pages/user/contact"));
 const CartPage = lazy(() => import("./pages/user/cart"));
 const CheckoutPage = lazy(() => import("./pages/user/checkout"));
@@ -19,8 +19,13 @@ const VnPayReturn = lazy(() => import("./pages/user/VnPayReturn"));
 const CategoryPage = lazy(() => import("./pages/user/category"));
 const ProfilePage = lazy(() => import("./pages/user/profile"));
 const ChangePassword = lazy(() => import("./pages/user/changepassword"));
+<<<<<<< HEAD
 const OrdersHistory = lazy(() => import("./pages/user/orderhistory"));
 const DetailOrder = lazy(() => import("./pages/user/orderdetail"));
+=======
+const BlogList = lazy(() => import("./pages/user/blog/BlogList"));
+const BlogDetail = lazy(() => import("./pages/user/blog/BlogDetail"));
+>>>>>>> a2a6b94c0a624ec2929ca6f7c6d7a0a0330082bd
 
 //page admin
 import Dashboard from "./pages/admin/Dashboard";
@@ -65,6 +70,7 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.AUTH.REGISTER, component: <Register /> },
     { path: ROUTERS.AUTH.FORGOTPASSWORD, component: <ForgotPassword /> },
     { path: ROUTERS.AUTH.RESSETPASSWORD, component: <RessetPassword /> },
+
     {path: ROUTERS.USER.HOME,component: <Homepage />,layout: userlayout},
     {path: ROUTERS.USER.SHOP,component: <ProductPage />,layout: userlayout},
     {path: ROUTERS.USER.PRODUCT_DETAIL,component: <ProductDetail />,layout: userlayout,},
@@ -76,8 +82,14 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.USER.CATEGORY, component: <CategoryPage />, layout: userlayout, },
     { path: ROUTERS.USER.PROFILE, component: <ProfilePage />, layout: userlayout, },
     { path: ROUTERS.USER.CHANGE_PASSWORD, component: <ChangePassword />, layout: userlayout, },
+<<<<<<< HEAD
     { path: ROUTERS.USER.ORDERS, component: <OrdersHistory />, layout: userlayout, },
     { path: ROUTERS.USER.ORDERDETAIL, component: <DetailOrder />, layout: userlayout, },
+=======
+    { path: ROUTERS.USER.BLOG_LIST, component: <BlogList />, layout: userlayout },
+    { path: ROUTERS.USER.BLOG_DETAIL, component: <BlogDetail />, layout: userlayout },
+
+>>>>>>> a2a6b94c0a624ec2929ca6f7c6d7a0a0330082bd
     { path: ROUTERS.ADMIN.DASHBOARD, component: <Dashboard />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.BRANDS, component: <Brands />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.CATEGORIES, component: <Categories />, layout: adminlayout, },

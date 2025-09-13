@@ -207,6 +207,13 @@ const Header = () => {
                                     >
                                         Liên hệ
                                     </Link>
+                                    <Link
+                                        to="/bai-viet"
+                                        className={`nav-item nav-link ${isActive("/bai-viet") ? "active" : ""
+                                            }`}
+                                    >
+                                        Blog
+                                    </Link>
                                 </div>
 
                                 {/* Khe auth có minWidth để tránh co/giãn */}

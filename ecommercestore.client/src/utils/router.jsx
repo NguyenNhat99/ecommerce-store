@@ -11,8 +11,13 @@
         CATEGORY: "/danh-muc/:id",
         PROFILE: "/thong-tin",
         CHANGE_PASSWORD: "/doi-mat-khau",
+<<<<<<< HEAD
         ORDERS: "/don-hang",
         ORDERDETAIL: "/don-hang/:id",
+=======
+        BLOG_LIST: "/bai-viet",
+        BLOG_DETAIL: "/chi-tiet-bai-viet/:id",
+>>>>>>> a2a6b94c0a624ec2929ca6f7c6d7a0a0330082bd
     },
     AUTH: {
         LOGIN: "dang-nhap",

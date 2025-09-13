@@ -77,6 +77,16 @@ namespace EcommerceStore.Server.Helpers
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User != null ? src.User.Id : null))
                 .ReverseMap()
                 .ForMember(dest => dest.User, opt => opt.Ignore());
+
+            // WeatherRecommendation <-> WeatherRecommendationModel
+            CreateMap<WeatherRecommendation, WeatherRecommendationModel>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName))
+                .ReverseMap()
+                .ForMember(dest => dest.Category, opt => opt.Ignore());
+
+            // BlogPost <-> BlogPostModel
+            CreateMap<BlogPost, BlogPostResponseModel>();
+            CreateMap<BlogPostRequestModel, BlogPost>();
         }
     }
 }
