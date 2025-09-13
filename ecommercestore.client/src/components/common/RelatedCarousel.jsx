@@ -49,7 +49,7 @@ export default function RelatedCarousel({ products }) {
                                         </div>
                                     </div>
                                     <div className="card-footer d-flex justify-content-between bg-light border">
-                                        <a href={`/product/${p.id}`} className="btn btn-sm text-dark p-0">
+                                        <a href={`/chi-tiet/${p.id}`} className="btn btn-sm text-dark p-0">
                                             <i className="fas fa-eye text-primary mr-1"></i>Xem
                                         </a>
                                         <button className="btn btn-sm text-dark p-0">

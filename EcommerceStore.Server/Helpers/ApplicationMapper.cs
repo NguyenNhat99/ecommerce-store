@@ -82,6 +82,10 @@ namespace EcommerceStore.Server.Helpers
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName))
                 .ReverseMap()
                 .ForMember(dest => dest.Category, opt => opt.Ignore());
+
+            // BlogPost <-> BlogPostModel
+            CreateMap<BlogPost, BlogPostResponseModel>();
+            CreateMap<BlogPostRequestModel, BlogPost>();
         }
     }
 }
