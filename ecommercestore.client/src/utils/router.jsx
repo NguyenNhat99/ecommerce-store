@@ -9,6 +9,8 @@
         CATEGORY: "/danh-muc/:id",
         PROFILE: "/thong-tin",
         CHANGE_PASSWORD: "/doi-mat-khau",
+        BLOG_LIST: "/bai-viet",
+        BLOG_DETAIL: "/chi-tiet-bai-viet/:id",
     },
     AUTH: {
         LOGIN: "dang-nhap",

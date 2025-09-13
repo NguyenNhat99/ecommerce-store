@@ -1,10 +1,10 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
-import productService from "../../services/productService";
+import productService from "../../../services/productService";
 import { useNavigate } from "react-router-dom";
-import ToastMessage from "../../components/common/ToastMessage";
-import cartService from "../../services/cartService";
-import { useCart } from "../../context/CartContext";
-import RatingSummary from "../../components/common/RatingSummary";
+import ToastMessage from "../../../components/common/ToastMessage";
+import cartService from "../../../services/cartService";
+import { useCart } from "../../../context/CartContext";
+import RatingSummary from "../../../components/common/RatingSummary";
 
 const IMG_BASE = "https://localhost:7235/Assets/Products/";
 

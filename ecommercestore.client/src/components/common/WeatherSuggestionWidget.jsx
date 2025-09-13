@@ -23,9 +23,10 @@ export default function WeatherSuggestionWidget() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    if (!user || !user.address) return null;
-
     useEffect(() => {
+        // Nếu chưa có user/address → không fetch
+        if (!user?.address) return;
+
         const cityName = removeVietnameseTones(user.address).replace(/\s+/g, " ");
 
         (async () => {
@@ -64,7 +65,7 @@ export default function WeatherSuggestionWidget() {
         })();
     }, [user]);
 
-    if (loading || !suggestion || products.length === 0) return null;
+    if (!user?.address || loading || !suggestion || products.length === 0) return null;
 
     return (
         <div className="my-8">
@@ -76,7 +77,7 @@ export default function WeatherSuggestionWidget() {
 
             <Swiper
                 spaceBetween={0}
-                slidesPerView={4}
+                slidesPerView={2}
                 modules={[Autoplay]}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 loop={true}

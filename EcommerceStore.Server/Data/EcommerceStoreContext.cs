@@ -25,6 +25,7 @@ namespace EcommerceStore.Server.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<WeatherRecommendation> WeatherRecommendations { get; set; }
+        public DbSet<BlogPost> BlogPosts { get; set; }
         #endregion
         protected override void OnModelCreating(ModelBuilder builder)
         {

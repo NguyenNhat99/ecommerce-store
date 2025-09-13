@@ -1,0 +1,23 @@
+.blog-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.blog-detail h1 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.blog-content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #333;
+}
+
+.blog-content p {
+    margin-bottom: 1rem;
+}
