@@ -128,6 +128,13 @@ namespace EcommerceStore.Server.Repository.Implementations
                 new CategoryRevenueRow(r.Category, r.Revenue, total > 0 ? Math.Round((double)(r.Revenue / total) * 100, 2) : 0)
             ).ToList();
         }
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            var total = await _context.Orders
+              .Where(o => o.PaymentStatus == PaymentStatus.Paid)
+              .SumAsync(o => (decimal?)o.TotalAmount) ?? 0m;
+            return total;
+        }
 
     }
 }

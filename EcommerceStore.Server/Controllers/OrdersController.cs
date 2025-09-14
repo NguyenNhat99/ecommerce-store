@@ -263,6 +263,32 @@ namespace EcommerceStore.Server.Controllers
             return ok ? Ok(new { message = "Cập nhật OrderStatus thành công", id, orderStatus = dto.OrderStatus })
                       : BadRequest(new { message = "OrderStatus không hợp lệ hoặc đơn không tồn tại" });
         }
+        [HttpGet("count-order")]
+        public async Task<IActionResult> CountOrderPending()
+        {
+            try
+            {
+                var count = await _orderRepository.countOrderPending();
+                return Ok(count);
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Lỗi server ! Vui lòng thử lại sau" });
+            }
+        }
 
+        [HttpGet("recent")]
+        public async Task<IActionResult> Recent([FromQuery] int limit = 6)
+        {
+            var list = await _orderRepository.GetRecentAsync(limit);
+            return Ok(list);
+        }
+        [HttpGet("track")]
+        public async Task<IActionResult> PublicTrack([FromQuery] string orderId, [FromQuery] string contact)
+        {
+            var dto = await _orderRepository.PublicTrackAsync(orderId, contact);
+            return dto == null ? NotFound() : Ok(dto);
+        }
     }
 }
+    

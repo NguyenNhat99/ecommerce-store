@@ -105,6 +105,19 @@ namespace EcommerceStore.Server.Controllers
                 return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau!", error = ex.Message });
             }
         }
+        [HttpGet("count-products")]
+        public async Task<IActionResult> CountProducts()
+        {
+            try
+            {
+                var quantity = await _productRepository.CountProductsAsync();
+                return Ok(quantity);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi. Vui lòng thử lại sau!", error = ex.Message });
+            }
+        }
 
     }
 }

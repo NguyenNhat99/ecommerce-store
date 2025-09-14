@@ -19,33 +19,13 @@ const VnPayReturn = lazy(() => import("./pages/user/VnPayReturn"));
 const CategoryPage = lazy(() => import("./pages/user/category"));
 const ProfilePage = lazy(() => import("./pages/user/profile"));
 const ChangePassword = lazy(() => import("./pages/user/changepassword"));
-<<<<<<< HEAD
 const OrdersHistory = lazy(() => import("./pages/user/orderhistory"));
 const DetailOrder = lazy(() => import("./pages/user/orderdetail"));
-=======
 const BlogList = lazy(() => import("./pages/user/blog/BlogList"));
 const BlogDetail = lazy(() => import("./pages/user/blog/BlogDetail"));
->>>>>>> a2a6b94c0a624ec2929ca6f7c6d7a0a0330082bd
 
 //page admin
 import Dashboard from "./pages/admin/Dashboard";
-import Buttons from "./pages/admin/Buttons";
-import Badges from "./pages/admin/Badges";
-import Tables from "./pages/admin/Tables";
-import SocialButtons from "./pages/admin/SocialButtons";
-import Cards from "./pages/admin/Cards";
-import Alerts from "./pages/admin/Alerts";
-import ProgressBars from "./pages/admin/ProgressBars";
-import Modals from "./pages/admin/Modals";
-import Grids from "./pages/admin/Grids";
-import Typography from "./pages/admin/Typography";
-import BasicForm from "./pages/admin/BasicForm";
-import AdvancedForm from "./pages/admin/AdvancedForm";
-import Icons from "./pages/admin/Icons";
-import Widgets from "./pages/admin/Widgets";
-import Chartjs from "./pages/admin/Chartjs";
-import Recharts from "./pages/admin/Recharts";
-import GoogleMaps from "./pages/admin/GoogleMaps";
 
 const Brands = lazy(() => import("./pages/admin/brands"));
 const Categories = lazy(() => import("./pages/admin/categories"));
@@ -58,6 +38,9 @@ const DetailAccount = lazy(() => import("./pages/admin/accounts/detailAccount"))
 const OrderPage = lazy(() => import("./pages/admin/orders/index"));
 const OrderDetail = lazy(() => import("./pages/admin/orders/detail"));
 const Revenue = lazy(() => import("./pages/admin/revenue/index"));
+const Article = lazy(() => import("./pages/admin/articles/index"));
+const InsertArticle = lazy(() => import("./pages/admin/articles/InsertArticles"));
+const UpdateBlog = lazy(() => import("./pages/admin/articles/UpdateArticle"));
 
 //auth page
 const Login = lazy(() => import("./pages/auth/login"));
@@ -82,14 +65,10 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.USER.CATEGORY, component: <CategoryPage />, layout: userlayout, },
     { path: ROUTERS.USER.PROFILE, component: <ProfilePage />, layout: userlayout, },
     { path: ROUTERS.USER.CHANGE_PASSWORD, component: <ChangePassword />, layout: userlayout, },
-<<<<<<< HEAD
     { path: ROUTERS.USER.ORDERS, component: <OrdersHistory />, layout: userlayout, },
     { path: ROUTERS.USER.ORDERDETAIL, component: <DetailOrder />, layout: userlayout, },
-=======
     { path: ROUTERS.USER.BLOG_LIST, component: <BlogList />, layout: userlayout },
     { path: ROUTERS.USER.BLOG_DETAIL, component: <BlogDetail />, layout: userlayout },
-
->>>>>>> a2a6b94c0a624ec2929ca6f7c6d7a0a0330082bd
     { path: ROUTERS.ADMIN.DASHBOARD, component: <Dashboard />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.BRANDS, component: <Brands />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.CATEGORIES, component: <Categories />, layout: adminlayout, },
@@ -102,78 +81,9 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.ADMIN.ORDERS, component: <OrderPage />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.ORDERDETAIL, component: <OrderDetail />, layout: adminlayout, },
     { path: ROUTERS.ADMIN.REVENUE, component: <Revenue />, layout: adminlayout, },
-    {
-        path: "/components/buttons",
-        component: <Buttons />, layout: adminlayout
-    },
-    {
-        path: "/components/badges",
-        component: <Badges />, layout: adminlayout
-    },
-    {
-        path: "/components/socials",
-        component: <SocialButtons />, layout: adminlayout
-    },
-    {
-        path: "/components/cards",
-        component: <Cards />, layout: adminlayout
-    },
-    {
-        path: "/components/alerts",
-        component: <Alerts />, layout: adminlayout
-    },
-    {
-        path: "/components/progressbars",
-        component: <ProgressBars />, layout: adminlayout
-    },
-    {
-        path: "/components/modals",
-        component: <Modals />, layout: adminlayout
-    },
-    {
-        path: "/components/grids",
-        component: <Grids />, layout: adminlayout
-    },
-    {
-        path: "/components/typography",
-        component: <Typography />, layout: adminlayout
-    },
-    {
-        path: "/tables",
-        component: <Tables />, layout: adminlayout
-    },
-    {
-        path: "/forms/basic-form",
-        component: <BasicForm />, layout: adminlayout
-    },
-    {
-        path: "/forms/advanced-form",
-        component: <AdvancedForm />, layout: adminlayout
-    },
-    {
-        path: "/icons",
-        component: <Icons />, layout: adminlayout
-    },
-   
-   
-   
-    {
-        path: "/widgets",
-        component: Widgets, layout: adminlayout
-    },
-    {
-        path: "/charts/chartjs",
-        component: Chartjs, layout: adminlayout
-    },
-    {
-        path: "/charts/recharts",
-        component: Recharts, layout: adminlayout
-    },
-    {
-        path: "/maps/google-map",
-        component: GoogleMaps, layout: adminlayout
-    },
-
+    { path: ROUTERS.ADMIN.BLOG, component: <Article />, layout: adminlayout, },
+    { path: ROUTERS.ADMIN.INSERTBLOG, component: <InsertArticle />, layout: adminlayout, },
+    { path: ROUTERS.ADMIN.UPDATEBLOG, component: <UpdateBlog />, layout: adminlayout, },
 ];
 
 

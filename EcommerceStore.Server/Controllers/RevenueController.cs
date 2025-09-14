@@ -62,6 +62,13 @@ namespace EcommerceStore.Server.Controllers
             var rows = await _revenueRepository.GetCategoryRevenueAsync(dFrom, dTo);
             return Ok(rows);
         }
+        [HttpGet("total")]
+        public async Task<IActionResult> GetTotalRevenue()
+        {
+            var total = await _revenueRepository.GetTotalRevenueAsync();
+            return Ok(new { total });
+        }
+
 
     }
 }

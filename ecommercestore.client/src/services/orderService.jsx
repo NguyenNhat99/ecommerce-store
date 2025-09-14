@@ -26,6 +26,26 @@ const orderService = {
             return res.data;
         } catch (error) {
             return Promise.reject("Lấy đơn hàng thất bại");
+
+        }
+    },
+    recent: async (limit = 6) => {
+        const { data } = await api.get("/orders/recent", { params: { limit } });
+        return Array.isArray(data) ? data : [];
+    },
+
+    lookup: async ({ code, emailOrPhone }) => {
+        const { data } = await api.get("/orders/track", {
+            params: { orderId: code, contact: emailOrPhone },
+        });
+        return data;
+    },
+    countOrderPending: async () => {
+        try {
+            const res = await api.get(`/orders/count-order`); // ✅ đúng với BE
+            return res.data;
+        } catch (error) {
+            return Promise.reject("Lấy số lượng đơn hàng đang xư lý thất bại");
         }
     },
 

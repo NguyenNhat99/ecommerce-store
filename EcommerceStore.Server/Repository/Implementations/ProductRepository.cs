@@ -367,5 +367,10 @@ namespace EcommerceStore.Server.Repository.Implementations
 
             await _context.SaveChangesAsync();
         }
+        public async Task<int> CountProductsAsync()
+        {
+            var products = await _context.Products.ToListAsync();
+            return products.Count;
+        }
     }
 }

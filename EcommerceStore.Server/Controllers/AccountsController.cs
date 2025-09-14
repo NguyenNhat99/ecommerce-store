@@ -274,6 +274,20 @@ namespace EcommerceStore.Server.Controllers
             return ok ? Ok(new { message = "Cập nhật vai trò thành công" })
                       : BadRequest(new { message = "Cập nhật vai trò thất bại" });
         }
+        [HttpGet("count-accounts")]
+        public async Task<IActionResult> CountAccounts()
+        {
+            try
+            {
+                var quantity = await _accountRepository.CountAccounts();
+                return Ok(quantity);
+            }
+            catch
+            {
+                return StatusCode(500, new { message = "Lỗi ! Vui lòng thử lại sau" });
+            }
+
+        }
 
     }
 }

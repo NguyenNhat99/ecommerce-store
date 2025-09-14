@@ -9,8 +9,9 @@ export default function BlogList() {
     useEffect(() => {
         (async () => {
             try {
-                const data = await blogService.getAll();
+                const data = await blogService.getAllEnable();
                 setBlogs(data);
+                console.log(data)
             } catch (err) {
                 console.error("Lỗi fetch blog:", err);
             }

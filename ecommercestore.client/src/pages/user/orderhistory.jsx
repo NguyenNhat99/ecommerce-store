@@ -1,32 +1,54 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
 import orderService from "../../services/orderService";
 
 const toVnd = (n) =>
     new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Number(n || 0)) + " ₫";
 
-const Badge = ({ text, variant }) => (
+const Badge = ({ text, variant = "secondary" }) => (
     <span className={`badge badge-${variant}`} style={{ fontSize: 12 }}>{text}</span>
 );
 
-const statusVariant = (s) => {
-    switch (s) {
-        case "Pending": return "warning";
-        case "AwaitingPayment": return "secondary";
-        case "Processing": return "info";
-        case "Completed": return "success";
-        case "Cancel": return "dark";
-        default: return "light";
-    }
+// ==== Mapping khớp BE ====
+const ORDER_STATUS_LABEL = {
+    awaitpay: "Chờ thanh toán",
+    pend: "Chờ xử lý",
+    processing: "Đang xử lý",
+    shipped: "Đã giao DVVC",
+    success: "Hoàn tất",
+    cancel: "Đã hủy",
+    err: "Lỗi",
 };
-const payVariant = (p) => {
-    switch (p) {
-        case "Paid": return "success";
-        case "Pending": return "warning";
-        case "Failed": return "danger";
-        case "Refunded": return "secondary";
-        default: return "light";
-    }
+const ORDER_STATUS_VARIANT = {
+    awaitpay: "secondary",
+    pend: "primary",
+    processing: "warning",
+    shipped: "info",
+    success: "success",
+    cancel: "dark",
+    err: "danger",
 };
+
+const PAYMENT_STATUS_VARIANT = {
+    Pending: "warning",
+    Paid: "success",
+    Failed: "danger",
+    Refunded: "secondary",
+    Processing: "info",
+};
+const PAYMENT_METHOD_LABEL = { vnp: "VNPay", cod: "COD" };
+
+const fmtDateTime = (s) => {
+    if (!s) return "-";
+    const d = new Date(s);
+    return isNaN(d) ? String(s) : d.toLocaleString("vi-VN", {
+        hour12: false, year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+    });
+};
+
+const normalizeVN = (str = "") =>
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 export default function OrdersHistory() {
     const [orders, setOrders] = useState([]);
@@ -35,28 +57,37 @@ export default function OrdersHistory() {
     const [page, setPage] = useState(1);
     const PAGE_SIZE = 10;
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const data = await orderService.getMyOrders();
-                setOrders(Array.isArray(data) ? data : []);
-            } catch (e) {
-                // có thể show toast
-            } finally {
-                setLoading(false);
-            }
-        })();
+    const fetchOrders = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await orderService.getMyOrders(); // GET /orders/MyOrder
+            setOrders(Array.isArray(data) ? data : []);
+        } catch {
+            // BE có thể trả 404 khi chưa có đơn => coi như danh sách rỗng
+            setOrders([]);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
+    useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+    // tìm kiếm đa trường
     const filtered = useMemo(() => {
-        const n = q.trim().toLowerCase();
-        if (!n) return orders;
-        return orders.filter(o =>
-            (o.id || "").toLowerCase().includes(n) ||
-            (o.paymentMethod || "").toLowerCase().includes(n) ||
-            (o.orderStatus || "").toLowerCase().includes(n) ||
-            (o.paymentStatus || "").toLowerCase().includes(n)
-        );
+        let list = [...orders];
+        const needle = normalizeVN(q);
+        if (needle) {
+            list = list.filter((o) => {
+                const hay = normalizeVN(
+                    [o?.id, o?.paymentMethod, o?.orderStatus, o?.paymentStatus,
+                    o?.customerName, o?.customerPhone, o?.customerEmail].map(x => x ?? "").join(" ")
+                );
+                return hay.includes(needle);
+            });
+        }
+        // sort: mới -> cũ
+        list.sort((a, b) => new Date(b.orderDate ?? 0) - new Date(a.orderDate ?? 0));
+        return list;
     }, [orders, q]);
 
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -82,11 +113,11 @@ export default function OrdersHistory() {
                 <div className="card shadow border-0">
                     <div className="card-body">
                         {/* Toolbar */}
-                        <div className="d-flex flex-wrap mb-3">
+                        <div className="d-flex flex-wrap mb-3 gap-2">
                             <input
-                                className="form-control mr-2 mb-2"
-                                style={{ maxWidth: 320 }}
-                                placeholder="Tìm theo mã đơn / trạng thái / phương thức..."
+                                className="form-control"
+                                style={{ maxWidth: 360 }}
+                                placeholder="Tìm theo mã đơn / trạng thái / phương thức / tên / sđt..."
                                 value={q}
                                 onChange={(e) => { setQ(e.target.value); setPage(1); }}
                             />
@@ -95,7 +126,7 @@ export default function OrdersHistory() {
                         {/* Empty state */}
                         {pageItems.length === 0 ? (
                             <div className="text-center text-muted py-5">
-                                Chưa có đơn hàng nào.
+                                {orders.length === 0 ? "Chưa có đơn hàng nào." : "Không tìm thấy đơn hàng phù hợp."}
                             </div>
                         ) : (
                             <div className="table-responsive">
@@ -104,7 +135,7 @@ export default function OrdersHistory() {
                                         <tr>
                                             <th>Mã đơn</th>
                                             <th>Ngày đặt</th>
-                                            <th>Tổng tiền</th>
+                                            <th className="text-right">Tổng tiền</th>
                                             <th>Thanh toán</th>
                                             <th>Trạng thái</th>
                                             <th>Hành động</th>
@@ -113,20 +144,28 @@ export default function OrdersHistory() {
                                     <tbody>
                                         {pageItems.map(o => (
                                             <tr key={o.id}>
-                                                <td><code>{o.id}</code></td>
-                                                <td>{o.orderDate ? new Date(o.orderDate).toLocaleString("vi-VN") : "-"}</td>
+                                                <td className="text-break"><code>{o.id}</code></td>
+                                                <td>{fmtDateTime(o.orderDate)}</td>
                                                 <td className="text-right">{toVnd(o.totalAmount)}</td>
                                                 <td>
                                                     <div className="d-flex flex-column">
-                                                        <span>{o.paymentMethod || "-"}</span>
-                                                        <Badge text={o.paymentStatus} variant={payVariant(o.paymentStatus)} />
+                                                        <span>{PAYMENT_METHOD_LABEL[o.paymentMethod] || (o.paymentMethod || "-")}</span>
+                                                        <Badge
+                                                            text={o.paymentStatus || "-"}
+                                                            variant={PAYMENT_STATUS_VARIANT[o.paymentStatus] || "secondary"}
+                                                        />
                                                     </div>
                                                 </td>
-                                                <td><Badge text={o.orderStatus} variant={statusVariant(o.orderStatus)} /></td>
                                                 <td>
-                                                    <a href={`/don-hang/${o.id}`} className="btn btn-sm btn-outline-primary">
+                                                    <Badge
+                                                        text={ORDER_STATUS_LABEL[o.orderStatus] || o.orderStatus || "-"}
+                                                        variant={ORDER_STATUS_VARIANT[o.orderStatus] || "secondary"}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <Link to={`/don-hang/${o.id}`} className="btn btn-sm btn-outline-primary">
                                                         Xem chi tiết
-                                                    </a>
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         ))}
@@ -139,15 +178,15 @@ export default function OrdersHistory() {
                         {totalPages > 1 && (
                             <nav>
                                 <ul className="pagination mb-0">
-                                    <li className={`page-item ${page === 1 && "disabled"}`}>
+                                    <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
                                         <button className="page-link" onClick={() => setPage(p => Math.max(1, p - 1))}>«</button>
                                     </li>
                                     {Array.from({ length: totalPages }).map((_, i) => (
-                                        <li key={i} className={`page-item ${page === i + 1 && "active"}`}>
+                                        <li key={i} className={`page-item ${page === i + 1 ? "active" : ""}`}>
                                             <button className="page-link" onClick={() => setPage(i + 1)}>{i + 1}</button>
                                         </li>
                                     ))}
-                                    <li className={`page-item ${page === totalPages && "disabled"}`}>
+                                    <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
                                         <button className="page-link" onClick={() => setPage(p => Math.min(totalPages, p + 1))}>»</button>
                                     </li>
                                 </ul>

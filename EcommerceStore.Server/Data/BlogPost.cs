@@ -23,6 +23,7 @@ namespace EcommerceStore.Server.Data
 
         [MaxLength(255)]
         public string? Thumbnail { get; set; }
+        public string? ThumbnailPublicId { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

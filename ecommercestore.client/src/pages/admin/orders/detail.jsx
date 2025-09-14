@@ -37,6 +37,7 @@ const PAYMENT_METHOD_LABEL = { vnp: "VNPay", cod: "COD" };
 
 const toVnd = (n) =>
     new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Number(n || 0)) + " ₫";
+
 const fmtDateTime = (s) => {
     if (!s) return "";
     const d = new Date(s);
@@ -46,6 +47,14 @@ const fmtDateTime = (s) => {
         hour: "2-digit", minute: "2-digit"
     });
 };
+
+// ===== Helpers cho danh sách sản phẩm (tương thích nhiều dạng BE) =====
+const getItems = (order) => order?.items || order?.orderItems || [];
+const getItemName = (it) => it?.product?.name || it?.productName || `SP#${it?.productId ?? ""}`;
+const getItemImg = (it) =>
+    it?.product?.thumbnailUrl || it?.product?.avatar || it?.imageUrl || null;
+const getUnitPrice = (it) => Number(it?.unitPrice ?? it?.price ?? 0);
+const getQty = (it) => Number(it?.quantity ?? it?.qty ?? 0);
 
 export default function OrderDetailBootstrap() {
     const { id } = useParams();
@@ -149,6 +158,11 @@ export default function OrderDetailBootstrap() {
         );
     }
 
+    const items = getItems(order);
+    const subtotal = Array.isArray(items)
+        ? items.reduce((s, it) => s + getUnitPrice(it) * getQty(it), 0)
+        : 0;
+
     return (
         <Container fluid className="py-3">
             <Row className="gy-4 gx-4">
@@ -238,7 +252,84 @@ export default function OrderDetailBootstrap() {
                     </Card>
                 </Col>
 
-                {/* (Tuỳ chọn) Sản phẩm trong đơn – khi BE trả OrderItems, thêm 1 Card hiển thị bảng ở đây */}
+                {/* Sản phẩm trong đơn */}
+                <Col xs={12}>
+                    <Card>
+                        <Card.Header><Card.Title as="h6" className="mb-0">Sản phẩm trong đơn</Card.Title></Card.Header>
+                        <Card.Body>
+                            {!Array.isArray(items) || items.length === 0 ? (
+                                <div className="text-muted">Không có sản phẩm nào trong đơn hoặc BE chưa trả OrderItems.</div>
+                            ) : (
+                                <div className="table-responsive">
+                                    <table className="table table-sm align-middle">
+                                        <thead className="thead-light">
+                                            <tr>
+                                                <th style={{ width: "50%" }}>Sản phẩm</th>
+                                                <th style={{ width: "14%" }} className="text-center">SL</th>
+                                                <th style={{ width: "18%" }} className="text-end">Đơn giá</th>
+                                                <th style={{ width: "18%" }} className="text-end">Thành tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {items.map((it, idx) => {
+                                                const name = getItemName(it);
+                                                const qty = getQty(it);
+                                                const price = getUnitPrice(it);
+                                                const lineTotal = qty * price;
+                                                const img = getItemImg(it);
+                                                return (
+                                                    <tr key={idx}>
+                                                        <td className="text-break">
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                {img ? (
+                                                                    <img
+                                                                        src={img}
+                                                                        alt={name}
+                                                                        style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 6 }}
+                                                                    />
+                                                                ) : null}
+                                                                <div>
+                                                                    <div>{name}</div>
+                                                                    {it?.sku && <small className="text-muted">SKU: {it.sku}</small>}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="text-center">{qty}</td>
+                                                        <td className="text-end">{toVnd(price)}</td>
+                                                        <td className="text-end"><strong>{toVnd(lineTotal)}</strong></td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colSpan={3} className="text-end"><strong>Tạm tính</strong></td>
+                                                <td className="text-end"><strong>{toVnd(subtotal)}</strong></td>
+                                            </tr>
+                                            {/* Nếu BE có ShippingFee/DiscountAmount, thêm các dòng dưới: */}
+                                            {order.shippingFee ? (
+                                                <tr>
+                                                    <td colSpan={3} className="text-end"><strong>Phí vận chuyển</strong></td>
+                                                    <td className="text-end"><strong>{toVnd(order.shippingFee)}</strong></td>
+                                                </tr>
+                                            ) : null}
+                                            {order.discountAmount ? (
+                                                <tr>
+                                                    <td colSpan={3} className="text-end"><strong>Giảm giá</strong></td>
+                                                    <td className="text-end"><strong>-{toVnd(order.discountAmount)}</strong></td>
+                                                </tr>
+                                            ) : null}
+                                            <tr>
+                                                <td colSpan={3} className="text-end"><strong>Tổng cộng</strong></td>
+                                                <td className="text-end"><strong>{toVnd(order.totalAmount)}</strong></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            )}
+                        </Card.Body>
+                    </Card>
+                </Col>
             </Row>
 
             <ToastContainer position="bottom-end" className="p-3">

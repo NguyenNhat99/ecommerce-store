@@ -9,5 +9,6 @@ namespace EcommerceStore.Server.Repository.Interfaces
         public Task<ProductResponseModel> AddAsync(ProductRequestModel model);
         public Task<bool> UpdateAsync(int id, ProductRequestModel model);
         public Task<bool> DeleteAsync(int id);
+        public Task<int> CountProductsAsync();
     }
 }

@@ -1,12 +1,10 @@
-﻿// src/pages/admin/revenue/RevenueDashboard.jsx
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import {
     Container, Row, Col, Card, Button, ButtonGroup, Form,
     Badge, Table, ProgressBar, Alert, Spinner
 } from "react-bootstrap";
 import revenueService from "../../../services/revenueService";
 
-// ========= HELPERS =========
 const toVnd = (n) =>
     new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(Number(n || 0)) + " ₫";
 

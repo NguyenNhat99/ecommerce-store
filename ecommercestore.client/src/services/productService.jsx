@@ -36,7 +36,14 @@ const productService = {
             return Promise.reject("Lấy sản phẩm thất bại", error);
         }
     },
-
+    countProducts: async () => {
+        try {
+            const response = await api.get(`/products/count-products`);
+            return response.data;
+        } catch (error) {
+            return Promise.reject("Lấy số lượng sản phẩm thất bại", error);
+        }
+    },
     getOne: async (id) => {
         try {
             const response = await api.get(`/products/${id}`);

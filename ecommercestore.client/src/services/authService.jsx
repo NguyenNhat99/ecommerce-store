@@ -26,7 +26,14 @@ const signUp = async (data) => {
         throw error.response?.data || error.message || "Lỗi không xác định";
     }
 };
-
+const countAccount = async () => {
+    try {
+        const res = await api.get("/accounts/count-accounts");
+        return res.data;
+    } catch (error) {
+        throw error.response?.data || error.message || "Lỗi không xác định";
+    }
+};
 const getCurrentUser = async () => {
     try {
         const token = getToken();
@@ -170,5 +177,6 @@ export default {
     lockAccount,
     unlockAccount,
     setLockoutEnabled,
-    setRole
+    setRole,
+    countAccount
 };

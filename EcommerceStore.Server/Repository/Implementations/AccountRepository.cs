@@ -5,8 +5,10 @@ using EcommerceStore.Server.Models;
 using EcommerceStore.Server.Repository.Interfaces;
 using EcommerceStore.Server.Services.EmailService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
@@ -22,6 +24,7 @@ namespace EcommerceStore.Server.Repository.Implementations
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IMapper mapper;
         private readonly IEmailSender emailSender;
+        private readonly EcommerceStoreContext context;
 
         public AccountRepository(EcommerceStoreContext context, UserManager<User> userManager, SignInManager<User> signInManager, 
             IConfiguration configuration, RoleManager<IdentityRole> roleManager, IHttpContextAccessor httpContextAccessor,
@@ -34,6 +37,7 @@ namespace EcommerceStore.Server.Repository.Implementations
             this.httpContextAccessor = httpContextAccessor;
             this.mapper = mapper;
             this.emailSender = emailSender;
+            this.context = context;
         }
         /// <summary>
         /// Lấy thông tin user hiện tại
@@ -322,6 +326,11 @@ namespace EcommerceStore.Server.Repository.Implementations
 
             var add = await userManager.AddToRoleAsync(user, roleName);
             return add.Succeeded;
+        }
+        public async Task<int> CountAccounts()
+        {
+            var accounts = await context.Users.ToListAsync();
+            return accounts.Count;  
         }
 
     }

@@ -194,25 +194,18 @@ const Header = () => {
                                         Giỏ hàng
                                     </Link>
                                     <Link
-                                        to="/thanh-toan"
-                                        className={`nav-item nav-link ${isActive("/thanh-toan") ? "active" : ""
+                                        to="/tra-cuu"
+                                        className={`nav-item nav-link ${isActive("/tra-cuu") ? "active" : ""
                                             }`}
                                     >
-                                        Thanh toán
-                                    </Link>
-                                    <Link
-                                        to="/lien-he"
-                                        className={`nav-item nav-link ${isActive("/lien-he") ? "active" : ""
-                                            }`}
-                                    >
-                                        Liên hệ
+                                        Tra cứu
                                     </Link>
                                     <Link
                                         to="/bai-viet"
                                         className={`nav-item nav-link ${isActive("/bai-viet") ? "active" : ""
                                             }`}
                                     >
-                                        Blog
+                                        Bài viết
                                     </Link>
                                 </div>
 

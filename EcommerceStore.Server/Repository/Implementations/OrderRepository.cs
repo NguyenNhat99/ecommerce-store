@@ -298,15 +298,27 @@ namespace EcommerceStore.Server.Repository.Implementations
             return _mapper.Map<List<OrderResponseModel>>(orders);
         }
 
+        // Trả 1 đơn kèm Items + Product
         public async Task<OrderResponseModel> GetByIdAsync(string id)
         {
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.OrderItems)!.ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
             return _mapper.Map<OrderResponseModel>(order);
         }
+
+        // Trả danh sách đơn của user kèm Items + Product (để FE có thể xem nhanh)
         public async Task<List<OrderResponseModel>> MyOrder()
         {
             if (CurrentUserId == null) throw new ArgumentNullException("model");
-            var orders = await _context.Orders.Where(o => o.UserId.Equals(CurrentUserId)).ToListAsync();
+
+            var orders = await _context.Orders
+                .Where(o => o.UserId == CurrentUserId)
+                .Include(o => o.OrderItems)!.ThenInclude(i => i.Product)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+
             return _mapper.Map<List<OrderResponseModel>>(orders);
         }
 
@@ -356,5 +368,77 @@ namespace EcommerceStore.Server.Repository.Implementations
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<int> countOrderPending()
+        {
+            var orders = await _context.Orders.Where(p=>p.OrderStatus.Equals(OrderStatus.Pending)).ToListAsync();
+            return orders.Count;
+        }
+        /// <summary>
+        /// Lấy danh sách n đơn hàng mới nhất (kèm items & product)
+        /// </summary>
+        public async Task<List<OrderResponseModel>> GetRecentAsync(int limit = 6)
+        {
+            if (limit <= 0) limit = 6;
+            if (limit > 50) limit = 50;
+
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)!.ThenInclude(i => i.Product)
+                .OrderByDescending(o => o.OrderDate)
+                .Take(limit)
+                .ToListAsync();
+
+            return _mapper.Map<List<OrderResponseModel>>(orders);
+        }
+        private static string NormalizeContact(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return "";
+            s = s.Trim();
+            // chuẩn hoá sđt VN đơn giản: bỏ khoảng trắng & ký tự không số
+            var digits = new string(s.Where(char.IsDigit).ToArray());
+            // nếu là email thì để nguyên (có @)
+            return s.Contains('@') ? s.ToLowerInvariant() : digits;
+        }
+        public async Task<OrderTrackDto?> PublicTrackAsync(string orderId, string contact)
+        {
+            if (string.IsNullOrWhiteSpace(orderId) || string.IsNullOrWhiteSpace(contact))
+                return null;
+
+            // 1) Lấy đơn theo Id (kèm items & product)
+            var order = await _context.Orders
+                .Include(o => o.OrderItems).ThenInclude(i => i.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null) return null;
+
+            // 2) Chuẩn hoá contact nhập vào
+            var norm = NormalizeContact(contact);
+
+            // 3) So khớp ở bộ nhớ (tránh gọi custom method trong LINQ)
+            var emailOk = !string.IsNullOrEmpty(order.CustomerEmail)
+                          && order.CustomerEmail!.Trim().ToLowerInvariant() == norm;
+
+            var phoneOk = !string.IsNullOrEmpty(order.CustomerPhone)
+                          && NormalizeContact(order.CustomerPhone!) == norm;
+
+            if (!emailOk && !phoneOk) return null;
+
+            // 4) Trả DTO
+            return new OrderTrackDto
+            {
+                Id = order.Id,
+                OrderDate = order.OrderDate,
+                OrderStatus = order.OrderStatus,
+                PaymentStatus = order.PaymentStatus,
+                PaymentMethod = order.PaymentMethod,
+                TotalAmount = order.TotalAmount,
+                Items = order.OrderItems.Select(x => new OrderTrackDto.OrderTrackItemDto
+                {
+                    ProductName = x.Product?.Name ?? $"SP#{x.ProductId}",
+                    Quantity = x.Quantity,
+                    UnitPrice = x.UnitPrice
+                }).ToList()
+            };
+        }
+
     }
 }

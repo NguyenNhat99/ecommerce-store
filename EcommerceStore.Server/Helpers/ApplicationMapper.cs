@@ -40,7 +40,20 @@ namespace EcommerceStore.Server.Helpers
                 .ForMember(dest => dest.CodeColor, opt => opt.MapFrom(src => src.Color.CodeColor));
 
             CreateMap<Color, ColorModel>().ReverseMap();
-            CreateMap<Order, OrderResponseModel>();
+            // OrderItem -> OrderItemResponseModel
+            CreateMap<OrderItem, OrderItemResponseModel>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId.ToString()))
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : null))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Product != null ? src.Product.Avatar : null))
+                .ForMember(dest => dest.UnitPrice, opt => opt.MapFrom(src => src.UnitPrice))
+                .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Quantity));
+
+            // Order -> OrderResponseModel
+            CreateMap<Order, OrderResponseModel>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems))
+                .ForMember(dest => dest.Subtotal, opt => opt.MapFrom(src =>
+                    src.OrderItems.Sum(i => i.UnitPrice * i.Quantity)));
+
 
             CreateMap<User, AccountModel>()
                  .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
