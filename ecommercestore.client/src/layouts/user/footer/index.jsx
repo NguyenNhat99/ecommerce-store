@@ -24,20 +24,10 @@ const Footer = () => {
                             <h5 className="font-weight-bold text-dark mb-4">Liên kết nhanh</h5>
                             <div className="d-flex flex-column justify-content-start">
                                 <Link className="text-dark mb-2" to="/"><i className="fa fa-angle-right mr-2"></i>Trang chủ</Link>
-                                <Link className="text-dark mb-2" to="/shop"><i className="fa fa-angle-right mr-2"></i>Cửa hàng</Link>
-                                <Link className="text-dark mb-2" to="/detail"><i className="fa fa-angle-right mr-2"></i>Chi tiết</Link>
-                                <Link className="text-dark mb-2" to="/cart"><i className="fa fa-angle-right mr-2"></i>Giỏ hàng</Link>
-                                <Link className="text-dark" to="/contact"><i className="fa fa-angle-right mr-2"></i>Liên hệ</Link>
-                            </div>
-                        </div>
-
-                        <div className="col-md-4 mb-5">
-                            <h5 className="font-weight-bold text-dark mb-4">Danh mục</h5>
-                            <div className="d-flex flex-column justify-content-start">
-                                <Link className="text-dark mb-2" to="/category/men">Áo nam</Link>
-                                <Link className="text-dark mb-2" to="/category/women">Áo nữ</Link>
-                                <Link className="text-dark mb-2" to="/category/baby">Trẻ em</Link>
-                                <Link className="text-dark" to="/category/shoes">Giày</Link>
+                                <Link className="text-dark mb-2" to="/cua-hang"><i className="fa fa-angle-right mr-2"></i>Cửa hàng</Link>
+                                <Link className="text-dark mb-2" to="/bai-viet"><i className="fa fa-angle-right mr-2"></i>Blog</Link>
+                                <Link className="text-dark mb-2" to="/gio-hang"><i className="fa fa-angle-right mr-2"></i>Giỏ hàng</Link>
+                                <Link className="text-dark" to="/lien-he"><i className="fa fa-angle-right mr-2"></i>Liên hệ</Link>
                             </div>
                         </div>
 

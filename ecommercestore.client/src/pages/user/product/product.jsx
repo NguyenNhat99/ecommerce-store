@@ -15,11 +15,14 @@ export default function ProductPage() {
     const [sort, setSort] = useState("");
     const [open, setOpen] = useState(false);
     const [priceRange, setPriceRange] = useState("all");
-    const [selectedColors, setSelectedColors] = useState([]);
+    const [selectedColors] = useState([]);
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [addingId, setAddingId] = useState(null);
     const [message, setMessage] = useState(null);
     const { setCartQty } = useCart();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 9;
 
     useEffect(() => {
         (async () => {
@@ -44,17 +47,6 @@ export default function ProductPage() {
             });
         });
         return Array.from(set); // ví dụ ["S","M","L","XL"]
-    }, [products]);
-
-    // Gom tất cả màu từ sản phẩm (tránh trùng)
-    const allColors = useMemo(() => {
-        const set = new Set();
-        products.forEach(p => {
-            (p?.productColors || []).forEach(c => {
-                if (c?.codeColor) set.add(c.codeColor);
-            });
-        });
-        return Array.from(set);
     }, [products]);
 
     const filteredProducts = useMemo(() => {
@@ -106,19 +98,27 @@ export default function ProductPage() {
         return arr;
     }, [products, search, sort, priceRange, selectedColors, selectedSizes]);
 
+    // Tính toán phân trang
+    const totalPages = Math.ceil(filteredProducts.length / pageSize);
+    const paginatedProducts = useMemo(() => {
+        const start = (currentPage - 1) * pageSize;
+        return filteredProducts.slice(start, start + pageSize);
+    }, [filteredProducts, currentPage]);
+
+    // Reset về trang 1 khi bộ lọc/search thay đổi
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, sort, priceRange, selectedColors, selectedSizes]);
+
+    // CUỘN LÊN ĐẦU TRANG khi đổi trang
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [currentPage]);
+
     // Helper an toàn để render ảnh
     const buildImg = (avatar) => {
         if (!avatar) return "/img/placeholder.png";
         return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
-    };
-
-    // Toggle chọn màu
-    const toggleColor = (color) => {
-        setSelectedColors(prev =>
-            prev.includes(color)
-                ? prev.filter(c => c !== color)
-                : [...prev, color]
-        );
     };
 
     // ==== Handler: Thêm vào giỏ ====
@@ -207,28 +207,6 @@ export default function ProductPage() {
                             </form>
                         </div>
 
-                        {/* Lọc theo màu */}
-                        <div className="border-bottom mb-4 pb-4">
-                            <h5 className="font-weight-semi-bold mb-4">Lọc theo màu</h5>
-                            <div className="d-flex flex-wrap">
-                                {allColors.map((color) => (
-                                    <div
-                                        key={color}
-                                        onClick={() => toggleColor(color)}
-                                        style={{
-                                            width: "25px",
-                                            height: "25px",
-                                            borderRadius: "50%",
-                                            margin: "5px",
-                                            cursor: "pointer",
-                                            border: selectedColors.includes(color) ? "3px solid #000" : "1px solid #ccc",
-                                            backgroundColor: color
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-
                         {/* Lọc theo size */}
                         <div className="border-bottom mb-4 pb-4">
                             <h5 className="font-weight-semi-bold mb-4">Lọc theo size</h5>
@@ -299,12 +277,13 @@ export default function ProductPage() {
                             </div>
 
                             {/* Danh sách sản phẩm */}
-                            {filteredProducts.map((p) => {
+                            {paginatedProducts.map((p) => {
                                 const price = Number(p?.price) || 0;
                                 const original = Number(p?.originalPrice) || null;
                                 return (
-                                    <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={p?.id ?? Math.random()}>
+                                    <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={p?.id}>
                                         <div className="card product-item border-0 mb-4">
+                                            {/* giữ nguyên phần hiển thị */}
                                             <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                                                 <img className="img-fluid w-100" src={buildImg(p?.avatar)} alt={p?.name ?? "Sản phẩm"} />
                                             </div>
@@ -320,23 +299,15 @@ export default function ProductPage() {
                                                 </div>
                                             </div>
                                             <div className="card-footer d-flex justify-content-between bg-light border">
-                                                <button
-                                                    className="btn btn-sm text-dark p-0"
-                                                    onClick={() => navigate(`/chi-tiet/${p.id}`)}
-                                                >
+                                                <button className="btn btn-sm text-dark p-0" onClick={() => navigate(`/chi-tiet/${p.id}`)}>
                                                     <i className="fas fa-eye text-primary mr-1" />Chi tiết
                                                 </button>
-                                                <RatingSummary
-                                                    productId={p.id}
-                                                    compact={true}
-                                                    showEmpty={false}
-                                                />
+                                                <RatingSummary productId={p.id} compact={true} showEmpty={false} />
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm text-dark p-0"
                                                     onClick={() => handleAddToCart(p.id, 1)}
                                                     disabled={addingId === p.id}
-                                                    aria-busy={addingId === p.id}
                                                 >
                                                     <i className="fas fa-shopping-cart text-primary mr-1"></i>
                                                     {addingId === p.id ? "Đang thêm..." : "Thêm"}
@@ -350,26 +321,34 @@ export default function ProductPage() {
                             {/* Toast hiển thị */}
                             <ToastMessage message={message} onClose={() => setMessage(null)} />
 
-                            {/* Pagination (giữ nguyên) */}
-                            <div className="col-12 pb-1">
-                                <nav aria-label="Page navigation">
-                                    <ul className="pagination justify-content-center mb-3">
-                                        <li className="page-item disabled">
-                                            <a className="page-link" href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                                        <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                        <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                        <li className="page-item">
-                                            <a className="page-link" href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="col-12 pb-1">
+                                    <nav aria-label="Page navigation">
+                                        <ul className="pagination justify-content-center mb-3">
+                                            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                                <button className="page-link" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}>
+                                                    &laquo;
+                                                </button>
+                                            </li>
+
+                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                                <li key={page} className={`page-item ${page === currentPage ? "active" : ""}`}>
+                                                    <button className="page-link" onClick={() => setCurrentPage(page)}>
+                                                        {page}
+                                                    </button>
+                                                </li>
+                                            ))}
+
+                                            <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                                <button className="page-link" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}>
+                                                    &raquo;
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -77,7 +77,7 @@ export default function WeatherSuggestionWidget() {
 
             <Swiper
                 spaceBetween={0}
-                slidesPerView={2}
+                slidesPerView={4}
                 modules={[Autoplay]}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 loop={true}

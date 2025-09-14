@@ -5,6 +5,7 @@ import categoryService from "../../services/categoryService";
 import cartService from "../../services/cartService";
 import ToastMessage from "../../components/common/ToastMessage";
 import { useCart } from "../../context/CartContext";
+import RatingSummary from "../../components/common/RatingSummary";
 
 const IMG_BASE = "https://localhost:7235/Assets/Products/";
 
@@ -17,7 +18,7 @@ export default function CategoryPage() {
     const [sort, setSort] = useState("");
     const [open, setOpen] = useState(false);
     const [priceRange, setPriceRange] = useState("all");
-    const [selectedColors, setSelectedColors] = useState([]);
+    const [selectedColors] = useState([]);
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [addingId, setAddingId] = useState(null);
     const [message, setMessage] = useState(null);
@@ -50,17 +51,6 @@ export default function CategoryPage() {
         products.forEach(p => {
             (p?.productSizes || []).forEach(s => {
                 if (s?.sizeName) set.add(s.sizeName);
-            });
-        });
-        return Array.from(set);
-    }, [products]);
-
-    // gom colors
-    const allColors = useMemo(() => {
-        const set = new Set();
-        products.forEach(p => {
-            (p?.productColors || []).forEach(c => {
-                if (c?.codeColor) set.add(c.codeColor);
             });
         });
         return Array.from(set);
@@ -112,13 +102,6 @@ export default function CategoryPage() {
     const buildImg = (avatar) => {
         if (!avatar) return "/img/placeholder.png";
         return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
-    };
-
-    // toggle color
-    const toggleColor = (color) => {
-        setSelectedColors(prev =>
-            prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
-        );
     };
 
     // handler add giỏ
@@ -196,28 +179,6 @@ export default function CategoryPage() {
                                     <label className="custom-control-label" htmlFor="price-4">Trên 2 triệu</label>
                                 </div>
                             </form>
-                        </div>
-
-                        {/* Lọc theo màu */}
-                        <div className="border-bottom mb-4 pb-4">
-                            <h5 className="font-weight-semi-bold mb-4">Lọc theo màu</h5>
-                            <div className="d-flex flex-wrap">
-                                {allColors.map((color) => (
-                                    <div
-                                        key={color}
-                                        onClick={() => toggleColor(color)}
-                                        style={{
-                                            width: "25px",
-                                            height: "25px",
-                                            borderRadius: "50%",
-                                            margin: "5px",
-                                            cursor: "pointer",
-                                            border: selectedColors.includes(color) ? "3px solid #000" : "1px solid #ccc",
-                                            backgroundColor: color
-                                        }}
-                                    />
-                                ))}
-                            </div>
                         </div>
 
                         {/* Lọc theo size */}
@@ -314,6 +275,7 @@ export default function CategoryPage() {
                                                 <button className="btn btn-sm text-dark p-0" onClick={() => navigate(`/chi-tiet/${p.id}`)}>
                                                     <i className="fas fa-eye text-primary mr-1" />Chi tiết
                                                 </button>
+                                                <RatingSummary productId={p.id} compact={true} showEmpty={false} />
                                                 <button
                                                     type="button"
                                                     className="btn btn-sm text-dark p-0"
