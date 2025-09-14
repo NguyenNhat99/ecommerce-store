@@ -1,6 +1,8 @@
-﻿using EcommerceStore.Server.Models;
+﻿using EcommerceStore.Server.Helpers;
+using EcommerceStore.Server.Models;
 using EcommerceStore.Server.Repository.Implementations;
 using EcommerceStore.Server.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceStore.Server.Controllers
@@ -71,6 +73,7 @@ namespace EcommerceStore.Server.Controllers
         /// http 500: Nếu xảy ra lỗi server hoặc không xác định
         /// </returns>
         [HttpPost]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<ActionResult<CategoryModel>> Create(CategoryModel model)
         {
             try
@@ -98,6 +101,7 @@ namespace EcommerceStore.Server.Controllers
         /// http 500: Xảy ra lỗi ở server hoặc bất kỳ
         /// </returns>
         [HttpDelete]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<ActionResult<bool>> Delete(int id)
         {
             try
@@ -122,6 +126,7 @@ namespace EcommerceStore.Server.Controllers
         /// Http 500: Lỗi server hoặc không xác định
         /// </returns>
         [HttpPut("{id}")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<ActionResult<bool>> Update(int id, CategoryModel model)
         {
             try

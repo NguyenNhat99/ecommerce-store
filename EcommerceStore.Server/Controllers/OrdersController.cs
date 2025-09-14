@@ -190,6 +190,7 @@ namespace EcommerceStore.Server.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -203,6 +204,7 @@ namespace EcommerceStore.Server.Controllers
             }
         }
         [HttpGet("{id}")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<IActionResult> GetById(string id)
         {
             try
@@ -217,6 +219,7 @@ namespace EcommerceStore.Server.Controllers
             }
         }
         [HttpGet("MyOrder")]
+        [Authorize]
         public async Task<IActionResult> GetMyOrders()
         {
             try
@@ -238,7 +241,7 @@ namespace EcommerceStore.Server.Controllers
         /// Cập nhật trạng thái thanh toán: Pending | Paid | Failed | Refunded | Processing
         /// </summary>
         [HttpPatch("{id}/payment-status")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<IActionResult> UpdatePaymentStatus(string id, [FromBody] UpdatePaymentStatusDto dto)
         {
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(dto?.PaymentStatus))
@@ -253,7 +256,7 @@ namespace EcommerceStore.Server.Controllers
         /// Cập nhật trạng thái đơn hàng: awaitpay | pend | processing | shipped | success | cancel | err
         /// </summary>
         [HttpPatch("{id}/order-status")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<IActionResult> UpdateOrderStatus(string id, [FromBody] UpdateOrderStatusDto dto)
         {
             if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(dto?.OrderStatus))
@@ -278,6 +281,7 @@ namespace EcommerceStore.Server.Controllers
         }
 
         [HttpGet("recent")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<IActionResult> Recent([FromQuery] int limit = 6)
         {
             var list = await _orderRepository.GetRecentAsync(limit);

@@ -7,6 +7,7 @@ import {
 import { ArrowLeft, Lock } from "react-bootstrap-icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import authService from "../../services/authService";
+import AuthHero from "../../components/auth/AuthHero"
 
 export default function ResetPasswordBootstrap() {
     const [searchParams] = useSearchParams();
@@ -71,22 +72,15 @@ export default function ResetPasswordBootstrap() {
                 <Row className="g-0 min-vh-100">
                     {/* HERO */}
                     <Col lg={6} className="d-none d-lg-flex align-items-center justify-content-center">
-                        <div className="p-5" style={{ maxWidth: 520 }}>
-                            <div className="d-flex align-items-center gap-2 mb-4">
-                                <img src="/logo.svg" alt="Logo" width={40} height={40}
-                                    style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,.25))" }} />
-                                <h4 className="mb-0 fw-semibold">YourBrand</h4>
-                            </div>
-                            <h1 className="display-6 fw-bold mb-3">Đặt lại mật khẩu 🔑</h1>
-                            <p className="text-white-50 mb-4">
-                                Nhập mật khẩu mới cho tài khoản của bạn. Hãy chọn mật khẩu đủ mạnh để bảo mật tốt hơn.
-                            </p>
-                            <div className="d-flex flex-wrap gap-2">
-                                <Badge bg="primary" pill>RB v5</Badge>
-                                <Badge bg="info" pill>Secure</Badge>
-                                <Badge bg="secondary" pill>Responsive</Badge>
-                            </div>
-                        </div>
+                        <AuthHero
+                            title="E-Shopper 👋"
+                            subtitle="Hãy tạo mật khẩu mới."
+                            badges={[
+                                { text: "Uy tín", variant: "primary" },
+                                { text: "Nhanh gọn", variant: "info" },
+                                { text: "Thương hiệu", variant: "secondary" },
+                            ]}
+                        />
                     </Col>
 
                     {/* FORM */}

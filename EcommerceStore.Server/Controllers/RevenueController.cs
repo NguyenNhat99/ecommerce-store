@@ -1,5 +1,7 @@
-﻿using EcommerceStore.Server.Repository.Implementations;
+﻿using EcommerceStore.Server.Helpers;
+using EcommerceStore.Server.Repository.Implementations;
 using EcommerceStore.Server.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceStore.Server.Controllers
@@ -21,6 +23,7 @@ namespace EcommerceStore.Server.Controllers
             _revenueRepository = revenueRepository;
         }
         [HttpGet("reports/summary")]
+        [Authorize(Roles = UserRole.Admin)]
         public async Task<IActionResult> GetRevenueSummary([FromQuery] string from, [FromQuery] string to)
         {
             if (!DateOnly.TryParse(from, out var dFrom) || !DateOnly.TryParse(to, out var dTo))
@@ -31,6 +34,8 @@ namespace EcommerceStore.Server.Controllers
         }
 
         [HttpGet("reports/by-day")]
+        [Authorize(Roles = UserRole.Admin)]
+
         public async Task<IActionResult> GetRevenueByDay([FromQuery] string from, [FromQuery] string to)
         {
             if (!DateOnly.TryParse(from, out var dFrom) || !DateOnly.TryParse(to, out var dTo))
@@ -41,6 +46,8 @@ namespace EcommerceStore.Server.Controllers
         }
 
         [HttpGet("reports/top-products")]
+        [Authorize(Roles = UserRole.Admin)]
+
         public async Task<IActionResult> GetTopProducts([FromQuery] string from, [FromQuery] string to, [FromQuery] int top = 5)
         {
             if (!DateOnly.TryParse(from, out var dFrom) || !DateOnly.TryParse(to, out var dTo))
@@ -54,6 +61,8 @@ namespace EcommerceStore.Server.Controllers
         }
 
         [HttpGet("reports/category-revenue")]
+        [Authorize(Roles = UserRole.Admin)]
+
         public async Task<IActionResult> GetCategoryRevenue([FromQuery] string from, [FromQuery] string to)
         {
             if (!DateOnly.TryParse(from, out var dFrom) || !DateOnly.TryParse(to, out var dTo))
@@ -63,6 +72,8 @@ namespace EcommerceStore.Server.Controllers
             return Ok(rows);
         }
         [HttpGet("total")]
+        [Authorize(Roles = UserRole.Admin)]
+
         public async Task<IActionResult> GetTotalRevenue()
         {
             var total = await _revenueRepository.GetTotalRevenueAsync();

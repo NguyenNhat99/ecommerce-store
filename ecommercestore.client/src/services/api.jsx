@@ -2,7 +2,7 @@ import axios from "axios";
 import authService from "./authService";
 
 const api = axios.create({
-    baseURL: "https://localhost:7235/api/",
+    baseURL: "http://eshopper.runasp.net/api/",
     withCredentials: true,
     headers: { "Content-Type": "application/json" },
 });

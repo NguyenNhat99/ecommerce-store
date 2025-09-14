@@ -106,12 +106,12 @@ export default function LoginBootstrap() {
                     {/* HERO - trái */}
                     <Col lg={6} className="d-none d-lg-flex align-items-center justify-content-center">
                         <AuthHero
-                            title="Chào mừng trở lại 👋"
-                            subtitle="Đăng nhập để quản lý sản phẩm, đơn hàng và khách hàng trong một giao diện gọn nhẹ, mượt mà và an toàn."
+                            title="E-Shopper 👋"
+                            subtitle="Đăng nhập để trải nghiệm tốt nhất."
                             badges={[
-                                { text: "RB v5", variant: "primary" },
-                                { text: "JWT Ready", variant: "info" },
-                                { text: "Responsive", variant: "secondary" },
+                                { text: "Uy tín", variant: "primary" },
+                                { text: "Nhanh gọn", variant: "info" },
+                                { text: "Thương hiệu", variant: "secondary" },
                             ]}
                         />
                     </Col>
@@ -201,15 +201,7 @@ export default function LoginBootstrap() {
                                         </InputGroup>
                                     </div>
 
-                                    {/* Remember + Forgot */}
                                     <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <Form.Check
-                                            type="checkbox"
-                                            label={<span className="text-white-50">Ghi nhớ đăng nhập</span>}
-                                            checked={form.remember}
-                                            onChange={(e) => setForm((f) => ({ ...f, remember: e.target.checked }))}
-                                            disabled={isBusy}
-                                        />
                                         <Button
                                             variant="link"
                                             className="p-0 text-decoration-none text-white-50"
@@ -219,8 +211,6 @@ export default function LoginBootstrap() {
                                             Quên mật khẩu?
                                         </Button>
                                     </div>
-
-                                    {/* Submit */}
                                     <Button type="submit" className="w-100 rounded-3" disabled={isBusy}>
                                         {isBusy ? (
                                             <>
@@ -240,7 +230,6 @@ export default function LoginBootstrap() {
                                 </Form>
                             </AuthCard>
 
-                            {/* footer nhỏ */}
                             <div className="text-center mt-3 text-white-50 small">
                                 © {new Date().getFullYear()} YourBrand. All rights reserved.
                             </div>
@@ -249,7 +238,6 @@ export default function LoginBootstrap() {
                 </Row>
             </Container>
 
-            {/* Toast lỗi */}
             <ToastContainer position="top-center" className="p-3">
                 <Toast
                     bg="danger"

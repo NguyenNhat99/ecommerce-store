@@ -16,7 +16,6 @@ public class BlogsController : ControllerBase
     [HttpGet("enable")]
     public async Task<IActionResult> GetAllEnable([FromQuery] bool includeDraft = false)
     {
-        // (tuỳ: check role cho includeDraft)
         var blogs = await _blogRepository.GetAllAsync(true);
         return Ok(blogs);
     }

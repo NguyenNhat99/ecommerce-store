@@ -47,12 +47,16 @@ const Login = lazy(() => import("./pages/auth/login"));
 const Register = lazy(() => import("./pages/auth/register"));
 const ForgotPassword = lazy(() => import("./pages/auth/forgotPassword"));
 const RessetPassword = lazy(() => import("./pages/auth/resetPassword"));
+const AccessDenied = lazy(() => import("./pages/auth/AccessDenied"));
+const NotFound = lazy(() => import("./pages/auth/NotFound"));
 
 const ROUTES_CONFIG = [
     { path: ROUTERS.AUTH.LOGIN, component: <Login /> },
     { path: ROUTERS.AUTH.REGISTER, component: <Register /> },
     { path: ROUTERS.AUTH.FORGOTPASSWORD, component: <ForgotPassword /> },
     { path: ROUTERS.AUTH.RESSETPASSWORD, component: <RessetPassword /> },
+    { path: ROUTERS.AUTH.ACCESSDENIED, component: <AccessDenied /> },
+    { path: ROUTERS.AUTH.NOTFOUND, component: <NotFound /> },
 
     {path: ROUTERS.USER.HOME,component: <Homepage />,layout: userlayout},
     {path: ROUTERS.USER.SHOP,component: <ProductPage />,layout: userlayout},
@@ -69,21 +73,22 @@ const ROUTES_CONFIG = [
     { path: ROUTERS.USER.ORDERDETAIL, component: <DetailOrder />, layout: userlayout, },
     { path: ROUTERS.USER.BLOG_LIST, component: <BlogList />, layout: userlayout },
     { path: ROUTERS.USER.BLOG_DETAIL, component: <BlogDetail />, layout: userlayout },
-    { path: ROUTERS.ADMIN.DASHBOARD, component: <Dashboard />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.BRANDS, component: <Brands />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.CATEGORIES, component: <Categories />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.LISTPRODUCT, component: <ListProduct />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.INSERTPRODUCT, component: <InsertProduct />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.UPDATEPRODUCT, component: <UpdateProduct />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.PROFILE, component: <Profile />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.ACCOUNTS, component: <Accounts />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.ACCOUNT_DETAIL, component: <DetailAccount />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.ORDERS, component: <OrderPage />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.ORDERDETAIL, component: <OrderDetail />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.REVENUE, component: <Revenue />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.BLOG, component: <Article />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.INSERTBLOG, component: <InsertArticle />, layout: adminlayout, },
-    { path: ROUTERS.ADMIN.UPDATEBLOG, component: <UpdateBlog />, layout: adminlayout, },
+
+    { path: ROUTERS.ADMIN.DASHBOARD, component: <Dashboard />, layout: adminlayout, roles:["Admin","Staff"]},
+    { path: ROUTERS.ADMIN.BRANDS, component: <Brands />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.CATEGORIES, component: <Categories />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.LISTPRODUCT, component: <ListProduct />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.INSERTPRODUCT, component: <InsertProduct />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.UPDATEPRODUCT, component: <UpdateProduct />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.PROFILE, component: <Profile />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.ACCOUNTS, component: <Accounts />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.ACCOUNT_DETAIL, component: <DetailAccount />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.ORDERS, component: <OrderPage />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.ORDERDETAIL, component: <OrderDetail />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.REVENUE, component: <Revenue />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.BLOG, component: <Article />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.INSERTBLOG, component: <InsertArticle />, layout: adminlayout, roles: ["Admin", "Staff"] },
+    { path: ROUTERS.ADMIN.UPDATEBLOG, component: <UpdateBlog />, layout: adminlayout, roles: ["Admin", "Staff"] },
 ];
 
 

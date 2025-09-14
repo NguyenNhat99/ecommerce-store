@@ -1,17 +1,18 @@
 import { Badge } from "react-bootstrap";
+import  logo  from "../../assets/image/ShopperLogoMini.svg"
 
 export default function AuthHero({ title, subtitle, badges }) {
     return (
         <div className="p-5" style={{ maxWidth: 520 }}>
             <div className="d-flex align-items-center gap-2 mb-4">
                 <img
-                    src="/logo.svg"
+                    src={logo }
                     alt="Logo"
                     width={40}
                     height={40}
                     style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,.25))" }}
                 />
-                <h4 className="mb-0 fw-semibold">YourBrand</h4>
+                <h4 className="mb-0 fw-semibold">- Shopper</h4>
             </div>
             <h1 className="display-6 fw-bold mb-3">{title}</h1>
             <p className="text-white-50 mb-4">{subtitle}</p>

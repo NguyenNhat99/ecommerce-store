@@ -21,7 +21,8 @@
         REGISTER: "dang-ky-tai-khoan",
         FORGOTPASSWORD: "quen-mat-khau",
         RESSETPASSWORD: "reset-password",
-        NOTAUTH: "khong-quyen-truy-cap",
+        ACCESSDENIED: "khong-quyen-truy-cap",
+        NOTFOUND: "khong-quyen-truy-cap",
     },
     ADMIN: {
         DASHBOARD: "admin/dashboard",

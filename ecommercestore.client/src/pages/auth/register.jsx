@@ -91,12 +91,12 @@ export default function RegisterBootstrap() {
                     {/* HERO */}
                     <Col lg={6} className="d-none d-lg-flex align-items-center justify-content-center">
                         <AuthHero
-                            title="Tạo tài khoản mới ✨"
-                            subtitle="Chỉ vài bước nhanh gọn để bắt đầu trải nghiệm hệ thống quản trị hiện đại của bạn."
+                            title="E-Shopper 👋"
+                            subtitle="Đăng ký để trải nghiệm tốt nhất."
                             badges={[
-                                { text: "RB v5", variant: "primary" },
-                                { text: "Form Validation", variant: "info" },
-                                { text: "Responsive", variant: "secondary" },
+                                { text: "Uy tín", variant: "primary" },
+                                { text: "Nhanh gọn", variant: "info" },
+                                { text: "Thương hiệu", variant: "secondary" },
                             ]}
                         />
                     </Col>

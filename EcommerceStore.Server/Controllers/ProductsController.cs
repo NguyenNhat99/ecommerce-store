@@ -1,6 +1,8 @@
-﻿using EcommerceStore.Server.Models;
+﻿using EcommerceStore.Server.Helpers;
+using EcommerceStore.Server.Models;
 using EcommerceStore.Server.Repository.Implementations;
 using EcommerceStore.Server.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceStore.Server.Controllers
@@ -30,6 +32,7 @@ namespace EcommerceStore.Server.Controllers
             }
         }
         [HttpGet("{id}")]
+
         public async Task<ActionResult<ProductResponseModel>> GetById(int id)
         {
             try
@@ -44,6 +47,8 @@ namespace EcommerceStore.Server.Controllers
             }
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
+
         public async Task<ActionResult<bool>> Delete(int id)
         {
             try
@@ -64,6 +69,8 @@ namespace EcommerceStore.Server.Controllers
         /// <returns>ProductResponseModel</returns>
         [HttpPost]
         [Consumes("multipart/form-data")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
+
         public async Task<IActionResult> AddProduct([FromForm] ProductRequestModel model)
         {
             if (!ModelState.IsValid)
@@ -87,6 +94,7 @@ namespace EcommerceStore.Server.Controllers
         /// <returns>Trạng thái cập nhật</returns>
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
+        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
         public async Task<IActionResult> UpdateProduct(int id, [FromForm] ProductRequestModel model)
         {
             if (!ModelState.IsValid)

@@ -56,11 +56,11 @@ export default function ForgotPasswordBootstrap() {
             <AuthHero
               title="Quên mật khẩu?"
               subtitle="Nhập email để nhận liên kết đặt lại mật khẩu. Đừng lo, thao tác này rất nhanh gọn."
-              badges={[
-                { text: "RB v5", variant: "primary" },
-                { text: "Secure", variant: "info" },
-                { text: "Responsive", variant: "secondary" },
-              ]}
+                          badges={[
+                              { text: "Uy tín", variant: "primary" },
+                              { text: "Nhanh gọn", variant: "info" },
+                              { text: "Thương hiệu", variant: "secondary" },
+                          ]}
             />
           </Col>
 

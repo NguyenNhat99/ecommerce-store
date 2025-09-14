@@ -1,4 +1,5 @@
-﻿using EcommerceStore.Server.Models;
+﻿using EcommerceStore.Server.Helpers;
+using EcommerceStore.Server.Models;
 using EcommerceStore.Server.Repository.Implementations;
 using EcommerceStore.Server.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -228,7 +229,7 @@ namespace EcommerceStore.Server.Controllers
         /// Http 500: Lỗi server
         /// </returns>
         [HttpGet("auth/detail/{email}")]
-        [Authorize(Roles = "Admin,Staff")]
+        [Authorize(Roles = UserRole.Admin)]
         public async Task<IActionResult> GetAccountById(string email)
         {
             try
@@ -245,6 +246,7 @@ namespace EcommerceStore.Server.Controllers
         }
 
         [HttpPost("lock")]
+        [Authorize(Roles = UserRole.Admin)]
         public async Task<IActionResult> Lock([FromBody] LockAccountDto dto)
         {
             // dto.Email, dto.Until (nullable)
@@ -253,6 +255,7 @@ namespace EcommerceStore.Server.Controllers
         }
 
         [HttpPost("unlock")]
+        [Authorize(Roles = UserRole.Admin)]
         public async Task<IActionResult> Unlock([FromBody] UnlockAccountDto dto)
         {
             var ok = await _accountRepository.UnlockAsync(dto.Email);
@@ -260,6 +263,7 @@ namespace EcommerceStore.Server.Controllers
         }
 
         [HttpPost("lockout-enabled")]
+        [Authorize(Roles = UserRole.Admin)]
         public async Task<IActionResult> SetLockoutEnabled([FromBody] SetLockoutEnabledDto dto)
         {
             var ok = await _accountRepository.SetLockoutEnabledAsync(dto.Email, dto.Enabled);
@@ -268,6 +272,7 @@ namespace EcommerceStore.Server.Controllers
         public record SetRoleDto(string Email, string Role);
 
         [HttpPost("roles/set")]
+        [Authorize(Roles = UserRole.Admin)]
         public async Task<IActionResult> SetRole([FromBody] SetRoleDto dto)
         {
             var ok = await _accountRepository.SetSingleRoleAsync(dto.Email, dto.Role);
@@ -275,6 +280,7 @@ namespace EcommerceStore.Server.Controllers
                       : BadRequest(new { message = "Cập nhật vai trò thất bại" });
         }
         [HttpGet("count-accounts")]
+        [Authorize(Roles = UserRole.Admin)]
         public async Task<IActionResult> CountAccounts()
         {
             try
