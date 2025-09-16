@@ -204,7 +204,7 @@ namespace EcommerceStore.Server.Controllers
             }
         }
         [HttpGet("{id}")]
-        [Authorize(Roles = UserRole.Admin + "," + UserRole.Staff)]
+        [Authorize]
         public async Task<IActionResult> GetById(string id)
         {
             try

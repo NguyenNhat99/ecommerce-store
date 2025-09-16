@@ -544,22 +544,6 @@ export default function CartPage() {
 
                     {/* TÓM TẮT GIỎ HÀNG */}
                     <div className="col-lg-4">
-                        <form className="mb-5" onSubmit={(e) => e.preventDefault()}>
-                            <div className="input-group">
-                                <input
-                                    type="text"
-                                    className="form-control p-4"
-                                    placeholder="Mã giảm giá (demo)"
-                                    style={{ height: 48 }}
-                                />
-                                <div className="input-group-append">
-                                    <button className="btn btn-primary" disabled>
-                                        Áp dụng
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-
                         <div className="card border-secondary mb-5">
                             <div className="card-header bg-secondary border-0" style={{ minHeight: 56 }}>
                                 <h4 className="font-weight-semi-bold m-0">Tóm tắt đơn hàng</h4>
