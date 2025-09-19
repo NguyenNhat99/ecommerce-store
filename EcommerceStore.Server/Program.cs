@@ -16,7 +16,7 @@ var MyCors = "_MyCors";
 builder.Services.AddCors(opts =>
 {
     opts.AddPolicy(MyCors, p => p
-        .WithOrigins("http://eshopper.runasp.net/", "http://eshopper.runasp.net/")
+        .WithOrigins("https://localhost:5173", "https://localhost:5173")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
