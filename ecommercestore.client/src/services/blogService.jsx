@@ -22,10 +22,15 @@ const blogService = {
         return data;
     },
     update: async (id, formData) => {
-        const res = await api.put(`/blogs/${id}`, formData, {
+        const { data } = await api.put(`/blogs/${id}`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
-        return res.data;
+        return data;
+    },
+    delete: async (id) => {
+        const res = await api.delete(`/blogs/${id}`);
+        return res.status === 204; // NoContent
     },
 };
+
 export default blogService;

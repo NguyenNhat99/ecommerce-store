@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
     Container, Row, Col, Card, Table as RBTable, Button, Form,
-    Spinner, Alert, InputGroup, Pagination as RBPagination, Badge
+    Spinner, Alert, InputGroup, Pagination as RBPagination, Badge,
+    Modal, Toast, ToastContainer
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import blogService from "@/services/blogService";
@@ -22,6 +23,11 @@ export default function ManagerBlogPage() {
     const [search, setSearch] = useState("");
     const [debounced, setDebounced] = useState(search);
     const [pubFilter, setPubFilter] = useState(""); // "", "published", "draft"
+
+    // delete states
+    const [confirmId, setConfirmId] = useState(null); // id đang chờ xác nhận xóa
+    const [deletingId, setDeletingId] = useState(null); // id đang xóa (để disable nút)
+    const [toast, setToast] = useState({ show: false, message: "", variant: "success" });
 
     useEffect(() => {
         const t = setTimeout(() => setDebounced(search), 300);
@@ -125,6 +131,34 @@ export default function ManagerBlogPage() {
 
     const thumbOf = (b) => b?.thumbnailUrl || b?.thumbnail || "";
 
+    // ===== Delete handlers =====
+    const handleRequestDelete = (id) => setConfirmId(id);
+
+    const handleConfirmDelete = async () => {
+        if (!confirmId) return;
+        try {
+            setDeletingId(confirmId);
+            const ok = await blogService.delete(confirmId);
+            if (ok) {
+                // Xóa tối ưu (không cần gọi lại API): lọc ra khỏi state
+                setBlogs(prev => prev.filter(x => x.id !== confirmId));
+                setToast({ show: true, message: "Đã xóa bài viết.", variant: "success" });
+            } else {
+                // Trường hợp API trả khác 204 (hiếm)
+                setToast({ show: true, message: "Không thể xóa bài viết.", variant: "danger" });
+            }
+        } catch (err) {
+            console.error(err);
+            const msg = err?.response?.status === 404
+                ? "Bài viết không tồn tại hoặc đã bị xóa."
+                : "Xóa thất bại. Vui lòng thử lại.";
+            setToast({ show: true, message: msg, variant: "danger" });
+        } finally {
+            setDeletingId(null);
+            setConfirmId(null);
+        }
+    };
+
     return (
         <Container fluid className="py-3">
             <Row className="gy-4 gx-4">
@@ -153,7 +187,7 @@ export default function ManagerBlogPage() {
                                     )}
                                 </InputGroup>
 
-                                {/* Đổi nhãn filter: Hiển thị / Ẩn (giá trị giữ nguyên để khớp BE) */}
+                                {/* Đổi nhãn filter: Hiển thị / Ẩn */}
                                 <Form.Select
                                     size="sm"
                                     value={pubFilter}
@@ -195,7 +229,7 @@ export default function ManagerBlogPage() {
                                                     <th>Ảnh</th>
                                                     <th style={{ minWidth: 140 }}>Ngày tạo</th>
                                                     <th style={{ minWidth: 120 }}>Trạng thái</th>
-                                                    <th style={{ width: 120 }}>Lệnh</th>
+                                                    <th style={{ width: 160 }}>Lệnh</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -229,7 +263,7 @@ export default function ManagerBlogPage() {
                                                                     : <Badge bg="secondary">Ẩn</Badge>}
                                                             </td>
 
-                                                            {/* BỎ nút "Xem", chỉ còn "Sửa" */}
+                                                            {/* Lệnh: Sửa + Xóa */}
                                                             <td className="d-flex gap-2">
                                                                 <Button
                                                                     size="sm"
@@ -237,6 +271,18 @@ export default function ManagerBlogPage() {
                                                                     onClick={() => navigate(`/admin/cap-nhat-bai-viet/${b.id}`)}
                                                                 >
                                                                     Sửa
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline-danger"
+                                                                    onClick={() => handleRequestDelete(b.id)}
+                                                                    disabled={deletingId === b.id}
+                                                                >
+                                                                    {deletingId === b.id ? (
+                                                                        <>
+                                                                            <Spinner size="sm" animation="border" className="me-1" /> Đang xóa…
+                                                                        </>
+                                                                    ) : "Xóa"}
                                                                 </Button>
                                                             </td>
                                                         </tr>
@@ -252,6 +298,54 @@ export default function ManagerBlogPage() {
                     </Card>
                 </Col>
             </Row>
+
+            {/* Confirm Delete Modal */}
+            <Modal
+                show={!!confirmId}
+                onHide={() => setConfirmId(null)}
+                centered
+                backdrop="static"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Xác nhận xóa</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Bạn có chắc muốn xóa bài viết <strong>#{confirmId}</strong>? Hành động này không thể hoàn tác.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="secondary"
+                        onClick={() => setConfirmId(null)}
+                        disabled={deletingId === confirmId}
+                    >
+                        Hủy
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={handleConfirmDelete}
+                        disabled={deletingId === confirmId}
+                    >
+                        {deletingId === confirmId ? (
+                            <>
+                                <Spinner size="sm" animation="border" className="me-1" /> Đang xóa…
+                            </>
+                        ) : "Xóa ngay"}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Toast thông báo */}
+            <ToastContainer position="top-end" className="p-3">
+                <Toast
+                    bg={toast.variant === "danger" ? "danger" : "success"}
+                    onClose={() => setToast(s => ({ ...s, show: false }))}
+                    show={toast.show}
+                    delay={2500}
+                    autohide
+                >
+                    <Toast.Body className="text-white">{toast.message}</Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Container>
     );
 }

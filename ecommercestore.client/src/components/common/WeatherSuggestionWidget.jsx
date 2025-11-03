@@ -77,7 +77,7 @@ export default function WeatherSuggestionWidget() {
 
             <Swiper
                 spaceBetween={0}
-                slidesPerView={2}
+                slidesPerView={4}
                 modules={[Autoplay]}
                 autoplay={{ delay: 2500, disableOnInteraction: false }}
                 loop={true}
@@ -89,6 +89,7 @@ export default function WeatherSuggestionWidget() {
                                 src={p.avatar}
                                 alt={p.name}
                                 className="w-full h-40 object-cover rounded-lg cursor-pointer hover:scale-105 transition"
+                                style={{ height: "450px" }}
                                 onClick={() => navigate(`/chi-tiet/${p.id}`)}
                             />
                         </SwiperSlide>

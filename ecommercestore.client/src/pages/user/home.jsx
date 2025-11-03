@@ -104,8 +104,9 @@ export default function HomePage() {
             {/* Featured End */}
 
             {/* Widget gợi ý theo thời tiết */}
+            <WeatherSuggestionWidget />
+
             <div className="container-fluid px-xl-5">
-                <WeatherSuggestionWidget />
             </div>
 
             {/* Products Start */}

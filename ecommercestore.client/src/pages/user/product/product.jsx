@@ -15,11 +15,14 @@ export default function ProductPage() {
     const [sort, setSort] = useState("");
     const [open, setOpen] = useState(false);
     const [priceRange, setPriceRange] = useState("all");
-    const [selectedColors, setSelectedColors] = useState([]);
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [addingId, setAddingId] = useState(null);
     const [message, setMessage] = useState(null);
     const { setCartQty } = useCart();
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isLoadingPage, setIsLoadingPage] = useState(false);
+    const pageSize = 9;
 
     useEffect(() => {
         (async () => {
@@ -46,17 +49,6 @@ export default function ProductPage() {
         return Array.from(set); // ví dụ ["S","M","L","XL"]
     }, [products]);
 
-    // Gom tất cả màu từ sản phẩm (tránh trùng)
-    const allColors = useMemo(() => {
-        const set = new Set();
-        products.forEach(p => {
-            (p?.productColors || []).forEach(c => {
-                if (c?.codeColor) set.add(c.codeColor);
-            });
-        });
-        return Array.from(set);
-    }, [products]);
-
     const filteredProducts = useMemo(() => {
         const items = Array.isArray(products) ? products : [];
         const q = (search || "").trim().toLowerCase();
@@ -80,13 +72,6 @@ export default function ProductPage() {
             }
         });
 
-        // lọc theo màu
-        if (selectedColors.length > 0) {
-            arr = arr.filter(p =>
-                p?.productColors?.some(c => selectedColors.includes(c.codeColor))
-            );
-        }
-
         // lọc theo size
         if (selectedSizes.length > 0) {
             arr = arr.filter(p => {
@@ -104,21 +89,38 @@ export default function ProductPage() {
             });
         }
         return arr;
-    }, [products, search, sort, priceRange, selectedColors, selectedSizes]);
+    }, [products, search, sort, priceRange, selectedSizes]);
+
+    const totalPages = Math.ceil(filteredProducts.length / pageSize);
+    const paginatedProducts = useMemo(() => {
+        const start = (currentPage - 1) * pageSize;
+        return filteredProducts.slice(start, start + pageSize);
+    }, [filteredProducts, currentPage]);
+
+    // Hàm đổi trang có loading
+    const goToPage = (page) => {
+        if (page < 1 || page > totalPages || page === currentPage) return;
+        setIsLoadingPage(true);
+        setTimeout(() => {
+            setCurrentPage(page);
+            setIsLoadingPage(false);
+        }, 300); // thời gian loading giả
+    };
+
+    // Reset về trang 1 khi bộ lọc/search thay đổi
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, sort, priceRange, selectedSizes]);
+
+    // CUỘN LÊN ĐẦU TRANG khi đổi trang
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [currentPage]);
 
     // Helper an toàn để render ảnh
     const buildImg = (avatar) => {
         if (!avatar) return "/img/placeholder.png";
         return avatar.startsWith("http") ? avatar : `${IMG_BASE}${avatar}`;
-    };
-
-    // Toggle chọn màu
-    const toggleColor = (color) => {
-        setSelectedColors(prev =>
-            prev.includes(color)
-                ? prev.filter(c => c !== color)
-                : [...prev, color]
-        );
     };
 
     // ==== Handler: Thêm vào giỏ ====
@@ -165,7 +167,7 @@ export default function ProductPage() {
                 <div className="row px-xl-5">
                     {/* Sidebar */}
                     <div className="col-lg-3 col-md-12">
-                        {/* Lọc theo giá */ }
+                        {/* Lọc theo giá */}
                         <div className="border-bottom mb-4 pb-4">
                             <h5 className="font-weight-semi-bold mb-4">Lọc theo giá</h5>
                             <form>
@@ -205,28 +207,6 @@ export default function ProductPage() {
                                     <label className="custom-control-label" htmlFor="price-4">Trên 2 triệu</label>
                                 </div>
                             </form>
-                        </div>
-
-                        {/* Lọc theo màu */}
-                        <div className="border-bottom mb-4 pb-4">
-                            <h5 className="font-weight-semi-bold mb-4">Lọc theo màu</h5>
-                            <div className="d-flex flex-wrap">
-                                {allColors.map((color) => (
-                                    <div
-                                        key={color}
-                                        onClick={() => toggleColor(color)}
-                                        style={{
-                                            width: "25px",
-                                            height: "25px",
-                                            borderRadius: "50%",
-                                            margin: "5px",
-                                            cursor: "pointer",
-                                            border: selectedColors.includes(color) ? "3px solid #000" : "1px solid #ccc",
-                                            backgroundColor: color
-                                        }}
-                                    />
-                                ))}
-                            </div>
                         </div>
 
                         {/* Lọc theo size */}
@@ -299,77 +279,97 @@ export default function ProductPage() {
                             </div>
 
                             {/* Danh sách sản phẩm */}
-                            {filteredProducts.map((p) => {
-                                const price = Number(p?.price) || 0;
-                                const original = Number(p?.originalPrice) || null;
-                                return (
-                                    <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={p?.id ?? Math.random()}>
-                                        <div className="card product-item border-0 mb-4">
-                                            <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                                                <img className="img-fluid w-100" src={buildImg(p?.avatar)} alt={p?.name ?? "Sản phẩm"} />
-                                            </div>
-                                            <div className="card-body border-left border-right text-center p-0 pt-4 pb-3">
-                                                <h6 className="text-truncate mb-3">{p?.name ?? "Sản phẩm"}</h6>
-                                                <div className="d-flex justify-content-center">
-                                                    <h6>{price.toLocaleString("vi-VN")} ₫</h6>
-                                                    {original ? (
-                                                        <h6 className="text-muted ml-2">
-                                                            <del>{original.toLocaleString("vi-VN")} ₫</del>
-                                                        </h6>
-                                                    ) : null}
+                            {isLoadingPage ? (
+                                <div className="w-100 text-center py-5">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="sr-only">Đang tải...</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                paginatedProducts.map((p) => {
+                                    const price = Number(p?.price) || 0;
+                                    const original = Number(p?.originalPrice) || null;
+                                    return (
+                                        <div className="col-lg-4 col-md-6 col-sm-12 pb-1" key={p?.id}>
+                                            <div className="card product-item border-0 mb-4">
+                                                {/* giữ nguyên phần hiển thị */}
+                                                <div className="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                                                    <img className="img-fluid w-100" src={buildImg(p?.avatar)} alt={p?.name ?? "Sản phẩm"} />
+                                                </div>
+                                                <div className="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                                                    <h6 className="text-truncate mb-3">{p?.name ?? "Sản phẩm"}</h6>
+                                                    <div className="d-flex justify-content-center">
+                                                        <h6>{price.toLocaleString("vi-VN")} ₫</h6>
+                                                        {original ? (
+                                                            <h6 className="text-muted ml-2">
+                                                                <del>{original.toLocaleString("vi-VN")} ₫</del>
+                                                            </h6>
+                                                        ) : null}
+                                                    </div>
+                                                </div>
+                                                <div className="card-footer d-flex justify-content-between bg-light border">
+                                                    <button className="btn btn-sm text-dark p-0" onClick={() => navigate(`/chi-tiet/${p.id}`)}>
+                                                        <i className="fas fa-eye text-primary mr-1" />Chi tiết
+                                                    </button>
+                                                    <RatingSummary productId={p.id} compact={true} showEmpty={false} />
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm text-dark p-0"
+                                                        onClick={() => handleAddToCart(p.id, 1)}
+                                                        disabled={addingId === p.id}
+                                                    >
+                                                        <i className="fas fa-shopping-cart text-primary mr-1"></i>
+                                                        {addingId === p.id ? "Đang thêm..." : "Thêm"}
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div className="card-footer d-flex justify-content-between bg-light border">
-                                                <button
-                                                    className="btn btn-sm text-dark p-0"
-                                                    onClick={() => navigate(`/chi-tiet/${p.id}`)}
-                                                >
-                                                    <i className="fas fa-eye text-primary mr-1" />Chi tiết
-                                                </button>
-                                                <RatingSummary
-                                                    productId={p.id}
-                                                    compact={true}
-                                                    showEmpty={false}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-sm text-dark p-0"
-                                                    onClick={() => handleAddToCart(p.id, 1)}
-                                                    disabled={addingId === p.id}
-                                                    aria-busy={addingId === p.id}
-                                                >
-                                                    <i className="fas fa-shopping-cart text-primary mr-1"></i>
-                                                    {addingId === p.id ? "Đang thêm..." : "Thêm"}
-                                                </button>
-                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })
+                            )}
 
                             {/* Toast hiển thị */}
                             <ToastMessage message={message} onClose={() => setMessage(null)} />
 
-                            {/* Pagination (giữ nguyên) */}
-                            <div className="col-12 pb-1">
-                                <nav aria-label="Page navigation">
-                                    <ul className="pagination justify-content-center mb-3">
-                                        <li className="page-item disabled">
-                                            <a className="page-link" href="#" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                                        <li className="page-item"><a className="page-link" href="#">2</a></li>
-                                        <li className="page-item"><a className="page-link" href="#">3</a></li>
-                                        <li className="page-item">
-                                            <a className="page-link" href="#" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="col-12 pb-3">
+                                    <nav aria-label="Pagination" className="d-flex justify-content-center">
+                                        <ul className="pagination gap-2">
+                                            <li className="page-item">
+                                                <button
+                                                    className="btn btn-outline-primary rounded-circle"
+                                                    disabled={currentPage === 1}
+                                                    onClick={() => goToPage(currentPage - 1)}
+                                                >
+                                                    &laquo;
+                                                </button>
+                                            </li>
+
+                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                                <li key={page} className="page-item">
+                                                    <button
+                                                        className={`btn rounded-circle ${page === currentPage ? "btn-primary" : "btn-outline-primary"}`}
+                                                        onClick={() => goToPage(page)}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                </li>
+                                            ))}
+
+                                            <li className="page-item">
+                                                <button
+                                                    className="btn btn-outline-primary rounded-circle"
+                                                    disabled={currentPage === totalPages}
+                                                    onClick={() => goToPage(currentPage + 1)}
+                                                >
+                                                    &raquo;
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

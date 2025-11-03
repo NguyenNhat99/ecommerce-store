@@ -67,7 +67,7 @@ public class BlogRepository : IBlogRepository
         var blog = new BlogPost
         {
             Title = model.Title,
-            Slug = model.Slug,
+            Slug = "",
             Content = model.Content,
             IsPublished = model.IsPublished,
             Thumbnail = newUrl,

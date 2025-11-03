@@ -3,11 +3,15 @@ using EcommerceStore.Server.Helpers;
 using EcommerceStore.Server.Models;
 using EcommerceStore.Server.Repository.Implementations;
 using EcommerceStore.Server.Repository.Interfaces;
+using EcommerceStore.Server.Services.EmailService;
 using EcommerceStore.Server.Services.VnPayService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Globalization;
+using System.Net;
+using System.Text;
 
 namespace EcommerceStore.Server.Controllers
 {
@@ -20,19 +24,22 @@ namespace EcommerceStore.Server.Controllers
         private readonly VnPayOptions _vnOpts;
         private readonly ILogger<OrdersController> _logger;
         private readonly ICartRepository _cartRepository;
+        private readonly IEmailSender _emailSender;
 
         public OrdersController(
             IOrderRepository orderRepository,
             EcommerceStoreContext context,
             IOptions<VnPayOptions> vnOptions,
             ILogger<OrdersController> logger,
-            ICartRepository cartRepository)
+            ICartRepository cartRepository, IEmailSender emailSender
+            )
         {
             _orderRepository = orderRepository;
             _context = context;
             _vnOpts = vnOptions.Value;
             _logger = logger;
             _cartRepository = cartRepository;
+            _emailSender = emailSender;
         }
 
         // COD (giữ nếu bạn đang dùng)
@@ -148,7 +155,12 @@ namespace EcommerceStore.Server.Controllers
                     await _context.SaveChangesAsync();
 
                     // (Tùy chọn) Gửi email xác nhận
-                    // await _emailSender.SendEmailAsync(...)
+                    if (!string.IsNullOrWhiteSpace(order.CustomerEmail))
+                    {
+                        var html = BuildOrderEmailHtml(order, cart.Items);
+                        var subject = $"[EcommerceStore] Xác nhận đặt hàng #{order.Id}";
+                        await _emailSender.SendEmailAsync(order.CustomerEmail, subject, html);
+                    }
 
                     return Ok(new
                     {
@@ -189,6 +201,72 @@ namespace EcommerceStore.Server.Controllers
                 return StatusCode(500, new { message = "Lỗi server ! Vui lòng thử lại sau" });
             }
         }
+        public static string BuildOrderEmailHtml(Order order, IEnumerable<CartItem> itemsInCart)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("<div style='font-family:Segoe UI,Arial,sans-serif;font-size:14px;color:#222'>");
+            sb.AppendLine($"  <h2>✅ Đặt hàng thành công</h2>");
+            sb.AppendLine($"  <p>Xin chào <strong>{WebUtility.HtmlEncode(order.CustomerName)}</strong>,</p>");
+            sb.AppendLine("  <p>Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.</p>");
+            sb.AppendLine("  <hr/>");
+
+            sb.AppendLine("  <h3 style='margin:16px 0 8px'>Thông tin đơn hàng</h3>");
+            sb.AppendLine("  <table style='border-collapse:collapse;width:100%'>");
+            sb.AppendLine("    <tr><td style='padding:6px 0'>Mã đơn hàng:</td><td><strong>" + order.Id + "</strong></td></tr>");
+            sb.AppendLine("    <tr><td style='padding:6px 0'>Ngày đặt:</td><td>" + order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm") + "</td></tr>");
+            sb.AppendLine("    <tr><td style='padding:6px 0'>Người nhận:</td><td>" + WebUtility.HtmlEncode(order.CustomerName) + "</td></tr>");
+            sb.AppendLine("    <tr><td style='padding:6px 0'>Email:</td><td>" + WebUtility.HtmlEncode(order.CustomerEmail ?? "") + "</td></tr>");
+            sb.AppendLine("    <tr><td style='padding:6px 0'>Số điện thoại:</td><td>" + WebUtility.HtmlEncode(order.CustomerPhone ?? "") + "</td></tr>");
+            sb.AppendLine("    <tr><td style='padding:6px 0'>Địa chỉ giao hàng:</td><td>" + WebUtility.HtmlEncode(order.ShippingAddress ?? "") + "</td></tr>");
+            sb.AppendLine("  </table>");
+
+            sb.AppendLine("  <h3 style='margin:16px 0 8px'>Sản phẩm</h3>");
+            sb.AppendLine("  <table style='border-collapse:collapse;width:100%'>");
+            sb.AppendLine("    <thead>");
+            sb.AppendLine("      <tr>");
+            sb.AppendLine("        <th style='text-align:left;border-bottom:1px solid #ddd;padding:8px 0'>Sản phẩm</th>");
+            sb.AppendLine("        <th style='text-align:center;border-bottom:1px solid #ddd;padding:8px 0'>SL</th>");
+            sb.AppendLine("        <th style='text-align:right;border-bottom:1px solid #ddd;padding:8px 0'>Đơn giá</th>");
+            sb.AppendLine("        <th style='text-align:right;border-bottom:1px solid #ddd;padding:8px 0'>Thành tiền</th>");
+            sb.AppendLine("      </tr>");
+            sb.AppendLine("    </thead>");
+            sb.AppendLine("    <tbody>");
+
+            foreach (var ci in itemsInCart)
+            {
+                var name = ci.Product?.Name ?? $"SP#{ci.ProductId}";
+                var lineTotal = ci.UnitPrice * ci.Quantity;
+                sb.AppendLine("      <tr>");
+                sb.AppendLine("        <td style='padding:6px 0'>" + WebUtility.HtmlEncode(name) + "</td>");
+                sb.AppendLine("        <td style='text-align:center;padding:6px 0'>" + ci.Quantity + "</td>");
+                sb.AppendLine("        <td style='text-align:right;padding:6px 0'>" + FormatVnd(ci.UnitPrice) + "</td>");
+                sb.AppendLine("        <td style='text-align:right;padding:6px 0'>" + FormatVnd(lineTotal) + "</td>");
+                sb.AppendLine("      </tr>");
+            }
+
+            sb.AppendLine("    </tbody>");
+            sb.AppendLine("  </table>");
+
+            sb.AppendLine("  <div style='margin-top:12px;text-align:right'>");
+            sb.AppendLine("    <div><span style='display:inline-block;min-width:140px'>Tạm tính:</span> <strong>" + FormatVnd(order.TotalAmount) + "</strong></div>");
+            // Nếu bạn có phí ship trong Order, cộng thêm dòng ở đây
+            // sb.AppendLine("    <div><span style='display:inline-block;min-width:140px'>Phí vận chuyển:</span> <strong>" + FormatVnd(order.ShippingFee) + "</strong></div>");
+            // sb.AppendLine("    <div><span style='display:inline-block;min-width:140px'>Tổng cộng:</span> <strong>" + FormatVnd(order.TotalAmount + order.ShippingFee) + "</strong></div>");
+            sb.AppendLine("  </div>");
+
+            sb.AppendLine("  <p style='margin-top:16px'>Phương thức thanh toán: <strong>" + WebUtility.HtmlEncode(order.PaymentMethod.ToString()) + "</strong></p>");
+            if (!string.IsNullOrWhiteSpace(order.Note))
+            {
+                sb.AppendLine("  <p>Ghi chú: " + WebUtility.HtmlEncode(order.Note) + "</p>");
+            }
+
+            sb.AppendLine("  <hr/>");
+            sb.AppendLine("  <p>Mọi thắc mắc vui lòng phản hồi email này hoặc liên hệ CSKH của chúng tôi.</p>");
+            sb.AppendLine("</div>");
+            return sb.ToString();
+        }
+        private static string FormatVnd(decimal n)
+    => string.Format(new CultureInfo("vi-VN"), "{0:#,0} ₫", n);
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

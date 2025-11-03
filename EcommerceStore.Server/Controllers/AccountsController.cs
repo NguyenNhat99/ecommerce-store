@@ -24,7 +24,8 @@ namespace EcommerceStore.Server.Controllers
         /// http 201 CreatedAtAction: Khi đăng ký tài khoản thành công
         /// http 500: xảy ra lỗi server hoặc không xác định
         /// </returns>
-        [HttpPost("auth/singup")]
+        [HttpPost("auth/signup")]
+       [AllowAnonymous]
         public async Task<IActionResult> SignUp(SignUpModel model)
         {
             try

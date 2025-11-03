@@ -16,7 +16,7 @@ var MyCors = "_MyCors";
 builder.Services.AddCors(opts =>
 {
     opts.AddPolicy(MyCors, p => p
-        .WithOrigins("http://localhost:5173", "https://localhost:5173")
+        .WithOrigins("https://localhost:5173", "https://localhost:5173")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials() 
@@ -82,7 +82,6 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.Configure<VnPayOptions>(builder.Configuration.GetSection("VnPay"));
 
-
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -94,19 +93,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// 2) Bắt buộc chuyển HTTPS trước khi set cookie có Secure
 app.UseHttpsRedirection();
 
-// 3) Bật CORS (cho phép cookie cross-site)
+// Thêm routing rõ ràng (giúp định vị điểm đặt CORS)
+app.UseRouting();
+
+// ĐẶT CORS Ở ĐÂY
 app.UseCors(MyCors);
 
-// 4) Middleware đảm bảo có cookie cart_id cho khách ẩn danh
+// Middleware cookie tuỳ chỉnh của bạn
 app.Use(async (ctx, next) =>
 {
     const string CartCookie = "cart_id";
     if (!ctx.Request.Cookies.ContainsKey(CartCookie))
     {
-        // tạo id và set cookie với SameSite=None để XHR cross-site gửi lại
         var id = Guid.NewGuid().ToString("N");
         ctx.Response.Cookies.Append(
             CartCookie,
@@ -114,8 +114,8 @@ app.Use(async (ctx, next) =>
             new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,                 // bắt buộc khi SameSite=None
-                SameSite = SameSiteMode.None,  // quan trọng cho cross-site XHR
+                Secure = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.UtcNow.AddDays(30)
             }
         );
@@ -128,4 +128,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapFallbackToFile("/index.html");
+
 app.Run();

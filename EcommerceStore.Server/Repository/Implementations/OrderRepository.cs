@@ -225,7 +225,7 @@ namespace EcommerceStore.Server.Repository.Implementations
             return (dto, paymentUrl);
         }
 
-        private static string BuildOrderEmailHtml(Order order, IEnumerable<CartItem> itemsInCart)
+        public static string BuildOrderEmailHtml(Order order, IEnumerable<CartItem> itemsInCart)
         {
             var sb = new StringBuilder();
             sb.AppendLine("<div style='font-family:Segoe UI,Arial,sans-serif;font-size:14px;color:#222'>");
